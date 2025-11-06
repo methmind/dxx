@@ -1,0 +1,12 @@
+[submodule "external/luajit"]
+	path = external/luajit
+	url = https://luajit.org/git/luajit.git
+[submodule "external/imgui"]
+	path = external/imgui
+	url = https://github.com/ocornut/imgui.git
+[submodule "external/nlohmann"]
+	path = external/nlohmann
+	url = https://github.com/nlohmann/json.git
+[submodule "external/sol"]
+	path = external/sol
+	url = https://github.com/ThePhD/sol2.git
