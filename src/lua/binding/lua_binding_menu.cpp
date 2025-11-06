@@ -131,7 +131,7 @@ namespace lua::binding
         }
 
         const auto luaPath = GetScriptPath(state.lua_state());
-        if (!luaPath.has_value()) {
+        if (luaPath.empty()) {
             luaL_error(state.lua_state(), "Unable to find lua path");
             __builtin_unreachable();
         }
@@ -148,7 +148,7 @@ namespace lua::binding
         std::invoke(std::forward<decltype(customizer)>(customizer), newWidget);
 
         std::dynamic_pointer_cast<gui::C_IContainer>(parent)->addChild(newWidget);
-        if (!luaContainer->bindWidget(*luaPath, newWidget)) {
+        if (!luaContainer->bindWidget(luaPath, newWidget)) {
             luaL_error(state.lua_state(), "Unable to bind widget");
             __builtin_unreachable();
         }

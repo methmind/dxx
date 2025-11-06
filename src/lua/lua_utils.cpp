@@ -6,12 +6,11 @@
 
 namespace lua
 {
-    std::optional<std::string> GetScriptPath(lua_State *L)
+    std::string GetScriptPath(lua_State* L)
     {
         lua_Debug ar;
         std::string script_name;
-        int level = 1;
-        int max_level = 0;
+        int level = 1, max_level = 0;
 
         while (lua_getstack(L, level, &ar)) {
             ++level;
@@ -23,10 +22,6 @@ namespace lua
             if (ar.source && ar.source[0] == '@') {
                 script_name = ar.source + 1;
             }
-        }
-
-        if (script_name.empty()) {
-            return std::nullopt;
         }
 
         return script_name;
