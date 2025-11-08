@@ -3,11 +3,13 @@ project(dxx_dlc)
 
 set(CMAKE_CXX_STANDARD 20)
 
+file(GLOB_RECURSE minhook_files "./external/minhook/src/*.c")
+
 add_definitions(-DDEBUG_OUTPUT)
 
 add_compile_options(-Wa,-mbig-obj)
 
-add_executable(dxx_dlc main.cpp
+add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         external/imgui/backends/imgui_impl_dx11.cpp
         external/imgui/backends/imgui_impl_win32.cpp
         external/imgui/imgui.cpp
@@ -80,6 +82,21 @@ add_executable(dxx_dlc main.cpp
         src/gui/widget/gui_widget_lua_list.h
         src/config/config.cpp
         src/config/config.h
+        src/application.cpp
+        src/application.h
+        src/bootstrap/bootstrap_gui.cpp
+        src/bootstrap/bootstrap_gui.h
+        src/dx/dx_present.cpp
+        src/dx/dx_present.h
+        src/hook/hook_dispatcher.cpp
+        src/hook/hook_dispatcher.h
+        src/hook/hook_manager.cpp
+        src/hook/hook_manager.h
+        src/hook/impl/hook_impl_present.cpp
+        src/hook/impl/hook_impl_present.h
+        src/hook/hook_original_invoker.h
+        src/renderer/renderer.cpp
+        src/renderer/renderer.h
 )
 
 target_compile_definitions(dxx_dlc PRIVATE SOL_ALL_SAFETIES_ON=1 SOL_PRINT_ERRORS=1 SOL_EXCEPTIONS_SAFE_PROPAGATION=1)
@@ -91,6 +108,7 @@ target_include_directories(dxx_dlc PUBLIC
         "external/luajit/src/"
         "external/sol/single/single/include/"
         "external/nlohmann/single_include/"
+        "external/minhook/include/"
         "src/"
         "."
 )

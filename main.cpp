@@ -2,7 +2,9 @@
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx11.h>
 #include <d3d11.h>
+#include <thread>
 
+#include "application.h"
 #include "bootstrap/application_builder.h"
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
@@ -107,12 +109,6 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         return 0;
     }
     return ::DefWindowProcW(hWnd, msg, wParam, lParam);
-}
-
-extern "C" {
-    #include "lua.h"
-    #include "lauxlib.h"
-    #include "lualib.h"
 }
 
 int main(int, char**)
@@ -270,4 +266,29 @@ int main(int, char**)
     ::UnregisterClassW(wc.lpszClassName, wc.hInstance);
 
     return 0;
+}
+
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, [[maybe_unused]] LPVOID lpvReserved)
+{
+    static auto core = std::make_unique<app::C_Application>();
+
+    switch(fdwReason)
+    {
+        case DLL_PROCESS_ATTACH: {
+            if (!DisableThreadLibraryCalls(hinstDLL)) {
+                dbg("DisableThreadLibraryCalls got:err = %d", GetLastError());
+                return false;
+            }
+
+            std::thread([hinstDLL]{ core->entry(hinstDLL); }).detach();
+            break;
+        }
+        case DLL_PROCESS_DETACH: {
+            core->dispose();
+            break;
+        }
+        default: { break; }
+    }
+
+    return TRUE;
 }

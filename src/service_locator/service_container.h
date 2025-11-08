@@ -12,6 +12,8 @@
 
 namespace detail
 {
+    constexpr char PATTERN_PROLOG[] = "T = ";
+
     constexpr uint64_t fnv1a(const std::string_view str)
     {
         uint64_t hash = 14695981039346656037ULL;
@@ -25,16 +27,9 @@ namespace detail
     template<typename T>
     consteval auto type_name_impl()
     {
-#if defined(__GNUC__) || defined(__clang__)
         std::string_view name = __PRETTY_FUNCTION__;
-        constexpr std::string_view prefix = "consteval auto detail::type_name_impl() [with T = ";
-        constexpr std::string_view suffix = "]";
-#elif defined(_MSC_VER)
-        std::string_view name = __FUNCSIG__;
-        constexpr std::string_view prefix = "auto __cdecl detail::type_name_impl<";
-        constexpr std::string_view suffix = ">(void)";
-#endif
-        return std::string_view(name.begin() + prefix.size(), name.end() - suffix.size());
+        size_t start = name.find(PATTERN_PROLOG) + (std::size(PATTERN_PROLOG) - 1), end = name.find(']', start);
+        return std::string_view(name.data() + start, end - start);
     }
 }
 
