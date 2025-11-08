@@ -36,7 +36,8 @@ namespace render
         bool initialize();
 
         explicit C_Renderer(const std::shared_ptr<gui::C_IWidget>& root) :
-            guiRoot_(root), contextInited_(false), targetWindowHandle_(nullptr) {}
+            guiRoot_(root), contextInited_(false), targetWindowHandle_(nullptr),
+            d3dContext_(nullptr), renderTargetView_(nullptr) {}
 
         ~C_Renderer();
     };

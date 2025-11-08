@@ -15,9 +15,9 @@
 
 namespace app
 {
-    bool C_Application::entry([[maybe_unused]] HMODULE hModule)
+    bool C_Application::entry(HMODULE hModule)
     {
-        MessageBoxA(0, 0,0,0);
+        MessageBoxA(nullptr, "Press F to pay respect", nullptr, 0);
 
         if (this->disposeEvent_ = CreateEventW(nullptr, FALSE, FALSE, nullptr); !this->disposeEvent_) {
             dbg("CreateEvent got:err = %d", GetLastError());

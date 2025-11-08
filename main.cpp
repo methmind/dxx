@@ -1,7 +1,7 @@
 #include <thread>
 #include "application.h"
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, [[maybe_unused]] LPVOID lpvReserved)
+BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     static auto core = std::make_unique<app::C_Application>();
 
