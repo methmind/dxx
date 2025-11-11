@@ -2,7 +2,7 @@
 // Created by sexey on 07.11.2025.
 //
 
-#include "bootstrap_gui.h"
+#include "application_builder.h"
 
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
@@ -11,7 +11,7 @@
 
 namespace bootstrap
 {
-    bool InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& services)
+    bool C_ApplicationBuilder::InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& services)
     {
         const auto guiRegedit = services->get<gui::C_WidgetRegedit>();
         const auto guiRootObject = std::dynamic_pointer_cast<gui::widget::C_WidgetRoot>(

@@ -1,5 +1,6 @@
 #include <thread>
 #include "application.h"
+#include "debug/debug_output.h"
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {

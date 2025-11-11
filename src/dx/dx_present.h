@@ -12,7 +12,7 @@ namespace dx
 {
     constexpr auto WND_TARGET_NAME = L"Dota 2";
 
-    constexpr auto IDXGI_PRESENT_VTABLE_INDEX = 8;
+    constexpr auto IDXGI_PRESENT_VMT_INDEX = 8;
 
     constexpr D3D_FEATURE_LEVEL FEATURE_LEVELS[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
 

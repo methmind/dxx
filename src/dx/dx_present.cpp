@@ -40,7 +40,7 @@ namespace dx
         }
 
         const auto vtable = *reinterpret_cast<void***>(swapChain);
-        const auto presentFunction = vtable[IDXGI_PRESENT_VTABLE_INDEX];
+        const auto presentFunction = vtable[IDXGI_PRESENT_VMT_INDEX];
 
         swapChain->Release();
         device->Release();

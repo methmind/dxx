@@ -5,10 +5,7 @@
 #ifndef DXX_DLC_CORE_H
 #define DXX_DLC_CORE_H
 
-#include <memory>
 #include <windows.h>
-
-#include "bootstrap/application_builder.h"
 
 namespace app
 {

@@ -4,26 +4,31 @@
 
 #include "application_builder.h"
 
-#include "bootstrap_gui.h"
-#include "MinHook.h"
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
-#include "gui/widget/gui_widget_checkbox.h"
 #include "gui/widget/gui_widget_root.h"
 #include "home/home_directory.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_manager.h"
+#include "input/bind_system.h"
 #include "lua/lua_script_manager.h"
 #include "renderer/renderer.h"
+#include "sdk/dota_view_render.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
 REGISTER_GLOBAL_SERVICE(hook::C_HookDispatcher);
+REGISTER_GLOBAL_SERVICE(input::C_BindSystem);
 
 namespace bootstrap
 {
     std::shared_ptr<C_ServiceContainer> C_ApplicationBuilder::Build()
     {
+        if (!C_ServiceLocator::getInstance<sdk::C_DotaViewRender>()->initialize()) {
+            dbg("Unable to initialize sdk::C_DotaViewRender");
+            return nullptr;
+        }
+
         auto container = std::make_shared<C_ServiceContainer>();
         if (!container->add<hook::C_HookManager>()->initialize()) {
             dbg("Unable to initialize hooks!");

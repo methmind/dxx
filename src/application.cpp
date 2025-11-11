@@ -5,12 +5,10 @@
 #include "application.h"
 
 #include "bootstrap/application_builder.h"
-#include "bootstrap/bootstrap_gui.h"
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
 #include "hook/hook_manager.h"
-#include "menu/menu_main_form.h"
 #include "menu/menu_settings_form.h"
 
 namespace app

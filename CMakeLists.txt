@@ -85,7 +85,6 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/application.cpp
         src/application.h
         src/bootstrap/bootstrap_gui.cpp
-        src/bootstrap/bootstrap_gui.h
         src/dx/dx_present.cpp
         src/dx/dx_present.h
         src/hook/hook_dispatcher.cpp
@@ -97,7 +96,23 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/hook/hook_original_invoker.h
         src/renderer/renderer.cpp
         src/renderer/renderer.h
+        src/input/bind_system.cpp
+        src/input/bind_system.h
+        src/sdk/dota_view_render.cpp
+        src/sdk/dota_view_render.h
+        external/mem_scanner/src/CpuInfo.cpp
+        external/mem_scanner/src/backends/Avx2.cpp
+        external/mem_scanner/src/backends/Scalar.cpp
+        external/mem_scanner/src/backends/Sse42.cpp
+        external/mem_scanner/src/backends/StdFind.cpp
+        src/memory/pattern_scanner.cpp
+        src/memory/pattern_scanner.h
+        src/sdk/sdk_signature.h
+        src/hook/impl/hook_impl_on_render_start.cpp
+        src/hook/impl/hook_impl_on_render_start.h
 )
+
+target_compile_options(dxx_dlc PRIVATE -mavx2)
 
 target_compile_definitions(dxx_dlc PRIVATE SOL_ALL_SAFETIES_ON=1 SOL_PRINT_ERRORS=1 SOL_EXCEPTIONS_SAFE_PROPAGATION=1)
 
@@ -109,6 +124,7 @@ target_include_directories(dxx_dlc PUBLIC
         "external/sol/single/single/include/"
         "external/nlohmann/single_include/"
         "external/minhook/include/"
+        "external/mem_scanner/include"
         "src/"
         "."
 )

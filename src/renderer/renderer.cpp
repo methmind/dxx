@@ -12,6 +12,7 @@
 #include "imgui_impl_win32.h"
 #include "debug/debug_output.h"
 #include "hook/hook_dispatcher.h"
+#include "input/bind_system.h"
 #include "service_locator/service_locator.h"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -22,8 +23,13 @@ namespace render
 
     LRESULT C_Renderer::hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
-        if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam) > 0)
+        if (uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN) {
+            C_ServiceLocator::getInstance<input::C_BindSystem>()->invokeBindings(static_cast<uint8_t>(wParam));
+        }
+
+        if (ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam) > 0) {
             return 1L;
+        }
 
         return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
     }

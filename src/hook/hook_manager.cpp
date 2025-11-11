@@ -7,7 +7,10 @@
 #include "MinHook.h"
 #include "debug/debug_output.h"
 #include "dx/dx_present.h"
+#include "impl/hook_impl_on_render_start.h"
 #include "impl/hook_impl_present.h"
+#include "sdk/dota_view_render.h"
+#include "service_locator/service_locator.h"
 
 namespace hook
 {
@@ -27,6 +30,14 @@ namespace hook
         if (const auto err = MH_CreateHook(reinterpret_cast<void*>(presentFunction),
             reinterpret_cast<void*>(impl::hkPresent), nullptr); err != MH_OK) {
             dbg("Unable to create hook for IDXGISwapChain::Present! err = %d", err);
+            return false;
+        }
+
+        const auto onRenderStart = C_ServiceLocator::getInstance<sdk::C_DotaViewRender>()->onRenderStart();
+
+        if (const auto err = MH_CreateHook(reinterpret_cast<void*>(onRenderStart),
+            reinterpret_cast<void*>(impl::hkOnRenderStart), nullptr); err != MH_OK) {
+            dbg("Unable to create hook for C_DotaViewRender::OnRenderStart! err = %d", err);
             return false;
         }
 

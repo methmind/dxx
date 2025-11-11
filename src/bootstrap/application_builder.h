@@ -11,6 +11,10 @@ namespace bootstrap
 {
     class C_ApplicationBuilder
     {
+    private:
+
+        static bool InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& container);
+
     public:
         static std::shared_ptr<C_ServiceContainer> Build();
     };
