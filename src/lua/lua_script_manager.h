@@ -7,18 +7,23 @@
 
 #include "lua_script_engine.h"
 #include "lua_script_instance.h"
-#include "binding/lua_container_interface.h"
+#include "lua_container_interface.h"
 
 namespace lua
 {
-    class C_LuaScriptManager : public binding::C_ILuaContainer, public std::enable_shared_from_this<C_LuaScriptManager>
+    class C_LuaScriptManager : public C_ILuaContainer, public std::enable_shared_from_this<C_LuaScriptManager>
     {
     private:
-        C_LuaScriptEngine engine_;
+        std::shared_ptr<C_LuaScriptEngine> engine_;
         std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
         std::unordered_map<std::string_view, std::unique_ptr<C_LuaScriptInstance>> scripts_;
 
-        bool bindWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget) override;
+        /*
+         * Предполагаем, что lua state уже залочен на момент вызова этой функции.
+         * Ибо это вызывается уже из контекста lua интерпретатора.
+         * Не хочу использовать std::recursive_mutex...
+         */
+        bool bindGuiWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget) override;
 
     public:
 
@@ -31,6 +36,7 @@ namespace lua
         bool initialize();
 
         explicit C_LuaScriptManager(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit) :
+            engine_(std::make_shared<C_LuaScriptEngine>()),
             widgetRegedit_(widgetRegedit) {}
 
         ~C_LuaScriptManager() override = default;

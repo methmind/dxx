@@ -27,6 +27,7 @@ namespace gui
         void addChild(const widget_ptr_t& child)
         {
             child->setParent(weak_from_this());
+
             this->childList_.push_back(child);
         }
 

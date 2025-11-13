@@ -5,18 +5,24 @@
 #ifndef LUA_SCRIPT_ENGINE_H
 #define LUA_SCRIPT_ENGINE_H
 
+#include <mutex>
+#include <shared_mutex>
+
 #include "binding/lua_binding_menu.h"
-#include "binding/lua_container_interface.h"
+#include "lua_container_interface.h"
+#include "lua_syncer_interface.h"
 #include "gui/gui_widget_regedit.h"
 
 namespace lua
 {
-    class C_LuaScriptEngine
+    class C_LuaScriptEngine : public C_ILuaSyncerInterface, public std::enable_shared_from_this<C_LuaScriptEngine>
     {
     private:
         sol::state luaState_;
+        lua_sync_primitive_t luaStateMutex_;
+
         std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
-        std::weak_ptr<binding::C_ILuaContainer> luaContainer_;
+        std::weak_ptr<C_ILuaContainer> luaContainer_;
 
         bool applyBindings();
 
@@ -26,8 +32,10 @@ namespace lua
 
     public:
 
+        lua_state_locker_t luaStateLocker() override { return lua_state_locker_t(this->luaStateMutex_); }
+
         bool initialize(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-            const std::weak_ptr<binding::C_ILuaContainer>& luaContainer);
+            const std::weak_ptr<C_ILuaContainer>& luaContainer);
 
         sol::state& getLuaState() { return this->luaState_; }
 

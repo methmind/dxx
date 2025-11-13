@@ -2,7 +2,7 @@
 // Created by sexey on 11.11.2025.
 //
 
-#include "dota_view_render.h"
+#include "sdk_dota_view_render.h"
 
 #include "sdk_signature.h"
 #include "debug/debug_output.h"

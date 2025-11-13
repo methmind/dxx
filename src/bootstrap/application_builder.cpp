@@ -7,13 +7,13 @@
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
-#include "home/home_directory.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_manager.h"
 #include "input/bind_system.h"
 #include "lua/lua_script_manager.h"
 #include "renderer/renderer.h"
-#include "sdk/dota_view_render.h"
+#include "sdk/sdk_dota_view_render.h"
+#include "sdk/sdk_source2_client.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
@@ -26,6 +26,11 @@ namespace bootstrap
     {
         if (!C_ServiceLocator::getInstance<sdk::C_DotaViewRender>()->initialize()) {
             dbg("Unable to initialize sdk::C_DotaViewRender");
+            return nullptr;
+        }
+
+        if (!C_ServiceLocator::getInstance<sdk::C_Source2Client>()->initialize()) {
+            dbg("Unable to initialize sdk::C_Source2Client");
             return nullptr;
         }
 

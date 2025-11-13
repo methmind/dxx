@@ -5,11 +5,14 @@
 #ifndef DXX_DLC_HOOK_IMPL_ON_RENDER_START_H
 #define DXX_DLC_HOOK_IMPL_ON_RENDER_START_H
 
-#include "sdk/dota_view_render.h"
+#include <string>
+#include "sdk/sdk_dota_view_render.h"
 
 namespace hook::impl
 {
-    void hkOnRenderStart(sdk::C_DotaViewRender* self);
+    constexpr std::string ON_RENDER_START_HOOK_SID = "on_render_start";
+
+    void __fastcall hkOnRenderStart(sdk::C_DotaViewRender* self);
 } // hook
 
 #endif //DXX_DLC_HOOK_IMPL_ON_RENDER_START_H

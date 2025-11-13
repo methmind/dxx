@@ -13,7 +13,7 @@ namespace hook::impl
     HRESULT hkPresent(IDXGISwapChain* self, UINT sync_interval, UINT flags)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke(
-            hook_type_e::PRESENT, self, sync_interval, flags
+            PRESENT_HOOK_SID, self, sync_interval, flags
         );
 
         return MH_CALL_ORIGINAL(hkPresent)(self, sync_interval, flags);

@@ -6,8 +6,10 @@
 
 #include <format>
 
+#include "binding/lua_binding_hook.h"
 #include "binding/lua_binding_menu.h"
 #include "debug/debug_output.h"
+#include "script/callback_api.h"
 
 namespace lua
 {
@@ -16,6 +18,11 @@ namespace lua
         const auto lockPtr = this->luaContainer_.lock();
         if (!lockPtr) {
             dbg("Unable to get shared ptr for lua container!");
+            return false;
+        }
+
+        if (!binding::RegisterHookApi(this->luaState_, weak_from_this())) {
+            dbg("binding::RegisterHookApi got:err = Unable to apply hooks api!");
             return false;
         }
 
@@ -63,7 +70,7 @@ namespace lua
     }
 
     bool C_LuaScriptEngine::initialize(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-        const std::weak_ptr<binding::C_ILuaContainer>& luaContainer)
+                                       const std::weak_ptr<C_ILuaContainer>& luaContainer)
     {
         try {
             this->widgetRegedit_ = widgetRegedit;
@@ -89,6 +96,12 @@ namespace lua
 
             if (!applyBindings()) {
                 dbg("Unable to apply api bindings to lua engine!");
+                return false;
+            }
+
+            if (const auto callbackAPI = this->luaState_.safe_script(script::CALLBACK_API_SCRIPT);
+                !callbackAPI.valid()) {
+                dbg("Unable to load callback api script!");
                 return false;
             }
 

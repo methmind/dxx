@@ -2,8 +2,8 @@
 // Created by sexey on 11.11.2025.
 //
 
-#ifndef DXX_DLC_DOTA_VIEW_RENDER_H
-#define DXX_DLC_DOTA_VIEW_RENDER_H
+#ifndef DXX_DLC_SDK_DOTA_VIEW_RENDER_H
+#define DXX_DLC_SDK_DOTA_VIEW_RENDER_H
 #include "MinHook.h"
 
 namespace sdk
@@ -29,4 +29,4 @@ namespace sdk
     };
 } // sdk
 
-#endif //DXX_DLC_DOTA_VIEW_RENDER_H
+#endif //DXX_DLC_SDK_DOTA_VIEW_RENDER_H

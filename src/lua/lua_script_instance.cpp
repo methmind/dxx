@@ -8,6 +8,8 @@ namespace lua
 {
     void C_LuaScriptInstance::addWidget(const gui::widget_ptr_t& widget)
     {
+        std::lock_guard lock_(this->widgetsMutex_);
+
         this->widgets_.push_back(widget);
     }
 

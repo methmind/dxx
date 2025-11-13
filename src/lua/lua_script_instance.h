@@ -15,11 +15,16 @@ namespace lua
 {
     constexpr auto LUA_ENTRY_FUNCTION_NAME = "lua_entry";
 
+    constexpr std::string ON_LUA_DISPOSE_HOOK_SID  = "on_lua_dispose";
+
     class C_LuaScriptInstance
     {
     private:
         sol::protected_function entryPoint_;
+
         std::list<gui::widget_ptr_t> widgets_;
+        std::mutex widgetsMutex_;
+
         std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
 
     public:

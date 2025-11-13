@@ -68,7 +68,7 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/menu/menu_form_interface.h
         src/menu/menu_settings_form_designer.cpp
         src/menu/menu_settings_form_designer.h
-        src/lua/binding/lua_container_interface.h
+        src/lua/lua_container_interface.h
         src/lua/lua_utils.cpp
         src/lua/lua_utils.h
         src/gui/widget/gui_widget_windows_container.cpp
@@ -98,8 +98,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/renderer/renderer.h
         src/input/bind_system.cpp
         src/input/bind_system.h
-        src/sdk/dota_view_render.cpp
-        src/sdk/dota_view_render.h
+        src/sdk/sdk_dota_view_render.cpp
+        src/sdk/sdk_dota_view_render.h
         external/mem_scanner/src/CpuInfo.cpp
         external/mem_scanner/src/backends/Avx2.cpp
         external/mem_scanner/src/backends/Scalar.cpp
@@ -110,6 +110,14 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/sdk_signature.h
         src/hook/impl/hook_impl_on_render_start.cpp
         src/hook/impl/hook_impl_on_render_start.h
+        src/sdk/interface/sdk_interface_scanner.cpp
+        src/sdk/interface/sdk_interface_scanner.h
+        src/sdk/sdk_source2_client.cpp
+        src/sdk/sdk_source2_client.h
+        src/lua/script/callback_api.h
+        src/lua/binding/lua_binding_hook.cpp
+        src/lua/binding/lua_binding_hook.h
+        src/lua/lua_syncer_interface.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)
@@ -125,6 +133,7 @@ target_include_directories(dxx_dlc PUBLIC
         "external/nlohmann/single_include/"
         "external/minhook/include/"
         "external/mem_scanner/include"
+        "external/xenium/"
         "src/"
         "."
 )

@@ -9,7 +9,7 @@
 #include "dx/dx_present.h"
 #include "impl/hook_impl_on_render_start.h"
 #include "impl/hook_impl_present.h"
-#include "sdk/dota_view_render.h"
+#include "sdk/sdk_dota_view_render.h"
 #include "service_locator/service_locator.h"
 
 namespace hook

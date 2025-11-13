@@ -6,6 +6,7 @@
 #define GUI_WIDGET_REGEDIT_H
 
 #include <memory>
+#include <shared_mutex>
 #include <string_view>
 #include <unordered_map>
 
@@ -17,6 +18,7 @@ namespace gui
     {
     private:
         std::unordered_map<std::string_view, widget_ptr_t> widgets_;
+        std::shared_mutex mutex_;
 
     public:
 
@@ -28,7 +30,7 @@ namespace gui
 
         void remove(const std::string_view& id);
 
-        widget_list_t list() const { return this->widgets_; }
+        widget_list_t list();
 
         template<typename widget_t, typename ... args_t>
         widget_ptr_t createWidget(args_t&& ... args)

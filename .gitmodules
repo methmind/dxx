@@ -13,3 +13,6 @@
 [submodule "external/mem_scanner"]
 	path = external/mem_scanner
 	url = https://github.com/localcc/LightningScanner.git
+[submodule "external/xenium"]
+	path = external/xenium
+	url = https://github.com/mpoeter/xenium.git

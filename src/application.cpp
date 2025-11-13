@@ -10,6 +10,7 @@
 #include "gui/widget/gui_widget_root.h"
 #include "hook/hook_manager.h"
 #include "menu/menu_settings_form.h"
+#include "sdk/interface/sdk_interface_scanner.h"
 
 namespace app
 {

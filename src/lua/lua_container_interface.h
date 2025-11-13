@@ -7,13 +7,13 @@
 
 #include "gui/gui_widget_interface.h"
 
-namespace lua::binding
+namespace lua
 {
     class C_ILuaContainer
     {
     public:
 
-        virtual bool bindWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget) = 0;
+        virtual bool bindGuiWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget) = 0;
 
         virtual ~C_ILuaContainer() = default;
     };
