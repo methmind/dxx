@@ -36,7 +36,7 @@ namespace lua
         }
 
         for (const auto& widget : this->widgets_) {
-            this->widgetRegedit_->remove(widget->getID().c_str());
+            this->widgetRegedit_->remove(widget->getID());
         }
     }
 } // lua

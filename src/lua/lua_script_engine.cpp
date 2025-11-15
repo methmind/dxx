@@ -15,18 +15,13 @@ namespace lua
 {
     bool C_LuaScriptEngine::applyBindings()
     {
-        const auto lockPtr = this->luaContainer_.lock();
-        if (!lockPtr) {
-            dbg("Unable to get shared ptr for lua container!");
-            return false;
-        }
-
-        if (!binding::RegisterHookApi(this->luaState_, weak_from_this())) {
+        const auto self = weak_from_this();
+        if (!binding::RegisterHookApi(self)) {
             dbg("binding::RegisterHookApi got:err = Unable to apply hooks api!");
             return false;
         }
 
-        if (!binding::RegisterMenuApi(this->luaState_, this->widgetRegedit_, lockPtr)) {
+        if (!binding::RegisterMenuApi(self, this->widgetRegedit_, this->luaContainer_.lock())) {
             dbg("binding::RegisterMenuApi got:err = Unable to apply menu api binding!");
             return false;
         }
@@ -41,10 +36,10 @@ namespace lua
         return sol::stack::push(L, description);
     }
 
-    void C_LuaScriptEngine::printOverride(sol::variadic_args args) const
+    void C_LuaScriptEngine::PrintOverride(sol::this_state state, sol::variadic_args args)
     {
-        sol::state_view lua_state = this->luaState_;
-        const sol::protected_function tostring = lua_state["tostring"];
+        sol::state_view lua(state);
+        const sol::protected_function tostring = lua["tostring"];
         std::string output;
         bool first = true;
         for (auto arg : args) {
@@ -75,7 +70,16 @@ namespace lua
         try {
             this->widgetRegedit_ = widgetRegedit;
             this->luaContainer_ = luaContainer;
-            this->luaState_.open_libraries(
+
+            // SAFETY: Инициализация вызывается ТОЛЬКО один раз из одного потока
+            // ПЕРЕД тем как другие потоки получат доступ к luaState_.
+            // Handle жив на протяжении всей инициализации, поэтому ссылка валидна.
+            #pragma clang diagnostic push
+            #pragma clang diagnostic ignored "-Wdangling"
+            auto& luaState = *this->luaState_.lock();
+            #pragma clang diagnostic pop
+
+            luaState.open_libraries(
                 sol::lib::base,
                 sol::lib::package,
                 sol::lib::coroutine,
@@ -89,18 +93,19 @@ namespace lua
                 sol::lib::ffi
             );
 
-            this->luaState_.set_exception_handler(ExceptionHandler);
-            this->luaState_.set_function("print", [this](sol::variadic_args args) {
-                printOverride(std::move(args));
+            luaState.set_exception_handler(ExceptionHandler);
+            luaState.set_function("print", [](sol::this_state state, sol::variadic_args args) {
+                PrintOverride(state, std::move(args));
             });
+
 
             if (!applyBindings()) {
                 dbg("Unable to apply api bindings to lua engine!");
                 return false;
             }
 
-            if (const auto callbackAPI = this->luaState_.safe_script(script::CALLBACK_API_SCRIPT);
-                !callbackAPI.valid()) {
+            if (const auto callbackAPI = luaState.require_script(script::CALLBACK_API_CHUNK_NAME,
+                script::CALLBACK_API_SCRIPT); !callbackAPI.valid()) {
                 dbg("Unable to load callback api script!");
                 return false;
             }

@@ -8,6 +8,7 @@
 #include <functional>
 #include <xenium/harris_michael_hash_map.hpp>
 #include <xenium/reclamation/generic_epoch_based.hpp>
+#include "cs_lr_guarded.h"
 
 #include "debug/debug_output.h"
 
@@ -15,7 +16,7 @@ namespace hook
 {
     constexpr auto MAX_BUCKET_SIZE = 32;
 
-    using hook_sid_t = std::string;
+    using hook_id_t = uint16_t;
 
     class C_HookDispatcher
     {
@@ -35,31 +36,24 @@ namespace hook
         template<typename ... arg_t>
         struct callback_holder_s final : callback_holder_base_s {
             std::function<void(arg_t...)> fn;
-            bool isAllowUnsafeCall;
 
             [[nodiscard]] bool isSameType(const std::type_info& other) const override {
                 return *type == other;
             }
 
-            [[nodiscard]] bool isUnsafeAllowed() const override {
-                return this->isAllowUnsafeCall;
-            }
-
-            explicit callback_holder_s(const bool allowUnsafeCall, std::function<void(arg_t...)> fn_) :
-                callback_holder_base_s(typeid(void(*)(arg_t...))), fn(std::move(fn_)),
-                isAllowUnsafeCall(allowUnsafeCall) {}
+            explicit callback_holder_s(std::function<void(arg_t...)> fn_) :
+                callback_holder_base_s(typeid(void(*)(arg_t...))), fn(std::move(fn_)) {}
 
             ~callback_holder_s() override = default;
         };
 
         using callback_vector_t = std::vector<std::shared_ptr<callback_holder_base_s>>;
-        using callback_storage_t = std::shared_ptr<callback_vector_t>;
 
         using callback_map_t = xenium::harris_michael_hash_map<
-            hook_sid_t, std::atomic<callback_storage_t>,
+            hook_id_t, libguarded::lr_guarded<callback_vector_t>,
             xenium::policy::reclaimer<xenium::reclamation::epoch_based<>>,
-            xenium::policy::hash<std::hash<hook_sid_t>>,
-            std::equal_to<hook_sid_t>,
+            xenium::policy::hash<std::hash<hook_id_t>>,
+            std::equal_to<hook_id_t>,
             xenium::policy::buckets<MAX_BUCKET_SIZE>
         >;
 
@@ -68,50 +62,32 @@ namespace hook
     public:
 
         template<typename ... arg_t>
-        void subscribe(const hook_sid_t& type, bool allowUnsafe, std::invocable<arg_t...> auto callback)
+        void subscribe(const hook_id_t type, std::invocable<arg_t...> auto callback)
         {
             auto [it, _] = this->callbacks_.get_or_emplace(type);
-            auto current = it->second.load(std::memory_order_acquire);
+            it->second.modify([callback](callback_vector_t& storage) {
+                storage.push_back(std::make_shared<callback_holder_s<arg_t...>>(
+                    std::function<void(arg_t...)>(std::move(callback))
+                ));
+            });
 
-            while (true) {
-                auto newSlice = current ?
-                    std::make_shared<callback_vector_t>(*current) :
-                    std::make_shared<callback_vector_t>();
-
-                newSlice->push_back(
-                    std::make_shared<callback_holder_s<arg_t...>>(
-                        allowUnsafe, std::function<void(arg_t...)>(std::move(callback))
-                    )
-                );
-
-                if (it->second.compare_exchange_weak(current, newSlice,
-                    std::memory_order_release,
-                    std::memory_order_acquire)
-                ) {
-                    break;
-                }
-            }
-
-            dbg("New listener subscribed to: %s", type.c_str());
+            dbg("New listener subscribed to: %d", type);
         }
 
         template<typename ... arg_t>
-        void invoke(const hook_sid_t& type, const arg_t& ... args) const
+        void invoke(const hook_id_t type, const arg_t& ... args) const
         {
             const auto it = this->callbacks_.find(type);
             if (it == this->callbacks_.end()) {
                 return;
             }
 
-            const auto callbacks = it->second.load(std::memory_order_acquire);
-            if (!callbacks || callbacks->empty()) {
-                return;
-            }
-
+            const auto callbacks = it->second.lock_shared();
             const auto& targetTypeID = typeid(void(*)(arg_t...)); // prob. better than std::dynamic_pointer_cast
+
             for (const auto& holderBase : *callbacks) {
                 try {
-                    if (!holderBase->isUnsafeAllowed() && !holderBase->isSameType(targetTypeID)) {
+                    if (!holderBase->isSameType(targetTypeID)) {
                         throw std::runtime_error("Callback type mismatch!");
                     }
 

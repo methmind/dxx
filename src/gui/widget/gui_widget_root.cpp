@@ -6,10 +6,5 @@
 
 namespace gui::widget
 {
-    void C_WidgetRoot::render()
-    {
-        for (auto& childVector = getChildList(); const auto& child : childVector) {
-            child->render();
-        }
-    }
+
 } // gui

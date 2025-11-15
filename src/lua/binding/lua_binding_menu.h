@@ -7,13 +7,14 @@
 
 #include "lua/lua_container_interface.h"
 #include "gui/gui_widget_regedit.h"
-#include "sol/sol.hpp"
+#include "lua_guarded_state_interface.h"
 
 namespace lua::binding
 {
     constexpr auto MENU_NAMESPACE_NAME = "menu";
 
-    bool RegisterMenuApi(sol::state& state, const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
+    bool RegisterMenuApi(const std::weak_ptr<C_ILuaGuardedState>& syncer,
+        const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
         const std::shared_ptr<C_ILuaContainer>& luaContainer
     );
 } // lua

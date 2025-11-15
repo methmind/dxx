@@ -30,9 +30,7 @@ namespace gui::widget
                 this->isRectInvalidated_ = true;
             }
 
-            for (auto& childVector = getChildList(); const auto& child : childVector) {
-                child->render();
-            }
+            C_IContainer::render();
         }
 
         if (!isStillActive) {

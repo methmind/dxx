@@ -7,6 +7,8 @@
 
 namespace lua::script
 {
+    constexpr std::string CALLBACK_API_CHUNK_NAME = "callback";
+
     constexpr auto CALLBACK_API_SCRIPT = R"(
         -- Callback Registration API with Script ID Tracking
         -- Supports arbitrary number of arguments and callback cleanup
@@ -285,11 +287,12 @@ namespace lua::script
             return stats
         end
 
-        hook.subscribe("on_render_start", function()
+        hook.set_on_render_start(function()
             callback.trigger("on_render_start")
         end)
 
-        hook.subscribe("on_lua_dispose", function(script_id)
+        hook.set_on_lua_dispose(function(script_id)
+            print("Dispose callbacks for: " .. script_id)
             callback.unregister_all_by_script(script_id)
         end)
 

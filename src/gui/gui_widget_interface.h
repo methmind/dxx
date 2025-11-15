@@ -55,6 +55,8 @@ namespace gui
     };
 
     using widget_ptr_t = std::shared_ptr<C_IWidget>;
+
+    using weak_widget_ptr_t = std::weak_ptr<C_IWidget>;
 }
 
 #endif //GUI_WIDGET_INTERFACE_H

@@ -16,8 +16,6 @@ namespace gui::widget
     {
     public:
 
-        void render() override;
-
         explicit C_WidgetRoot() : C_IWidget(ROOT_WIDGET_ID), C_IContainer(ROOT_WIDGET_ID) {}
 
         ~C_WidgetRoot() override = default;

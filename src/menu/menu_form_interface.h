@@ -13,14 +13,13 @@ namespace menu
     {
     public:
 
-        void render() override {
+        void render() override
+        {
             if (!isVisible()) {
                 return;
             }
 
-            for (auto& childVector = getChildList(); const auto& child : childVector) {
-                child->render();
-            }
+            C_IContainer::render();
         }
 
         virtual bool initialize() = 0;

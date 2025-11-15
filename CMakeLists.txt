@@ -117,7 +117,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/lua/script/callback_api.h
         src/lua/binding/lua_binding_hook.cpp
         src/lua/binding/lua_binding_hook.h
-        src/lua/lua_syncer_interface.h
+        src/lua/binding/lua_guarded_state_interface.h
+        src/hook/impl/hook_impl_type.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)
@@ -132,8 +133,9 @@ target_include_directories(dxx_dlc PUBLIC
         "external/sol/single/single/include/"
         "external/nlohmann/single_include/"
         "external/minhook/include/"
-        "external/mem_scanner/include"
+        "external/mem_scanner/include/"
         "external/xenium/"
+        "external/libguarded/src/"
         "src/"
         "."
 )

@@ -10,8 +10,6 @@
 
 namespace hook::impl
 {
-    constexpr std::string ON_RENDER_START_HOOK_SID = "on_render_start";
-
     void __fastcall hkOnRenderStart(sdk::C_DotaViewRender* self);
 } // hook
 

@@ -10,8 +10,6 @@
 
 namespace hook::impl
 {
-    constexpr std::string PRESENT_HOOK_SID = "present";
-
     HRESULT __fastcall hkPresent(IDXGISwapChain* self, UINT sync_interval, UINT flags);
 } // hook
 

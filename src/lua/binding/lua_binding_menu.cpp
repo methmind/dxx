@@ -21,6 +21,7 @@
 #include "gui/widget/gui_widget_unformatted_text.h"
 #include "gui/widget/gui_widget_window.h"
 #include "gui/widget/gui_widget_windows_container.h"
+#include "lua_guarded_state_interface.h"
 #include "lua/lua_utils.h"
 #include "menu/menu_main_form.h"
 #include "menu/menu_main_form_designer.h"
@@ -54,7 +55,6 @@ namespace lua::binding
             sol::base_classes, sol::bases<gui::C_IWidget>()
         );
         luaIContainer.set_function("add_child", &gui::C_IContainer::addChild);
-        luaIContainer.set_function("get_child_list", &gui::C_IContainer::getChildList);
 
         auto luaIClickable = state.new_usertype<gui::C_IClickable>(
             "C_IClickable", sol::no_constructor,
@@ -156,18 +156,22 @@ namespace lua::binding
         return newWidget;
     }
 
-    bool RegisterMenuApi(sol::state& state, const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
+    bool RegisterMenuApi(const std::weak_ptr<C_ILuaGuardedState>& syncer,
+        const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
         const std::shared_ptr<C_ILuaContainer>& luaContainer
     )
     {
-        auto menuNamespace = state[MENU_NAMESPACE_NAME].get_or_create<sol::table>();
+        const auto guardedState = syncer.lock()->getLuaState();
+        auto& luaState = *guardedState;
+
+        auto menuNamespace = luaState[MENU_NAMESPACE_NAME].get_or_create<sol::table>();
         if (!menuNamespace.valid()) {
             dbg("Unable to create menu namespace!");
             return false;
         }
 
-        RegisterBasicInterfaces(state);
-        RegisterWidgets(state);
+        RegisterBasicInterfaces(luaState);
+        RegisterWidgets(luaState);
 
         menuNamespace.set_function("get_widget", [widgetRegedit](const std::string_view& id){
             return widgetRegedit->find(id);

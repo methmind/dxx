@@ -9,6 +9,7 @@
 
 #include "debug/debug_output.h"
 #include "hook/hook_dispatcher.h"
+#include "hook/impl/hook_impl_type.h"
 #include "service_locator/service_locator.h"
 
 namespace lua
@@ -28,16 +29,16 @@ namespace lua
     void C_LuaScriptManager::disposeScript(const std::string_view& scriptPath)
     {
         // Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
-        C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->invoke(ON_LUA_DISPOSE_HOOK_SID, scriptPath);
+        C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->invoke<const std::string_view&>(
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_LUA_DISPOSE), scriptPath
+        );
 
-        auto locker = this->engine_->luaStateLocker(); // Ensure thread safety during disposal
+        auto locker = this->engine_->getLuaState(); // Ensure thread safety during disposal
         this->scripts_.erase(scriptPath);
     }
 
     bool C_LuaScriptManager::loadScript(const std::string_view& scriptPath)
     {
-        auto locker = this->engine_->luaStateLocker(); // Ensure thread safety during lua script loading
-
         try {
             if (this->scripts_.contains(scriptPath)) {
                 return true;
@@ -48,7 +49,9 @@ namespace lua
                 return false;
             }
 
-            auto payloadData = this->engine_->getLuaState().load_file(scriptPath.data());
+            const auto luaState = this->engine_->getLuaState();
+            auto payloadData = luaState->load_file(scriptPath.data());
+
             if (!payloadData.valid()) {
                 dbg("Unable to load user script: %s!", sol::error(payloadData).what());
                 return false;

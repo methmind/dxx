@@ -13,6 +13,7 @@
 #include "debug/debug_output.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_present.h"
+#include "hook/impl/hook_impl_type.h"
 #include "input/bind_system.h"
 #include "service_locator/service_locator.h"
 
@@ -132,7 +133,7 @@ namespace render
     bool C_Renderer::initialize()
     {
         C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->subscribe<IDXGISwapChain*, UINT, UINT>(
-            hook::impl::PRESENT_HOOK_SID, false,
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::PRESENT),
             [this](IDXGISwapChain* self, UINT sync_interval, UINT flags) {
                 dxgiPresent(self, sync_interval, flags);
             }
