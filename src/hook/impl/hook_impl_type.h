@@ -15,6 +15,8 @@ namespace hook::impl
         PRESENT,
         ON_RENDER_START,
         ON_LUA_DISPOSE,
+        ON_UPDATE,
+        ON_PRE_UPDATE,
     };
 }
 

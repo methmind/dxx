@@ -119,6 +119,9 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/lua/binding/lua_binding_hook.h
         src/lua/binding/lua_guarded_state_interface.h
         src/hook/impl/hook_impl_type.h
+        src/hook/impl/hook_impl_frame_stage_notify.cpp
+        src/hook/impl/hook_impl_frame_stage_notify.h
+        src/sdk/sdk_client_frame_stage_t.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)

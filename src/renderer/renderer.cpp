@@ -50,8 +50,9 @@ namespace render
         auto& io = ImGui::GetIO();
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
-        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+        io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
         io.Fonts->AddFontFromFileTTF(
             (std::filesystem::path(fontsRootPath) / "Verdana.ttf").string().c_str(), 15.0f
         );

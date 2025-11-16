@@ -10,6 +10,12 @@
 
 namespace sdk
 {
+    FARPROC C_Source2Client::getFrameStageNotify() const
+    {
+        const auto vtable = *static_cast<void***>(this->instance_);
+        return reinterpret_cast<FARPROC>(vtable[FRAME_STAGE_NOTIFY_VMT_INDEX]);
+    }
+
     bool C_Source2Client::initialize()
     {
         if (this->instance_ = iface::Find(GetModuleHandleA("client.dll"), "Source2Client0"); !this->instance_) {

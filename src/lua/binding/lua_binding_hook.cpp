@@ -8,7 +8,6 @@
 
 #include "debug/debug_output.h"
 #include "hook/hook_dispatcher.h"
-#include "hook/impl/hook_impl_on_render_start.h"
 #include "hook/impl/hook_impl_type.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
@@ -58,6 +57,14 @@ namespace lua::binding
             hookNamespace,
             "set_on_render_start",
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_RENDER_START),
+            syncer,
+            hookDispatcher
+        );
+
+        RegisterHookCallback(
+            hookNamespace,
+            "set_on_update",
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_UPDATE),
             syncer,
             hookDispatcher
         );

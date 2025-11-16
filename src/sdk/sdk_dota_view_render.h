@@ -4,7 +4,8 @@
 
 #ifndef DXX_DLC_SDK_DOTA_VIEW_RENDER_H
 #define DXX_DLC_SDK_DOTA_VIEW_RENDER_H
-#include "MinHook.h"
+
+#include <windows.h>
 
 namespace sdk
 {

@@ -291,6 +291,10 @@ namespace lua::script
             callback.trigger("on_render_start")
         end)
 
+        hook.set_on_update(function()
+            callback.trigger("on_update")
+        end)
+
         hook.set_on_lua_dispose(function(script_id)
             print("Dispose callbacks for: " .. script_id)
             callback.unregister_all_by_script(script_id)

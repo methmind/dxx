@@ -5,14 +5,20 @@
 #ifndef DXX_DLC_SDK_SOURCE2_CLIENT_H
 #define DXX_DLC_SDK_SOURCE2_CLIENT_H
 
+#include <windows.h>
+
 namespace sdk
 {
+    constexpr auto FRAME_STAGE_NOTIFY_VMT_INDEX = 36;
+
     class C_Source2Client
     {
     private:
         void* instance_;
 
     public:
+
+        [[nodiscard]] FARPROC getFrameStageNotify() const;
 
         bool initialize();
 

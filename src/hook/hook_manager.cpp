@@ -8,8 +8,10 @@
 #include "debug/debug_output.h"
 #include "dx/dx_present.h"
 #include "impl/hook_impl_on_render_start.h"
+#include "impl/hook_impl_frame_stage_notify.h"
 #include "impl/hook_impl_present.h"
 #include "sdk/sdk_dota_view_render.h"
+#include "sdk/sdk_source2_client.h"
 #include "service_locator/service_locator.h"
 
 namespace hook
@@ -34,10 +36,16 @@ namespace hook
         }
 
         const auto onRenderStart = C_ServiceLocator::getInstance<sdk::C_DotaViewRender>()->onRenderStart();
-
         if (const auto err = MH_CreateHook(reinterpret_cast<void*>(onRenderStart),
             reinterpret_cast<void*>(impl::hkOnRenderStart), nullptr); err != MH_OK) {
             dbg("Unable to create hook for C_DotaViewRender::OnRenderStart! err = %d", err);
+            return false;
+        }
+
+        const auto fsnFunc = C_ServiceLocator::getInstance<sdk::C_Source2Client>()->getFrameStageNotify();
+        if (const auto err = MH_CreateHook(reinterpret_cast<void*>(fsnFunc),
+            reinterpret_cast<void*>(impl::hkFrameStageNotify), nullptr); err != MH_OK) {
+            dbg("Unable to create hook for C_Source2Client::FrameStageNotify! err = %d", err);
             return false;
         }
 
