@@ -63,6 +63,14 @@ namespace lua::binding
 
         RegisterHookCallback(
             hookNamespace,
+            "set_on_pre_update",
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_PRE_UPDATE),
+            syncer,
+            hookDispatcher
+        );
+
+        RegisterHookCallback(
+            hookNamespace,
             "set_on_update",
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_UPDATE),
             syncer,

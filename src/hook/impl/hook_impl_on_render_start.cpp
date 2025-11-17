@@ -12,7 +12,7 @@
 
 namespace hook::impl
 {
-    void hkOnRenderStart(sdk::C_DotaViewRender* self)
+    void hkOnRenderStart(void* self)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke(
             static_cast<hook_id_t>(hook_impl_type_e::ON_RENDER_START)

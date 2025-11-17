@@ -13,6 +13,8 @@ namespace bootstrap
     {
     private:
 
+        static bool InitializeSdkStuff();
+
         static bool InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& container);
 
     public:

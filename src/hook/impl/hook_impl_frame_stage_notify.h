@@ -9,7 +9,7 @@
 
 namespace hook::impl
 {
-    void hkFrameStageNotify(void* self, int32_t frameStage);
+    void __fastcall hkFrameStageNotify(void* self, int32_t frameStage);
 } // hook
 
 #endif //DXX_DLC_HOOK_IMPL_FRAME_STAGE_NOTIFY_H

@@ -9,17 +9,18 @@ namespace hook
 {
     class C_HookManager
     {
-    private:
-
     public:
 
         bool initialize();
 
         bool enable();
 
+        // Костыли-костыли... Тут либо нужно настраивать пайплайн вызова деструкторов в C_ServiceContainer, либо так.
+        void disable();
+
         C_HookManager() = default;
 
-        ~C_HookManager();
+        ~C_HookManager() = default;
     };
 } // hook
 

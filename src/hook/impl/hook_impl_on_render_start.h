@@ -5,11 +5,11 @@
 #ifndef DXX_DLC_HOOK_IMPL_ON_RENDER_START_H
 #define DXX_DLC_HOOK_IMPL_ON_RENDER_START_H
 
-#include "sdk/sdk_dota_view_render.h"
+#include "../../sdk/singleton/sdk_dota_view_render.h"
 
 namespace hook::impl
 {
-    void __fastcall hkOnRenderStart(sdk::C_DotaViewRender* self);
+    void __fastcall hkOnRenderStart(void* self);
 } // hook
 
 #endif //DXX_DLC_HOOK_IMPL_ON_RENDER_START_H

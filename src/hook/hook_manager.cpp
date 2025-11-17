@@ -10,8 +10,8 @@
 #include "impl/hook_impl_on_render_start.h"
 #include "impl/hook_impl_frame_stage_notify.h"
 #include "impl/hook_impl_present.h"
-#include "sdk/sdk_dota_view_render.h"
-#include "sdk/sdk_source2_client.h"
+#include "sdk/singleton/sdk_dota_view_render.h"
+#include "sdk/singleton/sdk_source2_client.h"
 #include "service_locator/service_locator.h"
 
 namespace hook
@@ -35,14 +35,14 @@ namespace hook
             return false;
         }
 
-        const auto onRenderStart = C_ServiceLocator::getInstance<sdk::C_DotaViewRender>()->onRenderStart();
+        const auto onRenderStart = C_ServiceLocator::getInstance<sdk::singleton::C_DotaViewRender>()->onRenderStart();
         if (const auto err = MH_CreateHook(reinterpret_cast<void*>(onRenderStart),
             reinterpret_cast<void*>(impl::hkOnRenderStart), nullptr); err != MH_OK) {
             dbg("Unable to create hook for C_DotaViewRender::OnRenderStart! err = %d", err);
             return false;
         }
 
-        const auto fsnFunc = C_ServiceLocator::getInstance<sdk::C_Source2Client>()->getFrameStageNotify();
+        const auto fsnFunc = C_ServiceLocator::getInstance<sdk::singleton::C_Source2Client>()->getFrameStageNotify();
         if (const auto err = MH_CreateHook(reinterpret_cast<void*>(fsnFunc),
             reinterpret_cast<void*>(impl::hkFrameStageNotify), nullptr); err != MH_OK) {
             dbg("Unable to create hook for C_Source2Client::FrameStageNotify! err = %d", err);
@@ -62,9 +62,8 @@ namespace hook
         return true;
     }
 
-    C_HookManager::~C_HookManager()
+    void C_HookManager::disable()
     {
-        MH_DisableHook(MH_ALL_HOOKS);
         MH_Uninitialize();
     }
 } // hook

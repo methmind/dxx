@@ -7,7 +7,7 @@
 
 #include <windows.h>
 
-namespace sdk
+namespace sdk::singleton
 {
     constexpr auto FRAME_STAGE_NOTIFY_VMT_INDEX = 36;
 

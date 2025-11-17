@@ -14,11 +14,11 @@ namespace app
     private:
         HANDLE disposeEvent_{};
 
+        void dispose() const;
+
     public:
 
-        bool entry(HMODULE hModule);
-
-        void dispose() const;
+        bool entry();
 
         C_Application() = default;
 

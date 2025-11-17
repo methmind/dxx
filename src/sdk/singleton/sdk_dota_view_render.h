@@ -7,7 +7,7 @@
 
 #include <windows.h>
 
-namespace sdk
+namespace sdk::singleton
 {
     constexpr auto ON_RENDER_START_VMT_INDEX = 4;
 

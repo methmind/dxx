@@ -9,12 +9,14 @@
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
 #include "hook/hook_manager.h"
+#include "input/bind_system.h"
 #include "menu/menu_settings_form.h"
 #include "sdk/interface/sdk_interface_scanner.h"
+#include "service_locator/service_locator.h"
 
 namespace app
 {
-    bool C_Application::entry(HMODULE hModule)
+    bool C_Application::entry()
     {
         MessageBoxA(nullptr, "Press F to pay respect", nullptr, 0);
 
@@ -29,12 +31,26 @@ namespace app
             return false;
         }
 
-        if (!services->get<hook::C_HookManager>()->enable()) {
+        auto endBind = C_ServiceLocator::getInstance<input::C_BindSystem>()->createBinding(
+            VK_END, [this] {
+                dispose();
+            }
+        );
+
+        const auto hooks = services->get<hook::C_HookManager>();
+        if (!hooks->enable()) {
             dbg("Unable to enable hooks!");
             return false;
         }
 
-        return WaitForSingleObject(this->disposeEvent_, INFINITE) == ERROR_SUCCESS;
+        if (const auto err = WaitForSingleObject(this->disposeEvent_, INFINITE); err != ERROR_SUCCESS) {
+            dbg("WaitForSingleObject got:err = %d", err);
+        }
+
+        dbg("Unloading module from process...");
+        hooks->disable();
+
+        return true;
     }
 
     void C_Application::dispose() const

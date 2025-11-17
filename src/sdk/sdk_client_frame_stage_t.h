@@ -8,19 +8,18 @@
 namespace sdk
 {
     typedef enum {
-        UNDEFINED = -1,                           // Не выполнялись кадры (инициализация)
-        START = 0,                                // Начало кадра
-        NET_UPDATE_START = 1,                     // Начало получения сетевого пакета
-        NET_UPDATE_POSTDATAUPDATE_START = 2,      // Начало обработки полученных данных
-        NET_UPDATE_POSTDATAUPDATE_END = 3,        // Завершение обработки данных
-        NET_UPDATE_END = 4,                       // Завершение сетевого обновления
-        RENDER_START = 5,                         // Начало рендеринга
-        RENDER_END = 6,                           // Завершение рендеринга
-        // Source 2 специфичные расширения
-        UNKNOWN_7 = 7,                            // Промежуточная стадия (новая в Source 2)
-        // Пропущено 8
-        UNKNOWN_9 = 9,                            // Вызывается перед START (новая в Source 2)
-        UNKNOWN_10 = 10                           // Частые вызовы (новая в Source 2)
+        UNDEFINED = -1,
+        START = 0,
+        NET_UPDATE_START = 1,
+        FRAME_NET_UPDATE_POSTDATAUPDATE_START = 2,
+        FRAME_NET_UPDATE_POSTDATAUPDATE_END,
+        FRAME_NET_FULL_FRAME_UPDATE_ON_REMOVE,
+        FRAME_RENDER_START,
+        FRAME_RENDER_END,
+        FRAME_NET_UPDATE_END,
+        FRAME_NET_CREATION,
+        FRAME_RESTORE_SERVER_STATE,
+        FRAME_SIMULATE_END
     } ClientFrameStage_t;
 }
 

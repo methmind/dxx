@@ -33,7 +33,7 @@ namespace menu
         explicit C_MenuMainForm(const std::shared_ptr<C_IMenuForm>& settingsForm) :
             C_IWidget(MAIN_FORM_ID), settingsForm_(settingsForm) {}
 
-        ~C_MenuMainForm() override {}
+        ~C_MenuMainForm() override = default;
     };
 } // menu
 

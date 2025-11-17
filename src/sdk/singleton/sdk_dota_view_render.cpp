@@ -4,11 +4,11 @@
 
 #include "sdk_dota_view_render.h"
 
-#include "sdk_signature.h"
+#include "../sdk_signature.h"
 #include "debug/debug_output.h"
 #include "memory/pattern_scanner.h"
 
-namespace sdk
+namespace sdk::singleton
 {
     FARPROC C_DotaViewRender::onRenderStart() const
     {

@@ -6,9 +6,9 @@
 #include <windows.h>
 
 #include "debug/debug_output.h"
-#include "interface/sdk_interface_scanner.h"
+#include "sdk/interface/sdk_interface_scanner.h"
 
-namespace sdk
+namespace sdk::singleton
 {
     FARPROC C_Source2Client::getFrameStageNotify() const
     {

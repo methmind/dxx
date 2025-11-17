@@ -98,8 +98,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/renderer/renderer.h
         src/input/bind_system.cpp
         src/input/bind_system.h
-        src/sdk/sdk_dota_view_render.cpp
-        src/sdk/sdk_dota_view_render.h
+        src/sdk/singleton/sdk_dota_view_render.cpp
+        src/sdk/singleton/sdk_dota_view_render.h
         external/mem_scanner/src/CpuInfo.cpp
         external/mem_scanner/src/backends/Avx2.cpp
         external/mem_scanner/src/backends/Scalar.cpp
@@ -112,8 +112,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/hook/impl/hook_impl_on_render_start.h
         src/sdk/interface/sdk_interface_scanner.cpp
         src/sdk/interface/sdk_interface_scanner.h
-        src/sdk/sdk_source2_client.cpp
-        src/sdk/sdk_source2_client.h
+        src/sdk/singleton/sdk_source2_client.cpp
+        src/sdk/singleton/sdk_source2_client.h
         src/lua/script/callback_api.h
         src/lua/binding/lua_binding_hook.cpp
         src/lua/binding/lua_binding_hook.h
@@ -122,6 +122,10 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/hook/impl/hook_impl_frame_stage_notify.cpp
         src/hook/impl/hook_impl_frame_stage_notify.h
         src/sdk/sdk_client_frame_stage_t.h
+        src/sdk/singleton/sdk_source2_engine_to_client.cpp
+        src/sdk/singleton/sdk_source2_engine_to_client.h
+        src/memory/vmt_call.h
+        src/bootstrap/bootstrap_sdk.cpp
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)

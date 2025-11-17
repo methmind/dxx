@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <memory>
 #include <shared_mutex>
+#include "cs_shared_guarded.h"
+
 
 namespace input
 {
@@ -39,8 +41,7 @@ namespace input
     class C_BindSystem : std::enable_shared_from_this<C_BindSystem>
     {
     private:
-        std::shared_mutex mutex_;
-        std::unordered_map<uint8_t, std::vector<bind_callback_t>> bindings_;
+        libguarded::shared_guarded<std::unordered_map<uint8_t, std::vector<bind_callback_t>>> bindings_;
         uint64_t nextID_;
 
     public:
@@ -49,17 +50,12 @@ namespace input
 
         void removeBinding(const C_KeyBindHandle* bind);
 
-        void invokeBindings(uint8_t key);
+        void invokeBindings(uint8_t key) const;
 
         C_BindSystem() : nextID_(0) {}
 
         ~C_BindSystem() = default;
     };
-
-    inline C_KeyBindHandle::~C_KeyBindHandle()
-    {
-        this->parent_.lock()->removeBinding(this);
-    }
 } // input
 
 #endif //DXX_DLC_BIND_SYSTEM_H

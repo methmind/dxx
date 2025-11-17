@@ -12,8 +12,9 @@
 #include "input/bind_system.h"
 #include "lua/lua_script_manager.h"
 #include "renderer/renderer.h"
-#include "sdk/sdk_dota_view_render.h"
-#include "sdk/sdk_source2_client.h"
+#include "sdk/singleton/sdk_dota_view_render.h"
+#include "sdk/singleton/sdk_source2_client.h"
+#include "sdk/singleton/sdk_source2_engine_to_client.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
@@ -24,13 +25,8 @@ namespace bootstrap
 {
     std::shared_ptr<C_ServiceContainer> C_ApplicationBuilder::Build()
     {
-        if (!C_ServiceLocator::getInstance<sdk::C_DotaViewRender>()->initialize()) {
-            dbg("Unable to initialize sdk::C_DotaViewRender");
-            return nullptr;
-        }
-
-        if (!C_ServiceLocator::getInstance<sdk::C_Source2Client>()->initialize()) {
-            dbg("Unable to initialize sdk::C_Source2Client");
+        if (!InitializeSdkStuff()) {
+            dbg("Unable to SDK stuff!");
             return nullptr;
         }
 
