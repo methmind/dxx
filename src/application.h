@@ -14,8 +14,6 @@ namespace app
     private:
         HANDLE disposeEvent_{};
 
-        void dispose() const;
-
     public:
 
         bool entry();

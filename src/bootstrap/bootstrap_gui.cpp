@@ -17,9 +17,11 @@ namespace bootstrap
         const auto guiRootObject = std::dynamic_pointer_cast<gui::widget::C_WidgetRoot>(
             guiRegedit->createWidget<gui::widget::C_WidgetRoot>()
         );
+
         auto settingsForm = std::dynamic_pointer_cast<menu::C_MenuSettingsForm>(
             guiRegedit->createWidget<menu::C_MenuSettingsForm>(guiRegedit, services->get<lua::C_LuaScriptManager>())
         );
+
         const auto mainForm = std::dynamic_pointer_cast<menu::C_MenuMainForm>(
             guiRegedit->createWidget<menu::C_MenuMainForm>(settingsForm)
         );

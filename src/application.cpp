@@ -33,7 +33,7 @@ namespace app
 
         auto endBind = C_ServiceLocator::getInstance<input::C_BindSystem>()->createBinding(
             VK_END, [this] {
-                dispose();
+                SetEvent(this->disposeEvent_);
             }
         );
 
@@ -51,14 +51,5 @@ namespace app
         hooks->disable();
 
         return true;
-    }
-
-    void C_Application::dispose() const
-    {
-        if (!this->disposeEvent_) {
-            return;
-        }
-
-        SetEvent(this->disposeEvent_);
     }
 } // core

@@ -15,7 +15,9 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     }
 
     std::thread([hinstDLL] {
-        std::make_unique<app::C_Application>()->entry();
+        {
+            std::make_unique<app::C_Application>()->entry();
+        }
         FreeLibraryAndExitThread(hinstDLL, 0);
     }).detach();
 
