@@ -16,6 +16,12 @@ namespace sdk::singleton
         return reinterpret_cast<FARPROC>(vtable[FRAME_STAGE_NOTIFY_VMT_INDEX]);
     }
 
+    FARPROC C_Source2Client::getGetNetworkCallbackQueue() const
+    {
+        const auto vtable = *static_cast<void***>(this->instance_);
+        return reinterpret_cast<FARPROC>(vtable[GET_NETWORK_CALLBACK_QUEUE]);
+    }
+
     bool C_Source2Client::initialize()
     {
         if (this->instance_ = iface::Find(GetModuleHandleA("client.dll"), "Source2Client0"); !this->instance_) {

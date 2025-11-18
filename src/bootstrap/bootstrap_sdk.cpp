@@ -4,6 +4,7 @@
 
 #include "application_builder.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
+#include "sdk/singleton/sdk_game_entity_system.h"
 #include "sdk/singleton/sdk_source2_client.h"
 #include "sdk/singleton/sdk_source2_engine_to_client.h"
 #include "service_locator/service_locator.h"
@@ -23,6 +24,11 @@ namespace bootstrap
 
         if (!C_ServiceLocator::getInstance<sdk::singleton::C_Source2Client>()->initialize()) {
             dbg("Unable to initialize sdk::C_Source2Client");
+            return false;
+        }
+
+        if (!C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>()->initialize()) {
+            dbg("Unable to initialize sdk::C_GameEntitySystem");
             return false;
         }
 

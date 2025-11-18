@@ -20,7 +20,7 @@ namespace sdk::singleton
         int32_t playerSlot = -1;
         memory::vmt::call<void>(this->instance_, GET_LOCAL_PLAYER_VMT_INDEX, &playerSlot, 0);
 
-        return playerSlot;
+        return playerSlot + 1;
     }
 
     bool C_Source2EngineToClient::initialize()

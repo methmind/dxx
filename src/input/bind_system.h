@@ -9,9 +9,8 @@
 #include <functional>
 #include <unordered_map>
 #include <memory>
-#include <shared_mutex>
+#include <atomic>
 #include "cs_shared_guarded.h"
-
 
 namespace input
 {
@@ -42,7 +41,7 @@ namespace input
     {
     private:
         libguarded::shared_guarded<std::unordered_map<uint8_t, std::vector<bind_callback_t>>> bindings_;
-        uint64_t nextID_;
+        std::atomic<uint64_t> nextID_;
 
     public:
 

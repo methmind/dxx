@@ -126,6 +126,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/singleton/sdk_source2_engine_to_client.h
         src/memory/vmt_call.h
         src/bootstrap/bootstrap_sdk.cpp
+        src/sdk/singleton/sdk_game_entity_system.cpp
+        src/sdk/singleton/sdk_game_entity_system.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)
