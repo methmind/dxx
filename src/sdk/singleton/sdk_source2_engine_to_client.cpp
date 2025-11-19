@@ -15,7 +15,7 @@ namespace sdk::singleton
         return memory::vmt::call<bool>(this->instance_, IS_IN_GAME_VMT_INDEX);
     }
 
-    int32_t C_Source2EngineToClient::getLocalPlayerID() const
+    uint32_t C_Source2EngineToClient::getLocalPlayerID() const
     {
         int32_t playerSlot = -1;
         memory::vmt::call<void>(this->instance_, GET_LOCAL_PLAYER_VMT_INDEX, &playerSlot, 0);

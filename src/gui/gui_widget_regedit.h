@@ -10,13 +10,14 @@
 
 #include "cs_shared_guarded.h"
 #include "gui_widget_interface.h"
+#include "hash/xxhash_wrapper.h"
 
 namespace gui
 {
     class C_WidgetRegedit
     {
     public:
-        using widget_list_t = std::unordered_map<std::string_view, widget_ptr_t>;
+        using widget_list_t = std::unordered_map<std::string, widget_ptr_t, xx_hashier_s>;
 
     private:
         libguarded::shared_guarded<widget_list_t> widgets_;

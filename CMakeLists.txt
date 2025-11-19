@@ -128,6 +128,11 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/bootstrap/bootstrap_sdk.cpp
         src/sdk/singleton/sdk_game_entity_system.cpp
         src/sdk/singleton/sdk_game_entity_system.h
+        src/sdk/singleton/sdk_schema_system.cpp
+        src/sdk/singleton/sdk_schema_system.h
+        src/sdk/interface/sdk_schema_system.h
+        external/xxhash3/xxhash.c
+        src/hash/xxhash_wrapper.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)

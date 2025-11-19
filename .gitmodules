@@ -19,3 +19,6 @@
 [submodule "external/libguarded"]
 	path = external/libguarded
 	url = https://github.com/copperspice/cs_libguarded.git
+[submodule "external/xxhash3"]
+	path = external/xxhash3
+	url = https://github.com/pombredanne/xxHash-3.git

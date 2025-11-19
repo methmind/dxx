@@ -28,7 +28,7 @@ namespace sdk::singleton
 
     public:
 
-        [[nodiscard]] int32_t numberOfEntities() const { return this->numberOfEntities_(this->instance_, 0); }
+        [[nodiscard]] int32_t numberOfEntities() const;
 
         template<class T = void*>
         T* getBaseEntity(const int32_t index) const {

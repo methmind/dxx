@@ -62,6 +62,11 @@ namespace sdk::singleton
         return true;
     }
 
+    int32_t C_GameEntitySystem::numberOfEntities() const
+    {
+        return this->numberOfEntities_(this->instance_, 0);
+    }
+
     bool C_GameEntitySystem::initialize()
     {
         if (!findInstance()) {

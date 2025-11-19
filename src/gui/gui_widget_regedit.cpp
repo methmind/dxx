@@ -11,7 +11,7 @@ namespace gui
     {
         const auto guarded = this->widgets_.lock_shared();
 
-        const auto it = guarded->find(id);
+        const auto it = guarded->find(id.data());
         if (it == guarded->end()) {
             return nullptr;
         }
@@ -39,7 +39,7 @@ namespace gui
             std::dynamic_pointer_cast<C_IContainer>(parent)->removeChild(obj);
         }
 
-        guarded->erase(id);
+        guarded->erase(id.data());
     }
 
     C_WidgetRegedit::widget_list_t C_WidgetRegedit::list() const

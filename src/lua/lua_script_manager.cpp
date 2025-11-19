@@ -16,7 +16,7 @@ namespace lua
 {
     bool C_LuaScriptManager::bindGuiWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget)
     {
-        const auto it = this->scripts_.find(luaID);
+        const auto it = this->scripts_.find(luaID.data());
         if (it == this->scripts_.end()) {
             dbg("Unable to find lua script: %s!", luaID.data());
             return false;
@@ -34,13 +34,13 @@ namespace lua
         );
 
         auto locker = this->engine_->getLuaState(); // Ensure thread safety during disposal
-        this->scripts_.erase(scriptPath);
+        this->scripts_.erase(scriptPath.data());
     }
 
     bool C_LuaScriptManager::loadScript(const std::string_view& scriptPath)
     {
         try {
-            if (this->scripts_.contains(scriptPath)) {
+            if (this->scripts_.contains(scriptPath.data())) {
                 return true;
             }
 
@@ -82,7 +82,7 @@ namespace lua
             return true;
         } catch (const std::exception& ex) {
             dbg("Critical exception: %s", ex.what());
-            this->scripts_.erase(scriptPath);
+            this->scripts_.erase(scriptPath.data());
             return false;
         }
     }

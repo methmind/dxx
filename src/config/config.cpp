@@ -23,7 +23,7 @@ namespace config
             return;
         }
 
-        if (const auto widget = widgets.find(it->at("id").get<std::string_view>()); widget != widgets.end()) {
+        if (const auto widget = widgets.find(it->at("id").get<std::string>()); widget != widgets.end()) {
             widget->second->deserialize(it->at("data"));
         }
 
@@ -41,7 +41,7 @@ namespace config
                     continue;
                 }
 
-                auto widgetID = data.at("id").get<std::string_view>();
+                auto widgetID = data.at("id").get<std::string>();
                 if (widgetID.empty()) {
                     continue;
                 }

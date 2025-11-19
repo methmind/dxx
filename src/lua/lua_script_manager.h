@@ -8,6 +8,7 @@
 #include "lua_script_engine.h"
 #include "lua_script_instance.h"
 #include "lua_container_interface.h"
+#include "hash/xxhash_wrapper.h"
 
 namespace lua
 {
@@ -16,7 +17,7 @@ namespace lua
     private:
         std::shared_ptr<C_LuaScriptEngine> engine_;
         std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
-        std::unordered_map<std::string_view, std::unique_ptr<C_LuaScriptInstance>> scripts_;
+        std::unordered_map<std::string, std::unique_ptr<C_LuaScriptInstance>, xx_hashier_s> scripts_;
 
         /*
          * Предполагаем, что lua state уже залочен на момент вызова этой функции.
@@ -31,7 +32,7 @@ namespace lua
 
         bool loadScript(const std::string_view& scriptPath);
 
-        bool isScriptLoaded(const std::string_view& scriptPath) const { return this->scripts_.contains(scriptPath); }
+        bool isScriptLoaded(const std::string_view& scriptPath) const { return this->scripts_.contains(scriptPath.data()); }
 
         bool initialize();
 

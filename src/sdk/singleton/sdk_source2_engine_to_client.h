@@ -30,7 +30,7 @@ namespace sdk::singleton
 
         [[nodiscard]] bool isInGame() const;
 
-        [[nodiscard]] int32_t getLocalPlayerID() const;
+        [[nodiscard]] uint32_t getLocalPlayerID() const;
 
         bool initialize();
 
