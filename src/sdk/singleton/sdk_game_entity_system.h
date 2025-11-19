@@ -12,9 +12,9 @@ namespace sdk::singleton
     class C_GameEntitySystem
     {
     public:
-        using number_of_entities_t = int32_t(__thiscall*)(void* self, uint8_t unk);
+        using number_of_entities_t = int32_t(__fastcall*)(void* self, uint8_t unk);
 
-        using get_base_entity_t = void*(__thiscall*)(void* self, int32_t index);
+        using get_base_entity_t = void*(__fastcall*)(void* self, int32_t index);
 
     private:
         void* instance_;

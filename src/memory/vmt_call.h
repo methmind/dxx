@@ -8,25 +8,22 @@
 #include <cstdint>
 #include <type_traits>
 #include <utility>
-#include <_mingw.h>
 
 namespace memory::vmt
 {
-    template <typename return_t, typename ... arg_t>
-    __forceinline return_t call(void* instance, const size_t index, arg_t&& ... args)
+    template <typename func_declaration_t, size_t index>
+    __forceinline auto call(void* instance, auto&&... args)
     {
-        const auto vtable = *static_cast<void***>(instance);
+        using return_t = std::invoke_result_t<std::remove_pointer_t<func_declaration_t>*, void*, decltype(args)...>;
 
-        using vfn_t = return_t (__thiscall*)(void* instance, arg_t&& ... args);
-        const auto vfn = reinterpret_cast<vfn_t>(vtable[index]);
+        const auto vtable = *static_cast<void***>(instance);
+        const auto vfn = reinterpret_cast<func_declaration_t>(vtable[index]);
 
         if constexpr (std::is_void_v<return_t>) {
-            vfn(instance, std::forward<arg_t>(args)...);
+            vfn(instance, std::forward<decltype(args)>(args)...);
         } else {
-            return vfn(instance, std::forward<arg_t>(args)...);
+            return vfn(instance, std::forward<decltype(args)>(args)...);
         }
-
-        return return_t();
     }
 }
 

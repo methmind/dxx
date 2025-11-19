@@ -12,13 +12,15 @@ namespace sdk::singleton
 {
     bool C_Source2EngineToClient::isInGame() const
     {
-        return memory::vmt::call<bool>(this->instance_, IS_IN_GAME_VMT_INDEX);
+        return memory::vmt::call<bool(__fastcall*)(void*), IS_IN_GAME_VMT_INDEX>(this->instance_);
     }
 
     uint32_t C_Source2EngineToClient::getLocalPlayerID() const
     {
         int32_t playerSlot = -1;
-        memory::vmt::call<void>(this->instance_, GET_LOCAL_PLAYER_VMT_INDEX, &playerSlot, 0);
+        memory::vmt::call<void(__fastcall*)(void*, int32_t*, int32_t), GET_LOCAL_PLAYER_VMT_INDEX>(
+            this->instance_, &playerSlot, 0
+        );
 
         return playerSlot + 1;
     }

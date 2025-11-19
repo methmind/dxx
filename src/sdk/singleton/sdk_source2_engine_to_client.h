@@ -6,6 +6,7 @@
 #define DXX_DLC_SDK_SOURCE2_ENGINE_TO_CLIENT_H
 
 #include <cstdint>
+#include <string_view>
 
 namespace sdk::singleton
 {

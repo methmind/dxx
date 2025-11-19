@@ -10,7 +10,7 @@
 #include "sdk/singleton/sdk_source2_engine_to_client.h"
 #include "service_locator/service_locator.h"
 
-REGISTER_GLOBAL_SERVICE(sdk::singleton::C_ShemaSystem);
+REGISTER_GLOBAL_SERVICE(sdk::singleton::C_SchemaSystem);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_DotaViewRender);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_Source2Client);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_Source2EngineToClient);
@@ -19,7 +19,7 @@ namespace bootstrap
 {
     bool C_ApplicationBuilder::InitializeSdkStuff()
     {
-        if (!C_ServiceLocator::getInstance<sdk::singleton::C_ShemaSystem>()->initialize()) {
+        if (!C_ServiceLocator::getInstance<sdk::singleton::C_SchemaSystem>()->initialize()) {
             dbg("Unable to initialize sdk::C_ShemaSystem");
             return false;
         }
