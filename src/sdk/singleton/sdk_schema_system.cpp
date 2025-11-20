@@ -5,17 +5,21 @@
 #include "sdk_schema_system.h"
 
 #include <array>
+#include <ranges>
 #include <span>
 
 #include "debug/debug_output.h"
 #include "sdk/interface/sdk_interface_scanner.h"
 
-const char* MODULES_TO_SEARCH[] = { "client.dll" };
+constexpr std::array<const char*, 1> MODULES_TO_SEARCH = { "client.dll" };
 
 namespace sdk::singleton
 {
-    bool C_SchemaSystem::initializeClassSchema(const std::string_view& className)
-    {
+    std::optional<C_SchemaSystem::schema_key_value_t*> C_SchemaSystem::initializeClassSchema(
+        const guarded_schema_t::handle& table,
+        const std::string_view& className
+    ) const {
+        // todo Decompose this...
         for (const auto moduleName : MODULES_TO_SEARCH) {
             const auto typeScope = findTypeScopeForModule(moduleName);
             if (!typeScope) {
@@ -32,46 +36,50 @@ namespace sdk::singleton
                 continue;
             }
 
-            auto [it, ok] = this->schemaTable_.emplace(className.data(), schema_key_value_t{});
+            auto [it, ok] = table->emplace(className.data(), schema_key_value_t{});
             if (!ok) {
                 dbg("Unable to add schema table for class: %s", className.data());
-                return false;
+                return std::nullopt;
             }
 
-            for (std::span fields{ classInfo->getFields(), fieldsSize }; auto& field : fields) {
+            for (auto& field : std::views::counted(classInfo->getFields(), fieldsSize)) {
                 it->second.emplace(field.name, field.offset);
             }
 
-            return true;
+            return &it->second;
         }
 
-        return false;
+        return std::nullopt;
     }
 
-    C_SchemaSystem::schema_table_t::iterator C_SchemaSystem::getOrCreateSchemaTable(const std::string_view& className)
-	{
-		if (const auto& it = this->schemaTable_.find(className.data()); it != this->schemaTable_.end()) {
-    		return it;
-    	}
+    std::optional<C_SchemaSystem::schema_key_value_t*> C_SchemaSystem::getOrCreateSchemaTable(
+        const guarded_schema_t::handle& table,
+        const std::string_view& className
+    ) const {
+        if (const auto& it = table->find(className.data()); it != table->end()) {
+            return &it->second;
+        }
 
-    	if (!initializeClassSchema(className)) {
-    		dbg("Unable to find class schema: %s!", className.data());
-    		return this->schemaTable_.end();
-    	}
+        if (const auto it = initializeClassSchema(table, className); it.has_value()) {
+            return it;
+        }
 
-    	return this->schemaTable_.find(className.data());
+        dbg("Unable to initialize schema table for class: %s", className.data());
+        return std::nullopt;
     }
 
-    std::optional<int16_t> C_SchemaSystem::getOffset(const std::string_view& className, const std::string_view& fieldName)
+    std::optional<uint16_t> C_SchemaSystem::getOffset(const std::string_view& className, const std::string_view& fieldName)
     {
-        const auto& it = getOrCreateSchemaTable(className.data());
-        if (it == this->schemaTable_.end()) {
+        const auto locked = this->schemaTable_.lock();
+
+        const auto table = getOrCreateSchemaTable(locked, className);
+        if (!table.has_value()) {
             dbg("Unable to find class schema: %s!", className.data());
             return std::nullopt;
         }
 
-        const auto& fieldInfo = it->second.find(fieldName.data());
-        if (fieldInfo == it->second.end()) {
+        const auto& fieldInfo = table.value()->find(fieldName.data());
+        if (fieldInfo == table.value()->end()) {
             dbg("Unable to find offset for field: %s::%s!", className.data(), fieldName.data());
             return std::nullopt;
         }
@@ -82,7 +90,7 @@ namespace sdk::singleton
 
     bool C_SchemaSystem::initialize()
     {
-        if (this->instance_ = iface::Find(GetModuleHandleA("schemasystem.dll"), "SchemaSystem_001"); !this->instance_) {
+        if (this->instance_ = iface::Find(GetModuleHandleA("schemasystem.dll"), "SchemaSystem_"); !this->instance_) {
             dbg("Unable to find SchemaSystem instance!");
             return false;
         }

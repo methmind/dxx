@@ -12,7 +12,7 @@ namespace sdk::iface
     {
         const char* name;
         uint8_t pad0[0x8];
-        int16_t offset;
+        uint16_t offset;
         uint8_t pad1[0xE];
     };
 
@@ -22,16 +22,17 @@ namespace sdk::iface
 
         const char* getName()
         {
-            return *reinterpret_cast<const char**>(this + 0x8);
+            return *reinterpret_cast<const char**>(reinterpret_cast<uint8_t*>(this) + 0x8);
         }
 
-        [[nodiscard]] uint16_t getFieldsSize() const {
-            return *reinterpret_cast<const uint16_t*>(this + 0x1C);
+        [[nodiscard]] uint16_t getFieldsSize() const
+        {
+            return *reinterpret_cast<const uint16_t*>(reinterpret_cast<const uint8_t*>(this) + 0x1C);
         }
 
         schema_class_field_s* getFields()
         {
-            return *reinterpret_cast<schema_class_field_s**>(this + 0x28);
+            return *reinterpret_cast<schema_class_field_s**>(reinterpret_cast<uint8_t*>(this) + 0x28);
         }
     };
 

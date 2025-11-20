@@ -9,6 +9,8 @@
 #include <string>
 #include <unordered_map>
 
+#include "cs_plain_guarded.h"
+#include "hash/xxhash_wrapper.h"
 #include "memory/vmt_call.h"
 #include "sdk/interface/sdk_schema_system.h"
 
@@ -22,14 +24,13 @@ namespace sdk::singleton
 
     class C_SchemaSystem
     {
-    public:
-        using schema_key_value_t = std::unordered_map<std::string, int16_t>;
-
-        using schema_table_t = std::unordered_map<std::string, schema_key_value_t>;
-
     private:
+        using schema_key_value_t = std::unordered_map<std::string, uint16_t, xx_hashier_s>;
+        using schema_table_t = std::unordered_map<std::string, schema_key_value_t, xx_hashier_s>;
+        using guarded_schema_t = libguarded::plain_guarded<schema_table_t>;
+
         void* instance_;
-        schema_table_t schemaTable_;
+        guarded_schema_t schemaTable_;
 
         [[nodiscard]] iface::C_SchemaTypeScope* findTypeScopeForModule(const char* moduleName) const
         {
@@ -39,13 +40,17 @@ namespace sdk::singleton
             >(this->instance_, moduleName, nullptr);
         }
 
-        bool initializeClassSchema(const std::string_view& className);
+        std::optional<schema_key_value_t*> initializeClassSchema(const guarded_schema_t::handle& table,
+            const std::string_view& className
+        ) const;
 
-        schema_table_t::iterator getOrCreateSchemaTable(const std::string_view& className);
+        std::optional<schema_key_value_t*> getOrCreateSchemaTable(const guarded_schema_t::handle& table,
+            const std::string_view& className
+        ) const;
 
     public:
 
-        std::optional<int16_t> getOffset(const std::string_view& className, const std::string_view& fieldName);
+        std::optional<uint16_t> getOffset(const std::string_view& className, const std::string_view& fieldName);
 
         bool initialize();
 

@@ -11,13 +11,13 @@
 
 namespace memory::vmt
 {
-    template <typename func_declaration_t, size_t index>
-    __forceinline auto call(void* instance, auto&&... args)
+    template <typename func_declaration_t, size_t id>
+    __forceinline auto call(void* instance, auto&& ... args)
     {
         using return_t = std::invoke_result_t<std::remove_pointer_t<func_declaration_t>*, void*, decltype(args)...>;
 
         const auto vtable = *static_cast<void***>(instance);
-        const auto vfn = reinterpret_cast<func_declaration_t>(vtable[index]);
+        const auto vfn = reinterpret_cast<func_declaration_t>(vtable[id]);
 
         if constexpr (std::is_void_v<return_t>) {
             vfn(instance, std::forward<decltype(args)>(args)...);
