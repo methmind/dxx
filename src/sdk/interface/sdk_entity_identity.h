@@ -7,7 +7,7 @@
 
 #include "memory/offset.h"
 #include "sdk/sdk_schema_field_proxy.h"
-#include "sdk_base_handle.h"
+#include "sdk/util/sdk_base_handle.h"
 
 namespace sdk::iface
 {
@@ -21,7 +21,7 @@ namespace sdk::iface
 
         [[nodiscard]] bool isValid() const
         {
-            return C_BaseEntityHandle(getIndex()).isValid();
+            return util::C_BaseEntityHandle(getIndex()).isValid();
         }
 
         bool isSameType(const char* typeName)

@@ -6,7 +6,7 @@
 #define DXX_DLC_SDK_DOTA_PLAYER_CONTROLLER_H
 
 #include "sdk_base_entity.h"
-#include "sdk_base_handle.h"
+#include "sdk/util/sdk_base_handle.h"
 
 namespace sdk::iface
 {
@@ -14,7 +14,7 @@ namespace sdk::iface
     {
     public:
         SCHEMA_FIELD("C_DOTAPlayerController", "m_iszPlayerName", getPlayerName, const char*);
-        SCHEMA_FIELD("C_DOTAPlayerController", "m_hAssignedHero", getAssignedHero, C_BaseEntityHandle);
+        SCHEMA_FIELD("C_DOTAPlayerController", "m_hAssignedHero", getAssignedHero, util::C_BaseEntityHandle);
         SCHEMA_FIELD("C_DOTAPlayerController", "m_bHeroAssigned", isPawnAssigned, bool);
     };
 }

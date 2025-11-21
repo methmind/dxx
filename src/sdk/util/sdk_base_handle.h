@@ -7,7 +7,7 @@
 
 #include <cstdint>
 
-namespace sdk::iface
+namespace sdk::util
 {
     constexpr auto INVALID_ENTITY_HANDLE = 0xFFFFFFFF;
 
@@ -21,21 +21,6 @@ namespace sdk::iface
         uint32_t index_;
 
     public:
-
-        bool operator!=(const C_BaseEntityHandle& other) const
-        {
-            return this->index_ != other.index_;
-        }
-
-        bool operator==(const C_BaseEntityHandle& other) const
-        {
-            return this->index_ == other.index_;
-        }
-
-        bool operator<(const C_BaseEntityHandle& other) const
-        {
-            return this->index_ < other.index_;
-        }
 
         [[nodiscard]] bool isValid() const
         {
@@ -51,7 +36,7 @@ namespace sdk::iface
 
         explicit C_BaseEntityHandle(const int32_t index) : index_(index) {}
 
-        explicit C_BaseEntityHandle(const int32_t entry, const int32_t serial) : index_(entry | (serial << SERIAL_NUMBER_SHIFT_BITS)) {}
+        explicit C_BaseEntityHandle(const int32_t index, const int32_t serial) : index_(index | (serial << SERIAL_NUMBER_SHIFT_BITS)) {}
     };
 }
 

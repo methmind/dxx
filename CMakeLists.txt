@@ -137,10 +137,9 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/interface/sdk_entity_identity.h
         src/memory/offset.h
         src/sdk/interface/sdk_entity_instance.h
-        src/sdk/interface/sdk_base_handle.h
+        src/sdk/util/sdk_base_handle.h
         src/sdk/interface/sdk_base_entity.h
         src/sdk/interface/sdk_dota_player_controller.h
-        src/sdk/interface/sdk_handle_interface.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)
