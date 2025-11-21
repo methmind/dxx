@@ -8,6 +8,9 @@
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_original_invoker.h"
 #include "sdk/sdk_client_frame_stage_t.h"
+#include "sdk/interface/sdk_dota_player_controller.h"
+#include "sdk/interface/sdk_entity_identity.h"
+#include "sdk/interface/sdk_entity_instance.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
 #include "sdk/singleton/sdk_source2_engine_to_client.h"
@@ -30,6 +33,28 @@ namespace hook::impl
                     x->getLocalPlayerID(),
                     C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>()->numberOfEntities(),
                     x->isInGame()
+                );
+
+                auto entitySystem = C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>();
+                auto localController = entitySystem->getBaseEntity<sdk::iface::C_DotaPlayerController>(x->getLocalPlayerID());
+                if (!localController) {
+                    return;
+                }
+
+                auto localIdentity = localController->getAssignedHero();
+                if (!localIdentity.isValid()) {
+                    return;
+                }
+
+                auto localHero = entitySystem->getBaseEntity<sdk::iface::C_BaseEntity>(localIdentity.getEntryIndex());
+                if (!localHero) {
+                    return;
+                }
+
+                auto name = localHero->getClassInfo()->getName();
+                dbg("Entity %s:\nName: %s\nHealth: %d",
+                    name,
+                    localHero->getHealth()
                 );
 
                 dispatcher->invoke(static_cast<hook_id_t>(hook_impl_type_e::ON_UPDATE));

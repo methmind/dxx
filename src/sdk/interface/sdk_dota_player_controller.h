@@ -1,0 +1,22 @@
+//
+// Created by sexey on 21.11.2025.
+//
+
+#ifndef DXX_DLC_SDK_DOTA_PLAYER_CONTROLLER_H
+#define DXX_DLC_SDK_DOTA_PLAYER_CONTROLLER_H
+
+#include "sdk_base_entity.h"
+#include "sdk_base_handle.h"
+
+namespace sdk::iface
+{
+    class C_DotaPlayerController : public C_BaseEntity
+    {
+    public:
+        SCHEMA_FIELD("C_DOTAPlayerController", "m_iszPlayerName", getPlayerName, const char*);
+        SCHEMA_FIELD("C_DOTAPlayerController", "m_hAssignedHero", getAssignedHero, C_BaseEntityHandle);
+        SCHEMA_FIELD("C_DOTAPlayerController", "m_bHeroAssigned", isPawnAssigned, bool);
+    };
+}
+
+#endif //DXX_DLC_SDK_DOTA_PLAYER_CONTROLLER_H

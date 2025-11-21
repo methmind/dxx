@@ -4,6 +4,8 @@
 
 #ifndef DXX_DLC_SDK_SCHEMA_SYSTEM_H
 #define DXX_DLC_SDK_SCHEMA_SYSTEM_H
+
+#include "memory/offset.h"
 #include "memory/vmt_call.h"
 
 namespace sdk::iface
@@ -19,21 +21,9 @@ namespace sdk::iface
     class C_SchemaClassInfo
     {
     public:
-
-        const char* getName()
-        {
-            return *reinterpret_cast<const char**>(reinterpret_cast<uint8_t*>(this) + 0x8);
-        }
-
-        [[nodiscard]] uint16_t getFieldsSize() const
-        {
-            return *reinterpret_cast<const uint16_t*>(reinterpret_cast<const uint8_t*>(this) + 0x1C);
-        }
-
-        schema_class_field_s* getFields()
-        {
-            return *reinterpret_cast<schema_class_field_s**>(reinterpret_cast<uint8_t*>(this) + 0x28);
-        }
+        OFFSET(const char*, getName, 0x8);
+        OFFSET(uint16_t, getFieldsSize, 0x1C);
+        OFFSET(schema_class_field_s*, getFields, 0x28);
     };
 
     /*
