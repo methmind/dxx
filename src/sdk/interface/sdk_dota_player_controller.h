@@ -6,7 +6,7 @@
 #define DXX_DLC_SDK_DOTA_PLAYER_CONTROLLER_H
 
 #include "sdk_base_entity.h"
-#include "sdk/util/sdk_base_handle.h"
+#include "sdk/util/sdk_base_entity_handle.h"
 
 namespace sdk::iface
 {

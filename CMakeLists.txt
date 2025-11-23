@@ -137,9 +137,15 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/interface/sdk_entity_identity.h
         src/memory/offset.h
         src/sdk/interface/sdk_entity_instance.h
-        src/sdk/util/sdk_base_handle.h
+        src/sdk/util/sdk_base_entity_handle.h
         src/sdk/interface/sdk_base_entity.h
         src/sdk/interface/sdk_dota_player_controller.h
+        src/hook/impl/hook_impl_on_level_state_change.cpp
+        src/hook/impl/hook_impl_on_level_state_change.h
+        src/hook/impl/hook_impl_on_entity_list_change.cpp
+        src/hook/impl/hook_impl_on_entity_list_change.h
+        src/sdk/custom/sdk_entity_list.cpp
+        src/sdk/custom/sdk_entity_list.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)

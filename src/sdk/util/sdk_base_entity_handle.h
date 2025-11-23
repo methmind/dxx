@@ -2,8 +2,8 @@
 // Created by sexey on 21.11.2025.
 //
 
-#ifndef DXX_DLC_SDK_BASE_HANDLE_H
-#define DXX_DLC_SDK_BASE_HANDLE_H
+#ifndef DXX_DLC_SDK_BASE_ENTITY_HANDLE_H
+#define DXX_DLC_SDK_BASE_ENTITY_HANDLE_H
 
 #include <cstdint>
 
@@ -40,4 +40,4 @@ namespace sdk::util
     };
 }
 
-#endif //DXX_DLC_SDK_BASE_HANDLE_H
+#endif //DXX_DLC_SDK_BASE_ENTITY_HANDLE_H

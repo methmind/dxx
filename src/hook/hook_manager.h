@@ -5,10 +5,20 @@
 #ifndef DXX_DLC_HOOK_MANAGER_H
 #define DXX_DLC_HOOK_MANAGER_H
 
+#include <windows.h>
+
 namespace hook
 {
     class C_HookManager
     {
+    private:
+
+        bool initializeRender();
+
+        bool initializeWorld(HMODULE clientModule);
+
+        bool initializeEntity(HMODULE clientModule);
+
     public:
 
         bool initialize();

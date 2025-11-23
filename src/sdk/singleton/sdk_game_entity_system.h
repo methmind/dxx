@@ -9,6 +9,18 @@
 
 namespace sdk::singleton
 {
+    /*
+     * 48 89 74 24 ? 57 48 83 EC ? 41 B9 ? ? ? ? 41 8B C0 41 23 C1 48 8B F2 41 83 F8 ? 48 8B F9 44 0F 45 C8 41 81 F9 ? ? ? ? 73 ? FF 81
+     * void*(__fastcall*)(void* instance, void* entityInstance, int32_t handle);
+     */
+    constexpr auto ON_ADD_ENTITY_VMT_INDEX = 15;
+
+    /*
+     * 48 89 74 24 ? 57 48 83 EC ? 41 B9 ? ? ? ? 41 8B C0 41 23 C1 48 8B F2 41 83 F8 ? 48 8B F9 44 0F 45 C8 41 81 F9 ? ? ? ? 73 ? FF 89
+     * void*(__fastcall*)(void* instance, void* entityInstance, int32_t handle);
+     */
+    constexpr auto ON_REMOVE_ENTITY_VMT_INDEX = 16;
+
     class C_GameEntitySystem
     {
     public:
@@ -21,12 +33,18 @@ namespace sdk::singleton
 
         number_of_entities_t numberOfEntities_;
         get_base_entity_t getBaseEntity_;
+        void* onAddEntity_;
+        void* onRemoveEntity_;
 
         bool findInstance();
 
         bool findMethods();
 
     public:
+
+        void* getOnAddEntityFunc() const { return this->onAddEntity_; }
+
+        void* getOnRemoveEntityFunc() const { return this->onRemoveEntity_; }
 
         [[nodiscard]] int32_t numberOfEntities() const;
 

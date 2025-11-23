@@ -59,6 +59,10 @@ namespace sdk::singleton
             return false;
         }
 
+        const auto vtable = *static_cast<void***>(this->instance_);
+        this->onAddEntity_ = vtable[ON_ADD_ENTITY_VMT_INDEX];
+        this->onRemoveEntity_ = vtable[ON_REMOVE_ENTITY_VMT_INDEX];
+
         return true;
     }
 

@@ -12,6 +12,7 @@
 #include "input/bind_system.h"
 #include "lua/lua_script_manager.h"
 #include "renderer/renderer.h"
+#include "sdk/custom/sdk_entity_list.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_source2_client.h"
 #include "sdk/singleton/sdk_source2_engine_to_client.h"
@@ -26,7 +27,7 @@ namespace bootstrap
     std::shared_ptr<C_ServiceContainer> C_ApplicationBuilder::Build()
     {
         if (!InitializeSdkStuff()) {
-            dbg("Unable to SDK stuff!");
+            dbg("Unable to initialize SDK stuff!");
             return nullptr;
         }
 
@@ -44,6 +45,11 @@ namespace bootstrap
 
         if (!InitializeGuiStuff(container)) {
             dbg("Unable to initialize GUI stuff!");
+            return nullptr;
+        }
+
+        if (!container->add<sdk::custom::C_EntityList>()->initialize()) {
+            dbg("Unable to initialize sdk::custom::C_EntityList!");
             return nullptr;
         }
 

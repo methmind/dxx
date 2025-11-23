@@ -17,6 +17,10 @@ namespace hook::impl
         ON_LUA_DISPOSE,
         ON_UPDATE,
         ON_PRE_UPDATE,
+        ON_ADD_ENTITY,
+        ON_REMOVE_ENTITY,
+        ON_LEVEL_INIT,
+        ON_LEVEL_SHUTDOWN,
     };
 }
 
