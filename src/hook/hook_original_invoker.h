@@ -6,7 +6,6 @@
 #define DXX_DLC_HOOK_ORIGINAL_INVOKER_H
 
 #include <cassert>
-#include <utility>
 #include "MinHook.h"
 
 namespace hook
@@ -15,19 +14,20 @@ namespace hook
     {
     private:
         void* detour_;
+        mutable FARPROC cached_;
 
     public:
 
-        template<typename return_t, typename ... arg_t>
-        __forceinline decltype(auto) invoke(arg_t&& ... args)
+        template<typename func_declaration_t, typename ... arg_t>
+        __forceinline auto invoke(arg_t ... args)
         {
-            static auto original{FindTrampolineByDetour(this->detour_)};
-            assert(original != nullptr && "FindTrampolineByDetour returned nullptr");
-
-            return reinterpret_cast<return_t>(original)(std::forward<arg_t>(args)...);
+            return reinterpret_cast<func_declaration_t>(this->cached_)(args...);
         }
 
-        constexpr explicit C_HookOriginalInvoker(void* detour) : detour_(detour) {}
+        constexpr explicit C_HookOriginalInvoker(void* detour) : detour_(detour), cached_(FindTrampolineByDetour(detour))
+        {
+            assert(this->cached_ != nullptr && "FindTrampolineByDetour returned nullptr");
+        }
     };
 
     #define MH_CALL_ORIGINAL(detour) C_HookOriginalInvoker(reinterpret_cast<void*>(detour)).invoke<decltype(&detour)>

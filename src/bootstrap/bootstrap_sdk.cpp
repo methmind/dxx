@@ -13,6 +13,7 @@
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_SchemaSystem);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_DotaViewRender);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_Source2Client);
+REGISTER_GLOBAL_SERVICE(sdk::singleton::C_GameEntitySystem);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_Source2EngineToClient);
 
 namespace bootstrap

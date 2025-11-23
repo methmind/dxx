@@ -35,7 +35,7 @@ namespace sdk::custom
             return;
         }
 
-        dbg("[%s] new entity added!", entityInfo->getName());
+        //dbg("[%s] new entity added!", entityInfo->getName());
         this->entities_[entityInfo->getName()].emplace_back(entity);
     }
 
@@ -52,7 +52,7 @@ namespace sdk::custom
         }
 
         std::erase_if(it->second, [entity, entityInfo](auto& val) {
-            dbg("[%s] entity removed!", entityInfo->getName());
+            //dbg("[%s] entity removed!", entityInfo->getName());
             return val == entity;
         });
     }

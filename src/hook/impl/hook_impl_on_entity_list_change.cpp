@@ -28,6 +28,5 @@ namespace hook::impl
             entityInstance
         );
 
-        return MH_CALL_ORIGINAL(hkOnRemoveEntity)(instance, entityInstance, handle);
-    }
+        return MH_CALL_ORIGINAL(hkOnRemoveEntity)(instance, entityInstance, handle);}
 } // hook
