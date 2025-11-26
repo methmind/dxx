@@ -5,14 +5,13 @@
 #ifndef DXX_DLC_VMT_CALL_H
 #define DXX_DLC_VMT_CALL_H
 
-#include <cstdint>
 #include <type_traits>
 #include <utility>
 
 namespace memory::vmt
 {
     template <typename func_declaration_t, size_t id>
-    __forceinline auto call(void* instance, auto&& ... args)
+    __forceinline auto call(void* instance, auto ... args)
     {
         const auto vtable = *static_cast<void***>(instance);
         const auto vfn = reinterpret_cast<func_declaration_t>(vtable[id]);

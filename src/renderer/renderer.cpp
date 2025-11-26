@@ -118,16 +118,18 @@ namespace render
             assert("Unable to initialize DX11 renderer!");
         }
 
+        this->d3dContext_->OMSetRenderTargets(1, &this->renderTargetView_, nullptr);
+
         ImGui_ImplDX11_NewFrame();
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
         this->guiRoot_->render();
+        this->primitivesRenderFrame_->render(ImGui::GetBackgroundDrawList());
 
         ImGui::EndFrame();
         ImGui::Render();
 
-        this->d3dContext_->OMSetRenderTargets(1, &this->renderTargetView_, nullptr);
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     }
 

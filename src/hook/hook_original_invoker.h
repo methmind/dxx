@@ -21,7 +21,13 @@ namespace hook
         template<typename func_declaration_t, typename ... arg_t>
         __forceinline auto invoke(arg_t ... args)
         {
-            return reinterpret_cast<func_declaration_t>(this->cached_)(args...);
+            auto fn = reinterpret_cast<func_declaration_t>(this->cached_);
+
+            if constexpr (std::is_void_v<func_declaration_t>) {
+                fn(args...);
+            } else {
+                return fn(args...);
+            }
         }
 
         constexpr explicit C_HookOriginalInvoker(void* detour) : detour_(detour), cached_(FindTrampolineByDetour(detour))

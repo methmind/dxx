@@ -19,7 +19,7 @@ namespace sdk::singleton
     bool C_DotaViewRender::initialize()
     {
         const auto func = reinterpret_cast<GetViewRenderInstance_t>(memory::FindPattern(GetModuleHandleA("client.dll"),
-                signature::GET_VIEW_RENDER_INSTANCE_FUNC
+            signature::GET_VIEW_RENDER_INSTANCE_FUNC
             )
         );
 

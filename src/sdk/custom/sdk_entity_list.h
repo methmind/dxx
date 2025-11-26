@@ -12,10 +12,14 @@
 
 namespace sdk::custom
 {
+    constexpr std::string_view SCENE_ENTITY_NAME = "C_DOTASceneEntity";
+
     class C_EntityList
     {
     private:
         std::unordered_map<std::string, std::vector<iface::C_EntityInstance*>, xx_hashier_s> entities_;
+
+        static bool IsInvalidEntity(const char* entityClassName);
 
         void syncEntities();
 

@@ -146,6 +146,9 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/hook/impl/hook_impl_on_entity_list_change.h
         src/sdk/custom/sdk_entity_list.cpp
         src/sdk/custom/sdk_entity_list.h
+        src/sdk/interface/sdk_base_player_controller.h
+        src/renderer/renderer_list.cpp
+        src/renderer/renderer_list.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)

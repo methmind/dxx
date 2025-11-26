@@ -23,7 +23,7 @@ namespace hook::impl
             case sdk::ClientFrameStage_t::FRAME_NET_UPDATE_POSTDATAUPDATE_START:
                 dispatcher->invoke(static_cast<hook_id_t>(hook_impl_type_e::ON_PRE_UPDATE));
                 break;
-            case sdk::ClientFrameStage_t::FRAME_NET_FULL_FRAME_UPDATE_ON_REMOVE: {
+            case sdk::ClientFrameStage_t::FRAME_NET_UPDATE_END: {
                 dispatcher->invoke(static_cast<hook_id_t>(hook_impl_type_e::ON_UPDATE));
                 break;
             }

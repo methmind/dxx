@@ -14,7 +14,9 @@ namespace sdk::iface
     public:
         SCHEMA_FIELD("C_BaseEntity", "m_iMaxHealth", getMaxHealth, int32_t);
         SCHEMA_FIELD("C_BaseEntity", "m_iHealth", getHealth, int32_t);
+        SCHEMA_FIELD("C_BaseEntity", "m_fFlags", getEntityFlags, int32_t);
         SCHEMA_FIELD("C_BaseEntity", "m_iTeamNum", getTeam, int32_t);
+        SCHEMA_FIELD("C_BaseEntity", "m_flSimulationTime", getSimulationTime, float);
     };
 }
 

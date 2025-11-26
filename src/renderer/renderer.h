@@ -5,10 +5,12 @@
 #ifndef DXX_DLC_RENDERER_H
 #define DXX_DLC_RENDERER_H
 
+#include <atomic>
 #include <d3d11.h>
-#include <dxgi.h>
 #include <memory>
 
+#include "imgui.h"
+#include "renderer_list.h"
 #include "gui/widget/gui_widget_button.h"
 
 namespace render
@@ -23,6 +25,8 @@ namespace render
         ID3D11DeviceContext* d3dContext_;
         ID3D11RenderTargetView* renderTargetView_;
 
+        std::shared_ptr<C_RendererFrame> primitivesRenderFrame_;
+
         static LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
         bool initializeImGui(ID3D11Device* device) const;
@@ -33,11 +37,14 @@ namespace render
 
     public:
 
+        std::shared_ptr<C_RendererFrame> getPrimitivesRenderFrame() { return this->primitivesRenderFrame_; }
+
         bool initialize();
 
         explicit C_Renderer(const std::shared_ptr<gui::C_IWidget>& root) :
             guiRoot_(root), contextInited_(false), targetWindowHandle_(nullptr),
-            d3dContext_(nullptr), renderTargetView_(nullptr) {}
+            d3dContext_(nullptr), renderTargetView_(nullptr),
+            primitivesRenderFrame_(std::make_shared<C_RendererFrame>()) {}
 
         ~C_Renderer();
     };

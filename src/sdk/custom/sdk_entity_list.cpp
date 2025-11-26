@@ -10,6 +10,11 @@
 
 namespace sdk::custom
 {
+    bool C_EntityList::IsInvalidEntity(const char* entityClassName)
+    {
+        return SCENE_ENTITY_NAME.compare(entityClassName) == 0;
+    }
+
     void C_EntityList::syncEntities()
     {
         const auto entitySystem = C_ServiceLocator::getInstance<singleton::C_GameEntitySystem>();
@@ -24,6 +29,10 @@ namespace sdk::custom
                 continue;
             }
 
+            if (IsInvalidEntity(entityInfo->getName())) {
+                continue;
+            }
+
             this->entities_[entityInfo->getName()].emplace_back(entity);
         }
     }
@@ -35,7 +44,11 @@ namespace sdk::custom
             return;
         }
 
-        //dbg("[%s] new entity added!", entityInfo->getName());
+        if (IsInvalidEntity(entityInfo->getName())) {
+            return;;
+        }
+
+        dbg("[%s] new entity added!", entityInfo->getName());
         this->entities_[entityInfo->getName()].emplace_back(entity);
     }
 
@@ -43,6 +56,10 @@ namespace sdk::custom
     {
         const auto entityInfo = entity->getClassInfo();
         if (!entityInfo) {
+            return;
+        }
+
+        if (IsInvalidEntity(entityInfo->getName())) {
             return;
         }
 
