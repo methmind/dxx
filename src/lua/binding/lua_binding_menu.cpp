@@ -156,13 +156,10 @@ namespace lua::binding
         return newWidget;
     }
 
-    bool RegisterMenuApi(const std::weak_ptr<C_ILuaGuardedState>& syncer,
-        const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-        const std::shared_ptr<C_ILuaContainer>& luaContainer
-    )
+    bool C_LuaBindingMenu::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
-        const auto guardedState = syncer.lock()->getLuaState();
-        auto& luaState = *guardedState;
+        const auto tmp = guardedState.lock()->getLuaState();
+        auto& luaState = *tmp;
 
         auto menuNamespace = luaState[MENU_NAMESPACE_NAME].get_or_create<sol::table>();
         if (!menuNamespace.valid()) {
@@ -173,15 +170,15 @@ namespace lua::binding
         RegisterBasicInterfaces(luaState);
         RegisterWidgets(luaState);
 
-        menuNamespace.set_function("get_widget", [widgetRegedit](const std::string_view& id){
-            return widgetRegedit->find(id);
+        menuNamespace.set_function("get_widget", [this](const std::string_view& id){
+            return this->widgetRegedit_->find(id);
         });
 
         menuNamespace.set_function("create_window",
-            [widgetRegedit, luaContainer](sol::this_state state, const gui::widget_ptr_t& parent,
+            [this](sol::this_state state, const gui::widget_ptr_t& parent,
             const std::string_view& id, const std::string_view& label, const ImVec2 pos, const ImVec2 size, bool isVisible) {
                 const auto mainForm = std::dynamic_pointer_cast<
-                    menu::C_MenuMainForm>(widgetRegedit->find(menu::MAIN_FORM_ID)
+                    menu::C_MenuMainForm>(this->widgetRegedit_->find(menu::MAIN_FORM_ID)
                 );
 
                 if (!mainForm) {
@@ -190,7 +187,7 @@ namespace lua::binding
                 }
 
                 auto newWnd = CreateWidgetHelper<gui::widget::C_WidgetWindow>(
-                state, widgetRegedit.get(), luaContainer.get(), parent,
+                state, this->widgetRegedit_.get(), this->luaContainer_.get(), parent,
                 [&](const std::shared_ptr<gui::widget::C_WidgetWindow>& wnd) {
                     wnd->setPosition(pos);
                     wnd->setSize(size);
@@ -198,7 +195,7 @@ namespace lua::binding
 
                 const auto showButton = std::dynamic_pointer_cast<gui::widget::C_WidgetMenuItem>(
                     CreateWidgetHelper<gui::widget::C_WidgetMenuItem>(
-                    state, widgetRegedit.get(),luaContainer.get(),
+                    state, this->widgetRegedit_.get(),this->luaContainer_.get(),
                     mainForm->getWindowsContainer(),
                     [&](const std::shared_ptr<gui::widget::C_WidgetMenuItem>& item){},
                     std::format("{}_button", id.data()), label.data())

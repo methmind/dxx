@@ -28,13 +28,15 @@ namespace lua
 
     public:
 
+        std::shared_ptr<C_LuaScriptEngine> getEngine() { return this->engine_; }
+
         void disposeScript(const std::string_view& scriptPath);
 
         bool loadScript(const std::string_view& scriptPath);
 
         bool isScriptLoaded(const std::string_view& scriptPath) const { return this->scripts_.contains(scriptPath.data()); }
 
-        bool initialize();
+        bool initialize() const;
 
         explicit C_LuaScriptManager(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit) :
             engine_(std::make_shared<C_LuaScriptEngine>()),

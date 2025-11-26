@@ -87,9 +87,9 @@ namespace lua
         }
     }
 
-    bool C_LuaScriptManager::initialize()
+    bool C_LuaScriptManager::initialize() const
     {
-        if (!this->engine_->initialize(this->widgetRegedit_, weak_from_this())) {
+        if (!this->engine_->initialize()) {
             dbg("Unable to initialize C_LuaScriptEngine!");
             return false;
         }

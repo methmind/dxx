@@ -17,6 +17,8 @@ namespace bootstrap
 
         static bool InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& container);
 
+        static bool InitializeLuaStuff(const std::shared_ptr<C_ServiceContainer>& container);
+
     public:
         static std::shared_ptr<C_ServiceContainer> Build();
     };

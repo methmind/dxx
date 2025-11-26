@@ -14,8 +14,6 @@
 #include "renderer/renderer.h"
 #include "sdk/custom/sdk_entity_list.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
-#include "sdk/singleton/sdk_source2_client.h"
-#include "sdk/singleton/sdk_source2_engine_to_client.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
@@ -38,8 +36,8 @@ namespace bootstrap
         }
 
         const auto widgetRegedit = container->add<gui::C_WidgetRegedit>();
-        if (!container->add<lua::C_LuaScriptManager>(widgetRegedit)->initialize()) {
-            dbg("Unable to initialize lua::C_LuaScriptEngine");
+        if (!InitializeLuaStuff(container)) {
+            dbg("Unable to initialize Lua stuff!");
             return nullptr;
         }
 

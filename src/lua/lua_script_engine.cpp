@@ -9,26 +9,9 @@
 #include "binding/lua_binding_hook.h"
 #include "binding/lua_binding_menu.h"
 #include "debug/debug_output.h"
-#include "script/callback_api.h"
 
 namespace lua
 {
-    bool C_LuaScriptEngine::applyBindings()
-    {
-        const auto self = weak_from_this();
-        if (!binding::RegisterHookApi(self)) {
-            dbg("binding::RegisterHookApi got:err = Unable to apply hooks api!");
-            return false;
-        }
-
-        if (!binding::RegisterMenuApi(self, this->widgetRegedit_, this->luaContainer_.lock())) {
-            dbg("binding::RegisterMenuApi got:err = Unable to apply menu api binding!");
-            return false;
-        }
-
-        return true;
-    }
-
     int C_LuaScriptEngine::ExceptionHandler(lua_State* L, sol::optional<const std::exception&> maybe_exception,
         sol::string_view description)
     {
@@ -64,13 +47,15 @@ namespace lua
         dbg("[Lua]: %s", output.c_str());
     }
 
-    bool C_LuaScriptEngine::initialize(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-                                       const std::weak_ptr<C_ILuaContainer>& luaContainer)
+    void C_LuaScriptEngine::addBinding(std::unique_ptr<binding::C_ILuaBinding> bind)
+    {
+        bind->apply(weak_from_this());
+        this->bindings_.push_back(std::move(bind));
+    }
+
+    bool C_LuaScriptEngine::initialize()
     {
         try {
-            this->widgetRegedit_ = widgetRegedit;
-            this->luaContainer_ = luaContainer;
-
             // SAFETY: Инициализация вызывается ТОЛЬКО один раз из одного потока
             // ПЕРЕД тем как другие потоки получат доступ к luaState_.
             // Handle жив на протяжении всей инициализации, поэтому ссылка валидна.
@@ -97,18 +82,6 @@ namespace lua
             luaState.set_function("print", [](sol::this_state state, sol::variadic_args args) {
                 PrintOverride(state, std::move(args));
             });
-
-
-            if (!applyBindings()) {
-                dbg("Unable to apply api bindings to lua engine!");
-                return false;
-            }
-
-            if (const auto callbackAPI = luaState.require_script(script::CALLBACK_API_CHUNK_NAME,
-                script::CALLBACK_API_SCRIPT); !callbackAPI.valid()) {
-                dbg("Unable to load callback api script!");
-                return false;
-            }
 
             return true;
         } catch (const std::exception& ex) {
