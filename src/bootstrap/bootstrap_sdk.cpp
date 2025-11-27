@@ -3,6 +3,7 @@
 //
 
 #include "application_builder.h"
+#include "sdk/custom/sdk_entity_list.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
 #include "sdk/singleton/sdk_schema_system.h"
@@ -18,7 +19,7 @@ REGISTER_GLOBAL_SERVICE(sdk::singleton::C_Source2EngineToClient);
 
 namespace bootstrap
 {
-    bool C_ApplicationBuilder::InitializeSdkStuff()
+    bool C_ApplicationBuilder::InitializeSdkStuff(const std::shared_ptr<C_ServiceContainer>& container)
     {
         if (!C_ServiceLocator::getInstance<sdk::singleton::C_SchemaSystem>()->initialize()) {
             dbg("Unable to initialize sdk::C_ShemaSystem");
@@ -42,6 +43,11 @@ namespace bootstrap
 
         if (!C_ServiceLocator::getInstance<sdk::singleton::C_Source2EngineToClient>()->initialize()) {
             dbg("Unable to initialize sdk::C_Source2EngineToClient");
+            return false;
+        }
+
+        if (!container->add<sdk::custom::C_EntityList>()->initialize()) {
+            dbg("Unable to initialize sdk::custom::C_EntityList!");
             return false;
         }
 

@@ -5,6 +5,8 @@
 #include "renderer.h"
 
 #include <d3d11.h>
+#include <filesystem>
+
 #include "shlobj.h"
 
 #include "imgui.h"
@@ -124,8 +126,8 @@ namespace render
         ImGui_ImplWin32_NewFrame();
         ImGui::NewFrame();
 
-        this->guiRoot_->render();
         this->primitivesRenderFrame_->render(ImGui::GetBackgroundDrawList());
+        this->onRender_();
 
         ImGui::EndFrame();
         ImGui::Render();
@@ -133,8 +135,9 @@ namespace render
         ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
     }
 
-    bool C_Renderer::initialize()
+    bool C_Renderer::initialize(const on_render_callback& cb)
     {
+        this->onRender_ = cb;
         C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->subscribe<IDXGISwapChain*, UINT, UINT>(
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::PRESENT),
             [this](IDXGISwapChain* self, UINT sync_interval, UINT flags) {

@@ -16,7 +16,9 @@ namespace lua
 {
     void C_LuaScriptManager::disposeScript(const std::string_view& scriptPath)
     {
-        // Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
+        /* Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
+         * todo Нарушение SOLID. Надо бы исправить...
+        */
         C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->invoke<const std::string_view&>(
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_LUA_DISPOSE), scriptPath
         );

@@ -15,8 +15,6 @@ namespace lua
 {
     constexpr auto LUA_ENTRY_FUNCTION_NAME = "lua_entry";
 
-    constexpr std::string ON_LUA_DISPOSE_HOOK_SID  = "on_lua_dispose";
-
     class C_LuaScriptInstance
     {
     public:

@@ -6,19 +6,21 @@
 #define DXX_DLC_RENDERER_H
 
 #include <atomic>
+#include <functional>
 #include <d3d11.h>
 #include <memory>
 
 #include "imgui.h"
 #include "renderer_list.h"
-#include "gui/widget/gui_widget_button.h"
 
 namespace render
 {
+    using on_render_callback = std::function<void()>;
+
     class C_Renderer
     {
     private:
-        std::shared_ptr<gui::C_IWidget> guiRoot_;
+        on_render_callback onRender_;
         bool contextInited_;
 
         HWND targetWindowHandle_;
@@ -39,10 +41,10 @@ namespace render
 
         std::shared_ptr<C_RendererFrame> getPrimitivesRenderFrame() { return this->primitivesRenderFrame_; }
 
-        bool initialize();
+        bool initialize(const on_render_callback& cb);
 
-        explicit C_Renderer(const std::shared_ptr<gui::C_IWidget>& root) :
-            guiRoot_(root), contextInited_(false), targetWindowHandle_(nullptr),
+        explicit C_Renderer() :
+            contextInited_(false), targetWindowHandle_(nullptr),
             d3dContext_(nullptr), renderTargetView_(nullptr),
             primitivesRenderFrame_(std::make_shared<C_RendererFrame>()) {}
 

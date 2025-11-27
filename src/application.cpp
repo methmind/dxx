@@ -11,7 +11,6 @@
 #include "hook/hook_manager.h"
 #include "input/bind_system.h"
 #include "menu/menu_settings_form.h"
-#include "sdk/interface/sdk_interface_scanner.h"
 #include "service_locator/service_locator.h"
 
 namespace app

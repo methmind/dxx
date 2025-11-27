@@ -12,7 +12,6 @@
 #include "input/bind_system.h"
 #include "lua/lua_script_manager.h"
 #include "renderer/renderer.h"
-#include "sdk/custom/sdk_entity_list.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
@@ -24,12 +23,12 @@ namespace bootstrap
 {
     std::shared_ptr<C_ServiceContainer> C_ApplicationBuilder::Build()
     {
-        if (!InitializeSdkStuff()) {
+        auto container = std::make_shared<C_ServiceContainer>();
+        if (!InitializeSdkStuff(container)) {
             dbg("Unable to initialize SDK stuff!");
             return nullptr;
         }
 
-        auto container = std::make_shared<C_ServiceContainer>();
         if (!container->add<hook::C_HookManager>()->initialize()) {
             dbg("Unable to initialize hooks!");
             return nullptr;
@@ -46,12 +45,8 @@ namespace bootstrap
             return nullptr;
         }
 
-        if (!container->add<sdk::custom::C_EntityList>()->initialize()) {
-            dbg("Unable to initialize sdk::custom::C_EntityList!");
-            return nullptr;
-        }
-
-        if (!container->add<render::C_Renderer>(widgetRegedit->find(gui::widget::ROOT_WIDGET_ID))->initialize()) {
+        if (auto rootWidget = widgetRegedit->find(gui::widget::ROOT_WIDGET_ID);
+            !container->add<render::C_Renderer>()->initialize([rootWidget]{ rootWidget->render(); })) {
             dbg("Unable to initialize renderer!");
             return nullptr;
         }
