@@ -6,11 +6,9 @@
 
 namespace lua
 {
-    void C_LuaScriptInstance::addWidget(const gui::widget_ptr_t& widget)
+    void C_LuaScriptInstance::addDependency(const dependency_t& dependency)
     {
-        std::lock_guard lock_(this->widgetsMutex_);
-
-        this->widgets_.push_back(widget);
+        this->dependencies_.lock()->push_back(dependency);
     }
 
     bool C_LuaScriptInstance::initialize(const sol::protected_function_result& instance)
@@ -33,10 +31,6 @@ namespace lua
     {
         if (this->entryPoint_.valid()) {
             this->entryPoint_(1337);
-        }
-
-        for (const auto& widget : this->widgets_) {
-            this->widgetRegedit_->remove(widget->getID());
         }
     }
 } // lua

@@ -1,3 +1,4 @@
+#include <memory>
 #include <thread>
 
 #include "application.h"

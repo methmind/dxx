@@ -50,7 +50,7 @@ private:
 
 public:
 
-    template<typename int_t, typename   ... args_t>
+    template<typename int_t, typename ... args_t>
     std::shared_ptr<int_t> add(args_t&& ... args)
     {
         constexpr auto key = type_hash_s<int_t>::Get();

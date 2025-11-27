@@ -5,7 +5,7 @@
 #ifndef LUA_CONTAINER_INTERFACE_H
 #define LUA_CONTAINER_INTERFACE_H
 
-#include "gui/gui_widget_interface.h"
+#include "lua_script_instance.h"
 
 namespace lua
 {
@@ -13,7 +13,7 @@ namespace lua
     {
     public:
 
-        virtual bool bindGuiWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget) = 0;
+        virtual std::shared_ptr<C_LuaScriptInstance> getScriptInstance(const std::string_view& scriptPath) = 0;
 
         virtual ~C_ILuaContainer() = default;
     };

@@ -33,7 +33,7 @@ namespace gui
         widget_list_t list() const;
 
         template<typename widget_t, typename ... args_t>
-        widget_ptr_t createWidget(args_t&& ... args)
+        std::shared_ptr<widget_t> createWidget(args_t&& ... args)
         {
             auto widget = std::make_shared<widget_t>(std::forward<args_t>(args)...);
             if (!add(widget)) {

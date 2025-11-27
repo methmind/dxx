@@ -14,11 +14,28 @@ namespace lua::binding
 {
     constexpr auto MENU_NAMESPACE_NAME = "menu";
 
-    class C_LuaBindingMenu : public C_ILuaBinding
+    class C_LuaBindingWidgetWrapper : public std::any {
+    private:
+        std::shared_ptr<gui::C_IWidget> instance_;
+        std::shared_ptr<gui::C_WidgetRegedit> regedit_;
+
+    public:
+
+        explicit C_LuaBindingWidgetWrapper(const std::shared_ptr<gui::C_IWidget>& widget, const std::shared_ptr<gui::C_WidgetRegedit>& regedit) :
+            instance_(widget), regedit_(regedit) {}
+
+        ~C_LuaBindingWidgetWrapper() { this->regedit_->remove(this->instance_->getID().c_str()); }
+    };
+
+    class C_LuaBindingMenu final : public C_ILuaBinding
     {
     private:
         std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
         std::shared_ptr<C_ILuaContainer> luaContainer_;
+
+        static void RegisterBasicInterfaces(sol::state& state);
+
+        static void RegisterWidgets(sol::state& state);
 
     public:
 

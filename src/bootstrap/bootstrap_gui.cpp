@@ -14,18 +14,13 @@ namespace bootstrap
     bool C_ApplicationBuilder::InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& services)
     {
         const auto guiRegedit = services->get<gui::C_WidgetRegedit>();
-        const auto guiRootObject = std::dynamic_pointer_cast<gui::widget::C_WidgetRoot>(
-            guiRegedit->createWidget<gui::widget::C_WidgetRoot>()
+        const auto guiRootObject = guiRegedit->createWidget<gui::widget::C_WidgetRoot>();
+
+        auto settingsForm = guiRegedit->createWidget<menu::C_MenuSettingsForm>(guiRegedit,
+            services->get<lua::C_LuaScriptManager>()
         );
 
-        auto settingsForm = std::dynamic_pointer_cast<menu::C_MenuSettingsForm>(
-            guiRegedit->createWidget<menu::C_MenuSettingsForm>(guiRegedit, services->get<lua::C_LuaScriptManager>())
-        );
-
-        const auto mainForm = std::dynamic_pointer_cast<menu::C_MenuMainForm>(
-            guiRegedit->createWidget<menu::C_MenuMainForm>(settingsForm)
-        );
-
+        const auto mainForm = guiRegedit->createWidget<menu::C_MenuMainForm>(settingsForm);
         if (!mainForm->initialize()) {
             dbg("Unable to initialize main form!");
             return false;

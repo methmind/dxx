@@ -14,18 +14,6 @@
 
 namespace lua
 {
-    bool C_LuaScriptManager::bindGuiWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget)
-    {
-        const auto it = this->scripts_.find(luaID.data());
-        if (it == this->scripts_.end()) {
-            dbg("Unable to find lua script: %s!", luaID.data());
-            return false;
-        }
-
-        it->second->addWidget(widget);
-        return true;
-    }
-
     void C_LuaScriptManager::disposeScript(const std::string_view& scriptPath)
     {
         // Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
@@ -40,7 +28,7 @@ namespace lua
     bool C_LuaScriptManager::loadScript(const std::string_view& scriptPath)
     {
         try {
-            if (this->scripts_.contains(scriptPath.data())) {
+            if (isScriptLoaded(scriptPath)) {
                 return true;
             }
 
@@ -57,10 +45,7 @@ namespace lua
                 return false;
             }
 
-            auto [it, inserted] = this->scripts_.emplace(scriptPath,
-                std::make_unique<C_LuaScriptInstance>(this->widgetRegedit_)
-            );
-
+            auto [it, inserted] = this->scripts_.emplace(scriptPath, std::make_shared<C_LuaScriptInstance>());
             if (!inserted) {
                 throw std::runtime_error("Script already exists!");
             }
@@ -85,6 +70,21 @@ namespace lua
             this->scripts_.erase(scriptPath.data());
             return false;
         }
+    }
+
+    bool C_LuaScriptManager::isScriptLoaded(const std::string_view& scriptPath) const
+    {
+        return this->scripts_.contains(scriptPath.data());
+    }
+
+    std::shared_ptr<C_LuaScriptInstance> C_LuaScriptManager::getScriptInstance(const std::string_view& scriptPath)
+    {
+        const auto it = this->scripts_.find(scriptPath.data());
+        if (it == this->scripts_.end()) {
+            return nullptr;
+        }
+
+        return it->second;
     }
 
     bool C_LuaScriptManager::initialize() const

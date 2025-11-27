@@ -28,7 +28,7 @@
 
 namespace lua::binding
 {
-    void RegisterBasicInterfaces(sol::state& state)
+    void C_LuaBindingMenu::RegisterBasicInterfaces(sol::state& state)
     {
         auto luaImVec2 = state.new_usertype<ImVec2>("ImVec2",
             sol::constructors<ImVec2(), ImVec2(float, float)>(),
@@ -63,7 +63,7 @@ namespace lua::binding
         luaIClickable.set_function("get_state", &gui::C_IClickable::getState);
     }
 
-    void RegisterWidgets(sol::state& state)
+    void C_LuaBindingMenu::RegisterWidgets(sol::state& state)
     {
         auto luaWindowWidget = state.new_usertype<gui::widget::C_WidgetWindow>(
             "C_WidgetWindow", sol::no_constructor,
@@ -120,7 +120,7 @@ namespace lua::binding
     }
 
     template<typename widget_t, typename... args_t>
-    gui::widget_ptr_t CreateWidgetHelper(sol::this_state state, gui::C_WidgetRegedit* widgetRegedit,
+    gui::widget_ptr_t CreateWidgetHelper(sol::this_state state, std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit,
         C_ILuaContainer* luaContainer, const gui::widget_ptr_t& parent,
         std::invocable<std::shared_ptr<widget_t>&> auto&& customizer, args_t&&... args
     )
@@ -136,23 +136,22 @@ namespace lua::binding
             __builtin_unreachable();
         }
 
-        auto newWidget = std::dynamic_pointer_cast<widget_t>(
-            widgetRegedit->createWidget<widget_t>(std::forward<args_t>(args)...)
-        );
-
+        auto newWidget = widgetRegedit->createWidget<widget_t>(std::forward<args_t>(args)...);
         if (!newWidget) {
             luaL_error(state.lua_state(), "Unable to create new widget!");
             __builtin_unreachable();
         }
 
-        std::invoke(std::forward<decltype(customizer)>(customizer), newWidget);
+        std::invoke(std::forward<decltype(customizer)>(customizer), newWidget); // Call widget decorator
 
         std::dynamic_pointer_cast<gui::C_IContainer>(parent)->addChild(newWidget);
-        if (!luaContainer->bindGuiWidget(luaPath, newWidget)) {
-            luaL_error(state.lua_state(), "Unable to bind widget");
+        const auto scriptInstance = luaContainer->getScriptInstance(luaPath.c_str());
+        if (!scriptInstance) {
+            luaL_error(state.lua_state(), "Unable to find lua script instance!");
             __builtin_unreachable();
         }
 
+        scriptInstance->addDependency(std::make_shared<C_LuaBindingWidgetWrapper>(newWidget, widgetRegedit));
         return newWidget;
     }
 
@@ -187,7 +186,7 @@ namespace lua::binding
                 }
 
                 auto newWnd = CreateWidgetHelper<gui::widget::C_WidgetWindow>(
-                state, this->widgetRegedit_.get(), this->luaContainer_.get(), parent,
+                state, this->widgetRegedit_, this->luaContainer_.get(), parent,
                 [&](const std::shared_ptr<gui::widget::C_WidgetWindow>& wnd) {
                     wnd->setPosition(pos);
                     wnd->setSize(size);
@@ -195,13 +194,13 @@ namespace lua::binding
 
                 const auto showButton = std::dynamic_pointer_cast<gui::widget::C_WidgetMenuItem>(
                     CreateWidgetHelper<gui::widget::C_WidgetMenuItem>(
-                    state, this->widgetRegedit_.get(),this->luaContainer_.get(),
+                    state, this->widgetRegedit_,this->luaContainer_.get(),
                     mainForm->getWindowsContainer(),
                     [&](const std::shared_ptr<gui::widget::C_WidgetMenuItem>& item){},
                     std::format("{}_button", id.data()), label.data())
                 );
 
-                showButton->setCallback([newWnd](gui::C_IClickable* obj) {
+                showButton->setCallback([newWnd](gui::C_IClickable*) {
                     newWnd->setVisible(true);
                 });
 
