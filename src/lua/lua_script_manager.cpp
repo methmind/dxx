@@ -38,8 +38,8 @@ namespace lua
             }
 
             const auto luaState = this->engine_->getLuaState();
-            auto payloadData = luaState->load_file(scriptPath.data());
 
+            auto payloadData = luaState->load_file(scriptPath.data());
             if (!payloadData.valid()) {
                 dbg("Unable to load user script: %s!", sol::error(payloadData).what());
                 return false;

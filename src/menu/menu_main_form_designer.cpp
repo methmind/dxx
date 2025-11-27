@@ -17,7 +17,7 @@ namespace menu
         this->windowsContainer_ = std::make_shared<gui::widget::C_WidgetWindowsContainer>("navbar_windows_container");
         this->miscSeparator_ = std::make_shared<gui::widget::C_WidgetSeparator>("settings_separator", "Settings");
         this->settingShownButton_ = std::make_shared<gui::widget::C_WidgetMenuItem>("main_menu_settings", "Settings");
-        this->settingShownButton_->setCallback(std::bind(&C_MenuMainFormDesigner::onSettingButtonClick, this, std::placeholders::_1));
+        this->settingShownButton_->setCallback([this](gui::C_IClickable* obj){ onSettingButtonClick(obj); });
 
         this->contextMenu_->addChild(this->scriptSeparator_);
         this->contextMenu_->addChild(this->windowsContainer_);

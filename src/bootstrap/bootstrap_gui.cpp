@@ -11,13 +11,13 @@
 
 namespace bootstrap
 {
-    bool C_ApplicationBuilder::InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& services)
+    bool C_ApplicationBuilder::InitializeGuiStuff(const std::shared_ptr<C_ServiceContainer>& container)
     {
-        const auto guiRegedit = services->get<gui::C_WidgetRegedit>();
+        const auto guiRegedit = container->get<gui::C_WidgetRegedit>();
         const auto guiRootObject = guiRegedit->createWidget<gui::widget::C_WidgetRoot>();
 
         auto settingsForm = guiRegedit->createWidget<menu::C_MenuSettingsForm>(guiRegedit,
-            services->get<lua::C_LuaScriptManager>()
+            container->get<lua::C_LuaScriptManager>()
         );
 
         const auto mainForm = guiRegedit->createWidget<menu::C_MenuMainForm>(settingsForm);

@@ -9,7 +9,7 @@
 #include "lua_guarded_state_interface.h"
 
 /*
- *@brief Do not use any stuff from this anywhere except callback_api.lua
+ * @brief Do not use any stuff from this anywhere except callback_api.lua
 */
 
 namespace lua::binding

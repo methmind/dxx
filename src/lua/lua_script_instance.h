@@ -9,7 +9,6 @@
 
 #include "cs_plain_guarded.h"
 #include "gui/gui_widget_interface.h"
-#include "gui/gui_widget_regedit.h"
 #include "sol/sol.hpp"
 
 namespace lua
