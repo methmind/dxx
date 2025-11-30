@@ -15,6 +15,55 @@
 
 namespace lua::binding
 {
+    /* todo Возможно, что такая реализация была бы лучше... С ней можно убрать мануальную очистку C_HookDispatcher
+    // Вспомогательная функция для проталкивания аргументов
+    template<typename ... arg_t>
+    __forceinline void push_args_to_stack(lua_State* L, arg_t ... args) {
+        (..., sol::stack::push(L, args));
+    }
+
+    template<typename ... arg_t>
+    void RegisterHookCallback(sol::table& hookNamespace, const std::string_view& name, hook::hook_id_t hookType,
+        const std::weak_ptr<C_ILuaGuardedState>& guardedState, const std::shared_ptr<hook::C_HookDispatcher>& hookDispatcher
+    )
+    {
+        hookNamespace.set_function(name, [guardedState, hookDispatcher, hookType](const sol::protected_function& callback) {
+            auto callbackID = luaL_ref(callback.lua_state(), LUA_REGISTRYINDEX);
+            hookDispatcher->subscribe<arg_t...>(
+                hookType, [guardedState, callbackID](arg_t ... args) {
+                    const auto iface = guardedState.lock();
+                    if (!iface) {
+                        return;
+                    }
+
+                    const auto state_ptr = iface->getLuaState();
+                    if (!state_ptr) {
+                        return;
+                    }
+
+                    // Восстанавливаем функцию из registry
+                    lua_State* L = state_ptr->lua_state();
+                    lua_rawgeti(L, LUA_REGISTRYINDEX, callbackID);
+
+                    if (!lua_isfunction(L, -1)) {
+                        lua_pop(L, 1);
+                        return;
+                    }
+
+                    // Проталкиваем аргументы на стек
+                    push_args_to_stack(L, args...);
+
+                    // Вызываем функцию
+                    if (const auto argsCount = sizeof...(arg_t); lua_pcall(L, argsCount, 0, 0) != LUA_OK) {
+                        dbg("Error in hook callback: %s", lua_tostring(L, -1));
+                        lua_pop(L, 1);
+                    }
+                }
+            );
+        });
+    }
+     */
+
     // C++ porn...
 
     template<typename ... arg_t>
