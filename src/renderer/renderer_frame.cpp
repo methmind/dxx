@@ -2,7 +2,7 @@
 // Created by sexey on 25.11.2025.
 //
 
-#include "renderer_list.h"
+#include "renderer_frame.h"
 
 namespace render
 {
@@ -17,6 +17,11 @@ namespace render
                 cmd(drawList);
             }
         }
+    }
+
+    void C_RendererFrame::enqueue(const on_draw_callback& cmd) const
+    {
+        this->writeFrame_->emplace_back(cmd);
     }
 
     void C_RendererFrame::bake()

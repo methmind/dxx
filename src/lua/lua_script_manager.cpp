@@ -16,6 +16,10 @@ namespace lua
 {
     void C_LuaScriptManager::disposeScript(const std::string_view& scriptPath)
     {
+        if (!isScriptLoaded(scriptPath)) {
+            return;
+        }
+
         /* Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
          * todo Нарушение SOLID. Надо бы исправить...
         */

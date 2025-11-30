@@ -4,6 +4,7 @@
 
 #include "lua_script_engine.h"
 
+#include <windows.h>
 #include <format>
 
 #include "binding/lua_binding_hook.h"
@@ -17,6 +18,11 @@ namespace lua
     {
         dbg("[Lua]: %s:%s", (maybe_exception) ? maybe_exception->what() : "", description.data());
         return sol::stack::push(L, description);
+    }
+
+    void C_LuaScriptEngine::LuaPanicHandler(sol::optional<std::string> message)
+    {
+        MessageBoxA(nullptr, (message) ? message.value().c_str() : "Unknown panic!", "LuaVM", 0);
     }
 
     void C_LuaScriptEngine::PrintOverride(sol::this_state state, sol::variadic_args args)
@@ -79,6 +85,7 @@ namespace lua
             );
 
             luaState.set_exception_handler(ExceptionHandler);
+            luaState.set_panic(sol::c_call<decltype(&LuaPanicHandler), &LuaPanicHandler>);
             luaState.set_function("print", [](sol::this_state state, sol::variadic_args args) {
                 PrintOverride(state, std::move(args));
             });

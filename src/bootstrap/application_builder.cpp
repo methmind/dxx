@@ -35,6 +35,8 @@ namespace bootstrap
         }
 
         const auto widgetRegedit = container->add<gui::C_WidgetRegedit>();
+        const auto renderer = container->add<render::C_Renderer>();
+
         if (!InitializeLuaStuff(container)) {
             dbg("Unable to initialize Lua stuff!");
             return nullptr;
@@ -46,7 +48,7 @@ namespace bootstrap
         }
 
         if (auto rootWidget = widgetRegedit->find(gui::widget::ROOT_WIDGET_ID);
-            !container->add<render::C_Renderer>()->initialize([rootWidget]{ rootWidget->render(); })) {
+            !renderer->initialize([rootWidget]{ rootWidget->render(); })) {
             dbg("Unable to initialize renderer!");
             return nullptr;
         }

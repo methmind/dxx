@@ -12,13 +12,13 @@ namespace sdk::custom
 {
     bool C_EntityList::IsInvalidEntity(const char* entityClassName)
     {
-        return SCENE_ENTITY_NAME.compare(entityClassName) == 0;
+        return SCENE_ENTITY_NAME == entityClassName;
     }
 
     void C_EntityList::syncEntities()
     {
         const auto entitySystem = C_ServiceLocator::getInstance<singleton::C_GameEntitySystem>();
-        for (uint32_t i = 0, countOf = entitySystem->numberOfEntities(); i <= countOf; i++) {
+        for (int32_t i = 0, countOf = entitySystem->numberOfEntities(); i <= countOf; i++) {
             const auto entity = entitySystem->getBaseEntity<iface::C_EntityInstance>(i);
             if (!entity) {
                 continue;
@@ -45,7 +45,7 @@ namespace sdk::custom
         }
 
         if (IsInvalidEntity(entityInfo->getName())) {
-            return;;
+            return;
         }
 
         this->entities_[entityInfo->getName()].emplace_back(entity);
@@ -67,7 +67,7 @@ namespace sdk::custom
             return;
         }
 
-        std::erase_if(it->second, [entity, entityInfo](auto& val) {
+        std::erase_if(it->second, [entity](auto& val) {
             return val == entity;
         });
     }

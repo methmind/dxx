@@ -24,7 +24,21 @@ namespace gui
 
     public:
 
-        widget_ptr_t find(const std::string_view& id) const;
+        template<typename T = C_IWidget>
+        std::shared_ptr<T> find(const std::string_view& id) const {
+            const auto guarded = this->widgets_.lock_shared();
+
+            const auto it = guarded->find(id.data());
+            if (it == guarded->end()) {
+                return nullptr;
+            }
+
+            if constexpr (std::is_same_v<T, C_IWidget>) {
+                return it->second;
+            } else {
+                return std::dynamic_pointer_cast<T>(it->second);
+            }
+        }
 
         bool add(const widget_ptr_t& ptr);
 

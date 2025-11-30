@@ -5,13 +5,11 @@
 #ifndef DXX_DLC_RENDERER_H
 #define DXX_DLC_RENDERER_H
 
-#include <atomic>
 #include <functional>
 #include <d3d11.h>
 #include <memory>
 
-#include "imgui.h"
-#include "renderer_list.h"
+#include "renderer_frame.h"
 
 namespace render
 {

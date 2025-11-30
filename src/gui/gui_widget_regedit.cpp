@@ -7,18 +7,6 @@
 
 namespace gui
 {
-    widget_ptr_t C_WidgetRegedit::find(const std::string_view& id) const
-    {
-        const auto guarded = this->widgets_.lock_shared();
-
-        const auto it = guarded->find(id.data());
-        if (it == guarded->end()) {
-            return nullptr;
-        }
-
-        return it->second;
-    }
-
     bool C_WidgetRegedit::add(const widget_ptr_t& ptr)
     {
         const auto guarded = this->widgets_.lock();

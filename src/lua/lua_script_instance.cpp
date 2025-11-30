@@ -4,6 +4,8 @@
 
 #include "lua_script_instance.h"
 
+#include "debug/debug_output.h"
+
 namespace lua
 {
     void C_LuaScriptInstance::addDependency(const dependency_t& dependency)
@@ -23,7 +25,11 @@ namespace lua
             return false;
         }
 
-        this->entryPoint_(0);
+        if (const auto result = this->entryPoint_(0); !result.valid()) {
+            dbg("[Lua] error: %s", sol::error(result).what());
+            return false;
+        }
+
         return true;
     }
 

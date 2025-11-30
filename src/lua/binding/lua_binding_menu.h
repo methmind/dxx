@@ -24,7 +24,7 @@ namespace lua::binding
         explicit C_LuaBindingWidgetWrapper(const std::shared_ptr<gui::C_IWidget>& widget, const std::shared_ptr<gui::C_WidgetRegedit>& regedit) :
             instance_(widget), regedit_(regedit) {}
 
-        ~C_LuaBindingWidgetWrapper() { this->regedit_->remove(this->instance_->getID().c_str()); }
+        ~C_LuaBindingWidgetWrapper() { this->regedit_->remove(this->instance_->getID()); }
     };
 
     class C_LuaBindingMenu final : public C_ILuaBinding

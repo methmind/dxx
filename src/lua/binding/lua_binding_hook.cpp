@@ -22,7 +22,7 @@ namespace lua::binding
         const std::weak_ptr<C_ILuaGuardedState>& guardedState, const std::shared_ptr<hook::C_HookDispatcher>& hookDispatcher
     )
     {
-        hookNamespace.set_function(name, [guardedState, hookDispatcher, hookType](const sol::function& callback) {
+        hookNamespace.set_function(name, [guardedState, hookDispatcher, hookType](const sol::protected_function& callback) {
             hookDispatcher->subscribe<arg_t...>(
                 hookType, [guardedState, callback](arg_t ... args) {
                     const auto iface = guardedState.lock();
@@ -32,8 +32,7 @@ namespace lua::binding
                     }
 
                     const auto tmp = iface->getLuaState(); // Thread-safe access to Lua state
-                    if (const sol::protected_function_result result = callback(args...);
-                        !result.valid()) {
+                    if (const auto result = callback(args...); !result.valid()) {
                         dbg("Error in hook callback: %s", sol::error(result).what());
                     }
                 }

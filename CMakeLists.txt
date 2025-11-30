@@ -147,10 +147,14 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/custom/sdk_entity_list.cpp
         src/sdk/custom/sdk_entity_list.h
         src/sdk/interface/sdk_base_player_controller.h
-        src/renderer/renderer_list.cpp
-        src/renderer/renderer_list.h
+        src/renderer/renderer_frame.cpp
+        src/renderer/renderer_frame.h
         src/lua/binding/lua_binding_interface.h
         src/bootstrap/bootstrap_lua.cpp
+        src/lua/binding/lua_binding_renderer.cpp
+        src/lua/binding/lua_binding_renderer.h
+        src/lua/binding/lua_binding_imgui.cpp
+        src/lua/binding/lua_binding_imgui.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)

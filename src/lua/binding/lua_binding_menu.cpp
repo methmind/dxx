@@ -30,20 +30,6 @@ namespace lua::binding
 {
     void C_LuaBindingMenu::RegisterBasicInterfaces(sol::state& state)
     {
-        auto luaImVec2 = state.new_usertype<ImVec2>("ImVec2",
-            sol::constructors<ImVec2(), ImVec2(float, float)>(),
-            "x", &ImVec2::x,
-            "y", &ImVec2::y
-        );
-        luaImVec2.set_function("get", sol::overload(
-            [](ImVec2& self, size_t i) -> float& { return self[i]; },
-            [](const ImVec2& self, size_t i) -> float { return self[i]; }
-        ));
-        luaImVec2[sol::meta_function::index] = sol::overload(
-            [](ImVec2& self, size_t i) -> float& { return self[i]; },
-            [](const ImVec2& self, size_t i) -> float { return self[i]; }
-        );
-
         auto luaIWidget = state.new_usertype<gui::C_IWidget>("C_IWidget", sol::no_constructor);
         luaIWidget.set_function("get_id", &gui::C_IWidget::getID);
         luaIWidget.set_function("get_type", &gui::C_IWidget::getType);
@@ -120,7 +106,7 @@ namespace lua::binding
     }
 
     template<typename widget_t, typename... args_t>
-    gui::widget_ptr_t CreateWidgetHelper(sol::this_state state, std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit,
+    gui::widget_ptr_t CreateWidgetHelper(sol::this_state state, const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
         C_ILuaContainer* luaContainer, const gui::widget_ptr_t& parent,
         std::invocable<std::shared_ptr<widget_t>&> auto&& customizer, args_t&&... args
     )
@@ -145,7 +131,7 @@ namespace lua::binding
         std::invoke(std::forward<decltype(customizer)>(customizer), newWidget); // Call widget decorator
 
         std::dynamic_pointer_cast<gui::C_IContainer>(parent)->addChild(newWidget);
-        const auto scriptInstance = luaContainer->getScriptInstance(luaPath.c_str());
+        const auto scriptInstance = luaContainer->getScriptInstance(luaPath);
         if (!scriptInstance) {
             luaL_error(state.lua_state(), "Unable to find lua script instance!");
             __builtin_unreachable();
@@ -176,10 +162,7 @@ namespace lua::binding
         menuNamespace.set_function("create_window",
             [this](sol::this_state state, const gui::widget_ptr_t& parent,
             const std::string_view& id, const std::string_view& label, const ImVec2 pos, const ImVec2 size, bool isVisible) {
-                const auto mainForm = std::dynamic_pointer_cast<
-                    menu::C_MenuMainForm>(this->widgetRegedit_->find(menu::MAIN_FORM_ID)
-                );
-
+                const auto mainForm = this->widgetRegedit_->find<menu::C_MenuMainForm>(menu::MAIN_FORM_ID);
                 if (!mainForm) {
                     luaL_error(state.lua_state(), "Unable to find menu::C_MenuMainForm!");
                     __builtin_unreachable();

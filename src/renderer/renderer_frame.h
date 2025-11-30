@@ -2,8 +2,8 @@
 // Created by sexey on 25.11.2025.
 //
 
-#ifndef DXX_DLC_RENDERER_LIST_H
-#define DXX_DLC_RENDERER_LIST_H
+#ifndef DXX_DLC_RENDERER_FRAME_H
+#define DXX_DLC_RENDERER_FRAME_H
 
 #include <atomic>
 #include <functional>
@@ -12,7 +12,7 @@
 
 namespace render
 {
-    constexpr auto DEFAULT_QUEUE_SIZE = 32;
+    constexpr auto DEFAULT_QUEUE_SIZE = 128;
 
     /*
      * Only for SPSC (single-producer, single-consumer)
@@ -33,11 +33,7 @@ namespace render
 
         void render(ImDrawList* drawList);
 
-        template<typename T>
-        void enqueue(T&& cmd)
-        {
-            this->writeFrame_->emplace_back(std::forward<T>(cmd));
-        }
+        void enqueue(const on_draw_callback& cmd) const;
 
         void bake();
 
@@ -59,4 +55,4 @@ namespace render
     };
 } // renderer
 
-#endif //DXX_DLC_RENDERER_LIST_H
+#endif //DXX_DLC_RENDERER_FRAME_H

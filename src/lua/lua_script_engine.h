@@ -22,6 +22,8 @@ namespace lua
 
         static int ExceptionHandler(lua_State* L, sol::optional<const std::exception&> maybe_exception, sol::string_view description);
 
+        static void LuaPanicHandler(sol::optional<std::string> message);
+
         static void PrintOverride(sol::this_state state, sol::variadic_args args);
 
     public:
