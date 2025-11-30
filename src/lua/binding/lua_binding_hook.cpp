@@ -31,7 +31,7 @@ namespace lua::binding
                         return;
                     }
 
-                    const auto tmp = iface->getLuaState(); // Thread-safe access to Lua state
+                    const auto state = iface->getLuaState(); // Thread-safe access to Lua state
                     if (const auto result = callback(args...); !result.valid()) {
                         dbg("Error in hook callback: %s", sol::error(result).what());
                     }

@@ -4,10 +4,25 @@
 #include "application.h"
 #include "debug/debug_output.h"
 
+DWORD WINAPI UnloadModule(LPVOID lpModule)
+{
+    FreeLibraryAndExitThread(static_cast<HMODULE>(lpModule), 0);
+}
+
+DWORD WINAPI EntryModule(LPVOID lpModule)
+{
+    {
+        std::make_unique<app::C_Application>()->entry();
+    }
+
+    CloseHandle(CreateThread(nullptr, 0, UnloadModule, lpModule, 0, nullptr));
+    return 0;
+}
+
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 {
     if (fdwReason != DLL_PROCESS_ATTACH) {
-        return TRUE;
+        return true;
     }
 
     if (!DisableThreadLibraryCalls(hinstDLL)) {
@@ -15,12 +30,6 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
         return false;
     }
 
-    std::thread([hinstDLL] {
-        {
-            std::make_unique<app::C_Application>()->entry();
-        }
-        FreeLibraryAndExitThread(hinstDLL, 0);
-    }).detach();
-
-    return TRUE;
+    CloseHandle(CreateThread(nullptr, 0, EntryModule, hinstDLL, 0, nullptr));
+    return true;
 }

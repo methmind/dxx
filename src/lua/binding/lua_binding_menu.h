@@ -31,7 +31,7 @@ namespace lua::binding
     {
     private:
         std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
-        std::shared_ptr<C_ILuaContainer> luaContainer_;
+        std::weak_ptr<C_ILuaContainer> luaContainer_;
 
         static void RegisterBasicInterfaces(sol::state& state);
 
@@ -42,7 +42,7 @@ namespace lua::binding
         bool apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState) override;
 
         C_LuaBindingMenu(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-            const std::shared_ptr<C_ILuaContainer>& luaContainer)
+            const std::weak_ptr<C_ILuaContainer>& luaContainer)
             : widgetRegedit_(widgetRegedit), luaContainer_(luaContainer) {}
 
         ~C_LuaBindingMenu() override = default;

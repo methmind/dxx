@@ -8,6 +8,7 @@
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
+#include "hook/hook_dispatcher.h"
 #include "hook/hook_manager.h"
 #include "input/bind_system.h"
 #include "menu/menu_settings_form.h"
@@ -48,6 +49,7 @@ namespace app
 
         dbg("Unloading module from process...");
         hooks->disable();
+        C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->clear(); // Освобождаем всех слушателей с хуков.
 
         return true;
     }

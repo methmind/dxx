@@ -103,6 +103,8 @@ namespace hook
             }
         }
 
+        void clear() const;
+
         C_HookDispatcher() = default;
 
         ~C_HookDispatcher() = default;

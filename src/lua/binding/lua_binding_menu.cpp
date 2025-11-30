@@ -169,7 +169,7 @@ namespace lua::binding
                 }
 
                 auto newWnd = CreateWidgetHelper<gui::widget::C_WidgetWindow>(
-                state, this->widgetRegedit_, this->luaContainer_.get(), parent,
+                state, this->widgetRegedit_, this->luaContainer_.lock().get(), parent,
                 [&](const std::shared_ptr<gui::widget::C_WidgetWindow>& wnd) {
                     wnd->setPosition(pos);
                     wnd->setSize(size);
@@ -177,7 +177,7 @@ namespace lua::binding
 
                 const auto showButton = std::dynamic_pointer_cast<gui::widget::C_WidgetMenuItem>(
                     CreateWidgetHelper<gui::widget::C_WidgetMenuItem>(
-                    state, this->widgetRegedit_,this->luaContainer_.get(),
+                    state, this->widgetRegedit_,this->luaContainer_.lock().get(),
                     mainForm->getWindowsContainer(),
                     [&](const std::shared_ptr<gui::widget::C_WidgetMenuItem>& item){},
                     std::format("{}_button", id.data()), label.data())
