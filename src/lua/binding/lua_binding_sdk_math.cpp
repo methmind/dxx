@@ -42,8 +42,6 @@ namespace lua::binding
         luaVector3.set_function("clamp", &sdk::math::Vector3::clamp);
         luaVector3.set_function("clamped", &sdk::math::Vector3::clamped);
         luaVector3.set_function("sanitize_angles", &sdk::math::Vector3::sanitize_angles);
-
-        // Углы (если реализованы в cpp)
         luaVector3.set_function("to_angles", &sdk::math::Vector3::to_angles);
 
         // Статические методы (вызываются как Vector3.lerp(...))
