@@ -21,6 +21,53 @@ namespace sdk::signature
 
     // "map_shutdown"
     constexpr auto ON_LEVEL_SHUTDOWN_CALLBACK = "48 83 EC ? 48 8B 0D ? ? ? ? 48 8D 15 ? ? ? ? 45 33 C9 45 33 C0 48 8B 01 FF 50 ? 48 85 C0 74 ? 48 8B 0D ? ? ? ? 48 8B D0 4C 8B 01 41 FF 50 ? 48 83 C4";
+
+    // "CDOTA_MinimapRenderer::RenderCreepCamps"
+    constexpr auto GET_HUD_ICONS = "48 8D 05 ? ? ? ? C3 CC CC CC CC CC CC CC CC 48 89 5C 24 ? 48 89 6C 24 ? 48 89 74 24 ? 41 56 48 83 EC ? 48 8B D9";
+
+    /*
+     * __int64 __fastcall sub_18155D470(float *a1, __int64 a2)
+     * Can be found via xref on g_pRenderGameSystem
+    * __int64 __fastcall ScreenTransform(float *a1, __int64 a2)
+      {
+        unsigned int v3; // r14d
+        float *v4; // rax
+        float v5; // xmm0_4
+        float v6; // xmm1_4
+        float v7; // xmm2_4
+        float v8; // xmm1_4
+
+        v3 = 0;
+        v4 = (float *)(*(__int64 (__fastcall **)(__int64, _QWORD))(*(_QWORD *)g_pRenderGameSystem + 320LL))(
+                        g_pRenderGameSystem,
+                        0);
+        v5 = (float)((float)(v4[2] * a1[2]) + (float)((float)(v4[1] * a1[1]) + (float)(*v4 * *a1))) + v4[3];
+        *(float *)a2 = v5;
+        v6 = (float)((float)(v4[6] * a1[2]) + (float)((float)(v4[5] * a1[1]) + (float)(v4[4] * *a1))) + v4[7];
+        *(float *)(a2 + 4) = v6;
+        v7 = (float)((float)(v4[14] * a1[2]) + (float)((float)(v4[13] * a1[1]) + (float)(v4[12] * *a1))) + v4[15];
+        *(_DWORD *)(a2 + 8) = 0;
+        if ( v7 >= 0.001 )
+        {
+          *(float *)a2 = v5 * (float)(1.0 / v7);
+          v8 = v6 * (float)(1.0 / v7);
+        }
+        else
+        {
+          *(float *)a2 = v5 * 100000.0;
+          v8 = v6 * 100000.0;
+          v3 = 1;
+        }
+        *(float *)(a2 + 4) = v8;
+        return v3;
+      }
+     */
+    constexpr auto SCREEN_TRANSFORM_FUNC = "48 89 5C 24 ? 57 48 83 EC ? 48 8B F9 48 8B DA 48 8B 0D ? ? ? ? 48 85 C9 0F 84 ? ? ? ? 48 8B 01";
+
+    // Can be found via "IGameSystem::InitAllSystems" and "Game System %s is defined twice!\n"
+    constexpr auto GAME_SYSTEM_INIT_ALL_FUNC = "48 89 5C 24 ? 55 56 57 48 83 EC ? 48 8D 05 ? ? ? ? 48 C7 44 24 ? ? ? ? ? 33 F6";
+
+    constexpr auto GAME_SYSTEM_FACTORY_MOV_OPCODE = "48 8B 1D ? ? ? ? 48 85 DB 0F 84 ? ? ? ? BD";
 }
 
 #endif //DXX_DLC_SDK_SIGNATURE_H

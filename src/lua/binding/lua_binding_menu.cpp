@@ -122,6 +122,12 @@ namespace lua::binding
             __builtin_unreachable();
         }
 
+        const auto scriptInstance = luaContainer->getScriptInstance(luaPath);
+        if (!scriptInstance) {
+            luaL_error(state.lua_state(), "Unable to find lua script instance!");
+            __builtin_unreachable();
+        }
+
         auto newWidget = widgetRegedit->createWidget<widget_t>(std::forward<args_t>(args)...);
         if (!newWidget) {
             luaL_error(state.lua_state(), "Unable to create new widget!");
@@ -131,13 +137,8 @@ namespace lua::binding
         std::invoke(std::forward<decltype(customizer)>(customizer), newWidget); // Call widget decorator
 
         std::dynamic_pointer_cast<gui::C_IContainer>(parent)->addChild(newWidget);
-        const auto scriptInstance = luaContainer->getScriptInstance(luaPath);
-        if (!scriptInstance) {
-            luaL_error(state.lua_state(), "Unable to find lua script instance!");
-            __builtin_unreachable();
-        }
-
         scriptInstance->addDependency(std::make_shared<C_LuaBindingWidgetWrapper>(newWidget, widgetRegedit));
+
         return newWidget;
     }
 
@@ -168,8 +169,14 @@ namespace lua::binding
                     __builtin_unreachable();
                 }
 
+                const auto luaContainer = this->luaContainer_.lock();
+                if (!luaContainer) {
+                    luaL_error(state.lua_state(), "Unable to get lua container!");
+                    __builtin_unreachable();
+                }
+
                 auto newWnd = CreateWidgetHelper<gui::widget::C_WidgetWindow>(
-                state, this->widgetRegedit_, this->luaContainer_.lock().get(), parent,
+                state, this->widgetRegedit_, luaContainer.get(), parent,
                 [&](const std::shared_ptr<gui::widget::C_WidgetWindow>& wnd) {
                     wnd->setPosition(pos);
                     wnd->setSize(size);
@@ -177,7 +184,7 @@ namespace lua::binding
 
                 const auto showButton = std::dynamic_pointer_cast<gui::widget::C_WidgetMenuItem>(
                     CreateWidgetHelper<gui::widget::C_WidgetMenuItem>(
-                    state, this->widgetRegedit_,this->luaContainer_.lock().get(),
+                    state, this->widgetRegedit_,luaContainer.get(),
                     mainForm->getWindowsContainer(),
                     [&](const std::shared_ptr<gui::widget::C_WidgetMenuItem>& item){},
                     std::format("{}_button", id.data()), label.data())

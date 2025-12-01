@@ -4,7 +4,12 @@
 
 #include "lua_binding_renderer.h"
 
+#include "imgui_internal.h"
 #include "debug/debug_output.h"
+#include "sdk/custom/sdk_entity_list.h"
+#include "sdk/custom/sdk_world_to_screen.h"
+#include "sdk/math/sdk_math_vector3.h"
+#include "sdk/singleton/sdk_render_game_system.h"
 
 namespace lua::binding
 {
@@ -103,8 +108,39 @@ namespace lua::binding
            return this->renderer_->getPrimitivesRenderFrame();
         });
 
-        rendererNamespace.set_function("get_screen_size", [] { return ImGui::GetIO().DisplaySize; });
-        rendererNamespace.set_function("measure_text", [](const char* text) { return ImGui::CalcTextSize(text); });
+        rendererNamespace.set_function("get_screen_size", [] {
+            if (!GImGui) {
+                return ImVec2(-1, -1);
+            }
+
+            return ImGui::GetIO().DisplaySize;
+        });
+
+        rendererNamespace.set_function("measure_text", [](const char* text) {
+            if (!GImGui) {
+                return ImVec2(-1, -1);
+            }
+
+            return ImGui::CalcTextSize(text);
+        });
+
+        rendererNamespace.set_function("get_world_projection_matrix", [] {
+            return C_ServiceLocator::getInstance<sdk::singleton::C_RenderGameSystem>()->getWorldProjectionMatrix();
+        });
+
+        rendererNamespace.set_function("world_to_screen", [](const sdk::math::Vector3& pos) {
+            if (!GImGui) {
+                return ImVec2(-1, -1);
+            }
+
+            sdk::math::Vector3 out;
+            if (const auto& screenSize = ImGui::GetIO().DisplaySize;
+                sdk::custom::WorldToScreen({screenSize.x, screenSize.y}, pos, out)) {
+                return ImVec2(-1, -1);
+            }
+
+            return ImVec2(out.x, out.y);
+        });
 
         return true;
     }

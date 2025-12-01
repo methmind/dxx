@@ -14,9 +14,11 @@ namespace sdk::singleton
     class C_DotaViewRender
     {
     private:
+        using get_view_render_instance_t = C_DotaViewRender*(__fastcall*)();
+
         void* instance_;
 
-        using GetViewRenderInstance_t = C_DotaViewRender*(__fastcall*)();
+        bool findInstance(HMODULE clientModule);
 
     public:
 
@@ -24,7 +26,7 @@ namespace sdk::singleton
 
         bool initialize();
 
-        C_DotaViewRender() : instance_(nullptr) {}
+        C_DotaViewRender() = default;
 
         ~C_DotaViewRender() = default;
     };
