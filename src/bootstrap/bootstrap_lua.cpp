@@ -8,6 +8,7 @@
 #include "lua/binding/lua_binding_imgui.h"
 #include "lua/binding/lua_binding_menu.h"
 #include "lua/binding/lua_binding_renderer.h"
+#include "lua/binding/lua_binding_sdk_math.h"
 
 namespace bootstrap
 {
@@ -21,6 +22,7 @@ namespace bootstrap
 
         const auto luaEngine = luaManager->getEngine();
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingHook>());
+        luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSdkMath>());
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingImgui>());
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingRenderer>(
             container->get<render::C_Renderer>()

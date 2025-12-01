@@ -165,6 +165,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/singleton/sdk_render_game_system.h
         src/sdk/math/sdk_math_matrix.h
         src/sdk/math/sdk_math_vector2.h
+        src/lua/binding/lua_binding_sdk_math.cpp
+        src/lua/binding/lua_binding_sdk_math.h
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2)
