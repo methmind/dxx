@@ -14,9 +14,9 @@ namespace sdk::singleton
     private:
         void* vtable_{};
     public:
-        C_IGameSystemFactory* next;
-        const char* name;
-        void* gameSystem;
+        C_IGameSystemFactory* next{};
+        const char* name{};
+        void* gameSystem{};
     };
 
     class C_BaseGameSystemFactory
@@ -26,7 +26,7 @@ namespace sdk::singleton
 
     public:
 
-        void* find(const std::string_view& name) const;
+        [[nodiscard]] void* find(const std::string_view& name) const;
 
         bool initialize();
 

@@ -42,9 +42,9 @@ namespace sdk::singleton
 
     public:
 
-        void* getOnAddEntityFunc() const { return this->onAddEntity_; }
+        [[nodiscard]] void* getOnAddEntityFunc() const { return this->onAddEntity_; }
 
-        void* getOnRemoveEntityFunc() const { return this->onRemoveEntity_; }
+        [[nodiscard]] void* getOnRemoveEntityFunc() const { return this->onRemoveEntity_; }
 
         [[nodiscard]] int32_t numberOfEntities() const;
 
