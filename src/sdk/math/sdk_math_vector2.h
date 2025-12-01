@@ -12,7 +12,7 @@ namespace sdk::math
         float x, y;
     };
 
-    using Vector2 = vec2_s;
+    using vector2 = vec2_s;
 }
 
 #endif //DXX_DLC_SDK_MATH_VECTOR2_H

@@ -10,7 +10,7 @@
 
 namespace sdk::custom
 {
-    bool WorldToScreen(const math::Vector2& screenSize, const math::Vector3& in, math::Vector3& out);
+    bool WorldToScreen(const math::vector2& screenSize, const math::vector3& in, math::vector3& out);
 } // sdk
 
 #endif //DXX_DLC_SDK_WORLD_TO_SCREEN_H

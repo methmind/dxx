@@ -289,7 +289,7 @@ namespace sdk::math
         return vec3_s::lerp(a, b, t);
     }
 
-    using Vector3 = vec3_s;
+    using vector3 = vec3_s;
 } // namespace sdk::math
 
 #endif // DXX_DLC_SDK_MATH_VECTOR3_H

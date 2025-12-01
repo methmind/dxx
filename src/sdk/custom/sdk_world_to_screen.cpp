@@ -10,7 +10,7 @@
 
 namespace sdk::custom
 {
-    bool WorldToScreen(const math::Vector2& screenSize, const math::Vector3& in, math::Vector3& out)
+    bool WorldToScreen(const math::vector2& screenSize, const math::vector3& in, math::vector3& out)
     {
         // if return value is 1, so its out of screen...
         if (C_ServiceLocator::getInstance<singleton::C_RenderGameSystem>()->screenTransform(in, out) != 0) {

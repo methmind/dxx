@@ -21,7 +21,7 @@ namespace sdk::singleton
     class C_RenderGameSystem
     {
     private:
-        using screen_transform_t = uint32_t(__fastcall*)(const math::Vector3& in, math::Vector3& out);
+        using screen_transform_t = uint32_t(__fastcall*)(const math::vector3& in, math::vector3& out);
 
         using world_to_projection_matrix_t = float*(__fastcall*)(void* instance, int32_t screenSlot);
 
@@ -32,7 +32,7 @@ namespace sdk::singleton
 
         [[nodiscard]] float* getWorldProjectionMatrix() const;
 
-        uint32_t screenTransform(const math::Vector3& in, math::Vector3& out) const;
+        uint32_t screenTransform(const math::vector3& in, math::vector3& out) const;
 
         bool initialize();
 

@@ -128,12 +128,12 @@ namespace lua::binding
             return C_ServiceLocator::getInstance<sdk::singleton::C_RenderGameSystem>()->getWorldProjectionMatrix();
         });
 
-        rendererNamespace.set_function("world_to_screen", [](const sdk::math::Vector3& pos) {
+        rendererNamespace.set_function("world_to_screen", [](const sdk::math::vector3& pos) {
             if (!GImGui) {
                 return ImVec2(-1, -1);
             }
 
-            sdk::math::Vector3 out;
+            sdk::math::vector3 out;
             if (const auto& screenSize = ImGui::GetIO().DisplaySize;
                 sdk::custom::WorldToScreen({screenSize.x, screenSize.y}, pos, out)) {
                 return ImVec2(-1, -1);
