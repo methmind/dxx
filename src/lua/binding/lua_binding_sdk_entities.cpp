@@ -22,6 +22,10 @@ namespace lua::binding
         luaBaseEntityHandle.set_function("is_valid", &sdk::util::C_BaseEntityHandle::isValid);
         luaBaseEntityHandle.set_function("get_entry_index", &sdk::util::C_BaseEntityHandle::getEntryIndex);
 
+        auto luaEntityListView = state.new_usertype<C_LuaEntityListView>("C_LuaEntityListView", sol::no_constructor);
+        luaEntityListView.set_function(sol::meta_function::length, &C_LuaEntityListView::size);
+        luaEntityListView.set_function(sol::meta_function::index, &C_LuaEntityListView::get);
+
         state.new_usertype<sdk::util::color_t>(
             "sColor", sol::factories(
                 [] {
@@ -171,6 +175,20 @@ namespace lua::binding
         entitiesNamespace.set_function("find", [this](const std::string& className) -> auto& {
             return this->entities_->find(className);
         });
+
+        entitiesNamespace.set_function("find_as",
+            [this](sol::this_state state, const std::string& className, const std::string& castTo) {
+                const auto& list = this->entities_->find(className);
+
+                const auto caster = this->typeCasters_.find(castTo);
+                if (caster == this->typeCasters_.end()) {
+                    luaL_error(state.lua_state(), "Unable to get lua container!");
+                    __builtin_unreachable();
+                }
+
+                return sol::make_object(state, C_LuaEntityListView(state, list, caster->second));
+            }
+        );
 
         return true;
     }
