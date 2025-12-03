@@ -13,10 +13,10 @@ namespace sdk::iface
     class C_DotaPlayerController : public C_BaseEntity
     {
     public:
-        SCHEMA_FIELD("C_DOTAPlayerController", "m_iszPlayerName", getPlayerName, const char*);
+        SCHEMA_FIELD("CBasePlayerController", "m_iszPlayerName", getPlayerName, char[128]);
         SCHEMA_FIELD("CBasePlayerController", "m_steamID", getSteamID, uint64_t);
-        SCHEMA_FIELD("C_DOTAPlayerController", "m_hAssignedHero", getAssignedHero, util::C_BaseEntityHandle);
-        SCHEMA_FIELD("C_DOTAPlayerController", "m_bHeroAssigned", isHeroAssigned, bool);
+        //
+        SCHEMA_FIELD("C_DOTAPlayerController", "m_hAssignedHero", getAssignedHeroHandle, util::C_BaseEntityHandle);
     };
 }
 

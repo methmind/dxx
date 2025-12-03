@@ -14,9 +14,9 @@ namespace lua::binding
         const auto tmp = guardedState.lock()->getLuaState();
         auto& luaState = *tmp;
 
-        auto menuNamespace = luaState[IMGUI_NAMESPACE_NAME].get_or_create<sol::table>();
-        if (!menuNamespace.valid()) {
-            dbg("Unable to create menu namespace!");
+        auto imguiNamespace = luaState[IMGUI_NAMESPACE_NAME].get_or_create<sol::table>();
+        if (!imguiNamespace.valid()) {
+            dbg("Unable to create imgui namespace!");
             return false;
         }
 
@@ -34,7 +34,7 @@ namespace lua::binding
             "w", &ImVec4::w
         );
 
-        menuNamespace.set_function("color32", [](float r, float g, float b, float a) {
+        imguiNamespace.set_function("color32", [](float r, float g, float b, float a) {
             return IM_COL32(r, g, b, a);
         });
 

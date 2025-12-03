@@ -17,7 +17,7 @@ namespace lua
     private:
         std::shared_ptr<C_LuaScriptEngine> engine_;
         //@note Сейчас модификация происходит только из GUI потока.
-        std::unordered_map<std::string, std::shared_ptr<C_LuaScriptInstance>, xx_hashier_s> scripts_;
+        std::unordered_map<std::string, std::shared_ptr<C_LuaScriptInstance>, xx_hashier_s, std::equal_to<>> scripts_;
 
     public:
 

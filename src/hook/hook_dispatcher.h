@@ -22,14 +22,6 @@ namespace hook
     {
     private:
         struct callback_holder_base_s {
-            const std::type_info* type;
-
-            [[nodiscard]] virtual bool isSameType(const std::type_info& other) const = 0;
-
-            [[nodiscard]] virtual bool isUnsafeAllowed() const { return false; }
-
-            explicit callback_holder_base_s(const std::type_info& type) : type(&type) {}
-
             virtual ~callback_holder_base_s() = default;
         };
 
@@ -37,12 +29,7 @@ namespace hook
         struct callback_holder_s final : callback_holder_base_s {
             std::function<void(arg_t...)> fn;
 
-            [[nodiscard]] bool isSameType(const std::type_info& other) const override {
-                return *type == other;
-            }
-
-            explicit callback_holder_s(std::function<void(arg_t...)> fn_) :
-                callback_holder_base_s(typeid(void(*)(arg_t...))), fn(std::move(fn_)) {}
+            explicit callback_holder_s(std::function<void(arg_t...)> fn_) : fn(std::move(fn_)) {}
 
             ~callback_holder_s() override = default;
         };
@@ -65,10 +52,12 @@ namespace hook
         void subscribe(const hook_id_t type, std::invocable<arg_t...> auto callback)
         {
             auto [it, _] = this->callbacks_.get_or_emplace(type);
-            it->second.modify([callback](callback_vector_t& storage) {
-                storage.push_back(std::make_shared<callback_holder_s<arg_t...>>(
-                    std::function<void(arg_t...)>(std::move(callback))
-                ));
+
+            using func_t = std::function<void(arg_t...)>;
+            auto func = func_t(std::forward<decltype(callback)>(callback));
+
+            it->second.modify([fn = std::move(func)](callback_vector_t& storage) {
+                storage.emplace_back(std::make_shared<callback_holder_s<arg_t...>>(std::move(fn)));
             });
 
             dbg("New listener subscribed to: %d", type);
@@ -78,25 +67,16 @@ namespace hook
         void invoke(const hook_id_t type, const arg_t& ... args) const
         {
             const auto it = this->callbacks_.find(type);
-            if (it == this->callbacks_.end()) {
+            if (it == this->callbacks_.end()) [[unlikely]] {
                 return;
             }
 
             const auto callbacks = it->second.lock_shared();
-            const auto& targetTypeID = typeid(void(*)(arg_t...)); // prob. better than std::dynamic_pointer_cast
 
             for (const auto& holderBase : *callbacks) {
                 try {
-                    if (!holderBase->isSameType(targetTypeID)) {
-                        throw std::runtime_error("Callback type mismatch!");
-                    }
-
-                    auto holder = std::static_pointer_cast<callback_holder_s<arg_t...>>(holderBase);
-                    if (holder && holder->fn) {
-                        holder->fn(args...);
-                    }
-
-                    //dbg("Listener for hook: %s invoked", type.c_str());
+                    auto* holder = static_cast<callback_holder_s<arg_t...>*>(holderBase.get());
+                    holder->fn(args...);
                 } catch (const std::exception& ex) {
                     dbg("Critical exception in callback: %s", ex.what());
                 }

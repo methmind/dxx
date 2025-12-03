@@ -423,6 +423,46 @@ namespace lua::script
                 end
             end)
 
+            hook.set_on_entity_create(function(entity)
+                local success, err = pcall(function()
+                    callback.trigger("on_entity_create", entity)
+                end)
+
+                if not success then
+                    _logger.error("on_entity_create hook failed: " .. tostring(err))
+                end
+            end)
+
+            hook.set_on_entity_remove(function(entity)
+                local success, err = pcall(function()
+                    callback.trigger("on_entity_remove", entity)
+                end)
+
+                if not success then
+                    _logger.error("on_entity_remove hook failed: " .. tostring(err))
+                end
+            end)
+
+            hook.set_on_level_init(function()
+                local success, err = pcall(function()
+                    callback.trigger("on_level_init")
+                end)
+
+                if not success then
+                    _logger.error("on_level_init hook failed: " .. tostring(err))
+                end
+            end)
+
+            hook.set_on_level_shutdown(function()
+                local success, err = pcall(function()
+                    callback.trigger("on_level_shutdown")
+                end)
+
+                if not success then
+                    _logger.error("on_level_shutdown hook failed: " .. tostring(err))
+                end
+            end)
+
             hook.set_on_lua_dispose(function(script_id)
                 local success, err = pcall(function()
                     callback.unregister_all_by_script(script_id)

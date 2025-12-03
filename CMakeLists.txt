@@ -2,10 +2,12 @@ cmake_minimum_required(VERSION 4.0)
 project(dxx_dlc)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
 
 file(GLOB_RECURSE minhook_files "./external/minhook/src/*.c")
 
 add_definitions(-DDEBUG_OUTPUT)
+add_definitions(-DLUA_BUILD_AS_STATIC)
 
 add_compile_options(-Wa,-mbig-obj)
 
@@ -146,7 +148,6 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/hook/impl/hook_impl_on_entity_list_change.h
         src/sdk/custom/sdk_entity_list.cpp
         src/sdk/custom/sdk_entity_list.h
-        src/sdk/interface/sdk_base_player_controller.h
         src/renderer/renderer_frame.cpp
         src/renderer/renderer_frame.h
         src/lua/binding/lua_binding_interface.h
@@ -167,9 +168,30 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/math/sdk_math_vector2.h
         src/lua/binding/lua_binding_sdk_math.cpp
         src/lua/binding/lua_binding_sdk_math.h
+        src/lua/binding/lua_binding_sdk_entities.cpp
+        src/lua/binding/lua_binding_sdk_entities.h
+        src/lua/binding/lua_binding_sdk_schema.cpp
+        src/lua/binding/lua_binding_sdk_schema.h
+        src/sdk/interface/sdk_base_model_entity.h
+        src/sdk/interface/sdk_base_model_entity.cpp
+        src/sdk/util/sdk_color_t.h
+        src/sdk/interface/sdk_dota_base_npc.h
+        src/lua/binding/lua_binding_source_engine.cpp
+        src/lua/binding/lua_binding_source_engine.h
 )
 
-target_compile_options(dxx_dlc PRIVATE -mavx2)
+target_compile_options(dxx_dlc PRIVATE
+        $<$<CXX_COMPILER_ID:Clang>:-fvisibility=hidden>
+        $<$<CXX_COMPILER_ID:Clang>:-fvisibility-inlines-hidden>
+        -mavx2
+)
+
+set_target_properties(dxx_dlc PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+        VISIBILITY_INLINES_HIDDEN YES
+)
+
+target_sources(dxx_dlc PRIVATE "empty.def")
 
 target_compile_definitions(dxx_dlc PRIVATE SOL_ALL_SAFETIES_ON=1 SOL_PRINT_ERRORS=1 SOL_EXCEPTIONS_SAFE_PROPAGATION=1)
 

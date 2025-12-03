@@ -10,6 +10,7 @@
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_type.h"
 #include "lua/script/callback_api.h"
+#include "sdk/interface/sdk_base_model_entity.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
@@ -122,6 +123,38 @@ namespace lua::binding
             hookNamespace,
             "set_on_update",
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_UPDATE),
+            guardedState,
+            hookDispatcher
+        );
+
+        RegisterHookCallback<sdk::iface::C_EntityInstance*>(
+            hookNamespace,
+            "set_on_entity_create",
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_ADD_ENTITY),
+            guardedState,
+            hookDispatcher
+        );
+
+        RegisterHookCallback<sdk::iface::C_EntityInstance*>(
+            hookNamespace,
+            "set_on_entity_remove",
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_REMOVE_ENTITY),
+            guardedState,
+            hookDispatcher
+        );
+
+        RegisterHookCallback(
+            hookNamespace,
+            "set_on_level_init",
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_LEVEL_INIT),
+            guardedState,
+            hookDispatcher
+        );
+
+        RegisterHookCallback(
+            hookNamespace,
+            "set_on_level_shutdown",
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_LEVEL_SHUTDOWN),
             guardedState,
             hookDispatcher
         );

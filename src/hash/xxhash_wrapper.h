@@ -11,6 +11,8 @@
 
 struct xx_hashier_s
 {
+    using is_transparent = void;
+
     template<typename T>
     uint64_t operator()(const T& str) const
     requires (std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>)

@@ -17,7 +17,7 @@ namespace gui
     class C_WidgetRegedit
     {
     public:
-        using widget_list_t = std::unordered_map<std::string, widget_ptr_t, xx_hashier_s>;
+        using widget_list_t = std::unordered_map<std::string, widget_ptr_t, xx_hashier_s, std::equal_to<>>;
 
     private:
         libguarded::shared_guarded<widget_list_t> widgets_;

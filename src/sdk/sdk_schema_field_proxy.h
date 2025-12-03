@@ -13,12 +13,10 @@
     [[nodiscard]] std::add_lvalue_reference_t<type> fieldVarName() { \
         static auto cachedOffset{C_ServiceLocator::getInstance<sdk::singleton::C_SchemaSystem>()->getOffset(className, fieldName)}; \
         if (!cachedOffset.has_value()) {\
-            MessageBoxA(nullptr, "Invalid schema offset (0) for field: " #className "::" #fieldName, nullptr, 0); \
+            MessageBoxA(nullptr, "Invalid schema offset for field: " #className "::" #fieldName, nullptr, 0); \
             std::abort(); \
         }\
-        return *std::launder(reinterpret_cast<type*>( \
-            reinterpret_cast<uint8_t*>(this) + cachedOffset.value() \
-        )); \
+        return *reinterpret_cast<std::add_pointer_t<type>>(reinterpret_cast<uint8_t*>(this) + cachedOffset.value()); \
     }
 
 #endif //DXX_DLC_SDK_SCHEMA_MACROS_H

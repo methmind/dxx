@@ -68,6 +68,9 @@ namespace sdk::signature
     constexpr auto GAME_SYSTEM_INIT_ALL_FUNC = "48 89 5C 24 ? 55 56 57 48 83 EC ? 48 8D 05 ? ? ? ? 48 C7 44 24 ? ? ? ? ? 33 F6";
 
     constexpr auto GAME_SYSTEM_FACTORY_MOV_OPCODE = "48 8B 1D ? ? ? ? 48 85 DB 0F 84 ? ? ? ? BD";
+
+    // Can be found via xref on "OnColorChanged"
+    constexpr auto BASE_MODEL_ENTITY_CHANGE_COLOR_FUNC = "40 53 48 83 EC ? 48 8B D9 48 8B 89 ? ? ? ? 48 8B 01 0F B6 93";
 }
 
 #endif //DXX_DLC_SDK_SIGNATURE_H

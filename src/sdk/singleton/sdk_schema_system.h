@@ -25,8 +25,8 @@ namespace sdk::singleton
     class C_SchemaSystem
     {
     private:
-        using schema_key_value_t = std::unordered_map<std::string, uint16_t, xx_hashier_s>;
-        using schema_table_t = std::unordered_map<std::string, schema_key_value_t, xx_hashier_s>;
+        using schema_key_value_t = std::unordered_map<std::string, uint16_t, xx_hashier_s, std::equal_to<>>;
+        using schema_table_t = std::unordered_map<std::string, schema_key_value_t, xx_hashier_s, std::equal_to<>>;
         using guarded_schema_t = libguarded::plain_guarded<schema_table_t>;
 
         void* instance_;
