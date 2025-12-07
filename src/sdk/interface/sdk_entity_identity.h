@@ -13,21 +13,15 @@ namespace sdk::iface
 {
     class C_EntityIdentity
     {
+    private:
+        uint8_t size_[0x70]{};
+
     public:
-        OFFSET(int32_t, getIndex, 0x10);
+        OFFSET(void*, getAssignedEntity, 0x0);
+        OFFSET(int32_t, getEntityHandle, 0x10);
         SCHEMA_FIELD("CEntityIdentity", "m_name", getName, const char*);
         SCHEMA_FIELD("CEntityIdentity", "m_designerName", getDesignerName, const char*);
         SCHEMA_FIELD("CEntityIdentity", "m_flags", getFlags, uint32_t);
-
-        [[nodiscard]] bool isValid() const
-        {
-            return util::C_BaseEntityHandle(getIndex()).isValid();
-        }
-
-        bool isSameType(const char* typeName)
-        {
-            return strcmp(getDesignerName(), typeName) == 0;
-        }
     };
 }
 

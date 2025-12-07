@@ -22,7 +22,8 @@ namespace sdk::iface
     {
     public:
         OFFSET(const char*, getName, 0x8);
-        OFFSET(uint16_t, getFieldsSize, 0x1C);
+        OFFSET(uint32_t, getStructureSize, 0x18);
+        OFFSET(uint16_t, getFieldsCount, 0x1C);
         OFFSET(schema_class_field_s*, getFields, 0x28);
     };
 

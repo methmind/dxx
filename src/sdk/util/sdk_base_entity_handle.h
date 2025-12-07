@@ -18,7 +18,7 @@ namespace sdk::util
     class C_BaseEntityHandle
     {
     private:
-        uint32_t index_;
+        int32_t index_;
 
     public:
 

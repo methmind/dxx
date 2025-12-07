@@ -36,7 +36,7 @@ namespace lua
 
         C_LuaScriptEngine() = default;
 
-        ~C_LuaScriptEngine() override = default;
+        ~C_LuaScriptEngine() override { auto _ = this->luaState_.lock(); }
     };
 } // lua
 

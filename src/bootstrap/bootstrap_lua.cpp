@@ -10,8 +10,11 @@
 #include "lua/binding/lua_binding_renderer.h"
 #include "lua/binding/lua_binding_sdk_entities.h"
 #include "lua/binding/lua_binding_sdk_math.h"
+#include "lua/binding/lua_binding_sdk_modifier.h"
 #include "lua/binding/lua_binding_sdk_schema.h"
+#include "lua/binding/lua_binding_sdk_utils.h"
 #include "lua/binding/lua_binding_source_engine.h"
+#include "lua/binding/lua_binding_utl_vector.h"
 #include "sdk/custom/sdk_entity_list.h"
 
 namespace bootstrap
@@ -30,6 +33,8 @@ namespace bootstrap
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSdkMath>());
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSdkSchema>());
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSourceEngine>());
+        luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSdkUtils>());
+        luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSdkModifier>());
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingSdkEntities>(
             container->get<sdk::custom::C_EntityList>()
         ));

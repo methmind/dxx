@@ -5,6 +5,7 @@
 #ifndef DXX_DLC_VMT_CALL_H
 #define DXX_DLC_VMT_CALL_H
 
+#include <cstdint>
 #include <type_traits>
 #include <utility>
 

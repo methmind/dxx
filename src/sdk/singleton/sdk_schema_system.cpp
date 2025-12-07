@@ -31,7 +31,7 @@ namespace sdk::singleton
                 continue;
             }
 
-            const auto fieldsSize = classInfo->getFieldsSize();
+            const auto fieldsSize = classInfo->getFieldsCount();
             if (!fieldsSize) {
                 continue;
             }

@@ -15,7 +15,10 @@ namespace sdk::custom
 {
     constexpr std::string_view SCENE_ENTITY_NAME = "C_DOTASceneEntity";
 
-    constexpr std::array<std::string_view, 1> SPECIAL_ENTITY_IDENTITY_LIST = {"npc_dota_hero"};
+    constexpr std::array<std::pair<std::string_view, std::string_view>, 2> SPECIAL_ENTITY_IDENTITY_LIST = {
+        std::make_pair("DOTA_Unit_Hero", "hero"),
+        std::make_pair("C_DOTA_BaseNPC_Creep", "creep")
+    };
 
     class C_EntityList
     {

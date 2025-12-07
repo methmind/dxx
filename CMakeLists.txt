@@ -178,6 +178,17 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/interface/sdk_dota_base_npc.h
         src/lua/binding/lua_binding_source_engine.cpp
         src/lua/binding/lua_binding_source_engine.h
+        src/sdk/memory/sdk_memory.cpp
+        src/sdk/memory/sdk_memory.h
+        src/sdk/memory/sdk_memory_utl_vector.h
+        src/sdk/interface/sdk_dota_modifier_manager.h
+        src/sdk/interface/sdk_dota_buff.h
+        src/lua/binding/lua_binding_sdk_modifier.cpp
+        src/lua/binding/lua_binding_sdk_modifier.h
+        src/sdk/custom/sdk_entity_identities_chunk.h
+        src/lua/binding/lua_binding_utl_vector.h
+        src/lua/binding/lua_binding_sdk_utils.cpp
+        src/lua/binding/lua_binding_sdk_utils.h
 )
 
 target_compile_options(dxx_dlc PRIVATE

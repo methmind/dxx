@@ -6,6 +6,7 @@
 
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_type.h"
+#include "memory/pattern_scanner.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
 
 namespace sdk::custom
@@ -17,9 +18,9 @@ namespace sdk::custom
 
     std::optional<std::string_view> C_EntityList::GetTruncatedIdentityName(const std::string_view& identityName)
     {
-        for (const auto& name : SPECIAL_ENTITY_IDENTITY_LIST) {
-            if (identityName.find(name) != std::string::npos) {
-                return name;
+        for (const auto&[pattern, truncatedName] : SPECIAL_ENTITY_IDENTITY_LIST) {
+            if (identityName.find(pattern) != std::string::npos) {
+                return truncatedName;
             }
         }
 
@@ -28,17 +29,17 @@ namespace sdk::custom
 
     std::optional<std::string_view> C_EntityList::GetSpecialEntityName(iface::C_EntityInstance* entity)
     {
-        const auto identity = entity->getIdentity();
-        if (!identity) {
+        const auto classInfo = entity->getClassInfo();
+        if (!classInfo) {
             return std::nullopt;
         }
 
-        const auto identityName = identity->getName() ? identity->getName() : identity->getDesignerName();
-        if (!identityName) {
+        const auto className = classInfo->getName();
+        if (!className) {
             return std::nullopt;
         }
 
-        return GetTruncatedIdentityName(identityName);
+        return GetTruncatedIdentityName(className);
     }
 
     void C_EntityList::removeFromSpecialEntity(iface::C_EntityInstance* entity)
@@ -70,15 +71,11 @@ namespace sdk::custom
 
     void C_EntityList::syncEntities()
     {
-        const auto entitySystem = C_ServiceLocator::getInstance<singleton::C_GameEntitySystem>();
-        for (int32_t i = 0, countOf = entitySystem->numberOfEntities(); i <= countOf; i++) {
-            const auto entity = entitySystem->getBaseEntity<iface::C_EntityInstance>(i);
-            if (!entity) {
-                continue;
+        C_ServiceLocator::getInstance<singleton::C_GameEntitySystem>()->iterateEntities(
+            [this](iface::C_EntityInstance* entity) {
+                onAddEntity(entity);
             }
-
-            onAddEntity(entity);
-        }
+        );
     }
 
     void C_EntityList::onAddEntity(iface::C_EntityInstance* entity)

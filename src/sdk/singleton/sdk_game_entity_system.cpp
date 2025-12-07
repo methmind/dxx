@@ -6,9 +6,7 @@
 
 #include "sdk_source2_client.h"
 #include "debug/debug_output.h"
-#include "memory/pattern_scanner.h"
 #include "minhook/src/hde/hde64.h"
-#include "sdk/sdk_signature.h"
 #include "service_locator/service_locator.h"
 
 namespace sdk::singleton
@@ -32,54 +30,38 @@ namespace sdk::singleton
         }
 
         this->instance_ = *reinterpret_cast<void**>(getNetworkChangeQueuePtr + hs.disp.disp32 + length);
+        //identitiesChunks_ offset is instance ptr + 0x10
+        this->identitiesChunks_ = reinterpret_cast<custom::entity_identities_chunk_s**>(static_cast<uint8_t*>(this->instance_) + 0x10);
+
         dbg("C_GameEntitySystem ptr: %p", this->instance_);
-
         return true;
     }
 
-    bool C_GameEntitySystem::findMethods()
+    void* C_GameEntitySystem::getBaseEntityImpl(const int32_t index) const
     {
-        const auto module = GetModuleHandleA("client.dll");
-
-        this->numberOfEntities_ = reinterpret_cast<number_of_entities_t>(
-            memory::FindPattern(module,signature::EGS_NUMBER_OF_ENTITIES)
-        );
-
-        if (!this->numberOfEntities_) {
-            dbg("Unable to find C_GameEntitySystem::GetHighestEntityIndex");
-            return false;
+        if (index < 0 || index >= custom::MAX_TOTAL_ENTITIES) {
+            return nullptr;
         }
 
-        this->getBaseEntity_ = reinterpret_cast<get_base_entity_t>(
-            memory::FindPattern(module,signature::EGS_GET_BASE_ENTITY)
-        );
-
-        if (!this->getBaseEntity_) {
-            dbg("Unable to find C_GameEntitySystem::GetBaseEntity");
-            return false;
+        const auto chunkIndex = index / custom::MAX_ENTITIES_IN_CHUNK;
+        const auto chunk = this->identitiesChunks_[chunkIndex];
+        if (!chunk) {
+            return nullptr;
         }
 
-        const auto vtable = *static_cast<void***>(this->instance_);
-        this->onAddEntity_ = vtable[ON_ADD_ENTITY_VMT_INDEX];
-        this->onRemoveEntity_ = vtable[ON_REMOVE_ENTITY_VMT_INDEX];
+        const auto indexInChunk = index % custom::MAX_ENTITIES_IN_CHUNK;
+        const auto identity = &chunk->identities[indexInChunk];
+        if (const util::C_BaseEntityHandle identityHandle(identity->getEntityHandle()); identityHandle.getEntryIndex() != index) {
+            return nullptr;
+        }
 
-        return true;
-    }
-
-    int32_t C_GameEntitySystem::numberOfEntities() const
-    {
-        return this->numberOfEntities_(this->instance_, 0);
+        return identity->getAssignedEntity();
     }
 
     bool C_GameEntitySystem::initialize()
     {
         if (!findInstance()) {
             dbg("Unable to find instance of C_GameEntitySystem!");
-            return false;
-        }
-
-        if (!findMethods()) {
-            dbg("Unable to find method of C_GameEntitySystem!");
             return false;
         }
 

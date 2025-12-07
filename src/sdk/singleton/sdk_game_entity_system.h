@@ -5,7 +5,8 @@
 #ifndef DXX_DLC_SDK_GAME_ENTITY_SYSTEM_H
 #define DXX_DLC_SDK_GAME_ENTITY_SYSTEM_H
 
-#include <cstdint>
+#include "sdk/custom/sdk_entity_identities_chunk.h"
+#include "sdk/interface/sdk_entity_instance.h"
 
 namespace sdk::singleton
 {
@@ -23,34 +24,57 @@ namespace sdk::singleton
 
     class C_GameEntitySystem
     {
-    public:
-        using number_of_entities_t = int32_t(__fastcall*)(void* self, uint8_t unk);
-
-        using get_base_entity_t = void*(__fastcall*)(void* self, int32_t index);
-
     private:
         void* instance_;
-
-        number_of_entities_t numberOfEntities_;
-        get_base_entity_t getBaseEntity_;
-        void* onAddEntity_;
-        void* onRemoveEntity_;
+        custom::entity_identities_chunk_s** identitiesChunks_;
 
         bool findInstance();
 
-        bool findMethods();
+        void* getBaseEntityImpl(int32_t index) const;
+
+        auto getVtable() const { return *static_cast<void***>(this->instance_); }
 
     public:
 
-        [[nodiscard]] void* getOnAddEntityFunc() const { return this->onAddEntity_; }
+        [[nodiscard]] void* getOnAddEntityFunc() const { return getVtable()[ON_ADD_ENTITY_VMT_INDEX]; }
 
-        [[nodiscard]] void* getOnRemoveEntityFunc() const { return this->onRemoveEntity_; }
-
-        [[nodiscard]] int32_t numberOfEntities() const;
+        [[nodiscard]] void* getOnRemoveEntityFunc() const { return getVtable()[ON_REMOVE_ENTITY_VMT_INDEX]; }
 
         template<class T = void*>
         T* getBaseEntity(const int32_t index) const {
-            return static_cast<T*>(this->getBaseEntity_(this->instance_, index));
+            return static_cast<T*>(getBaseEntityImpl(index));
+        }
+
+        template<typename func_t>
+        void iterateEntities(func_t callback) const
+        {
+            for (auto i = 0; i < custom::MAX_CHUNKS_COUNT; ++i) {
+                const auto chunk = this->identitiesChunks_[i];
+                if (!chunk) {
+                    continue;
+                }
+
+                for (auto j = 0; j < custom::MAX_ENTITIES_IN_CHUNK; ++j) {
+                    auto& identity = chunk->identities[j];
+                    if (!identity.getAssignedEntity()) {
+                        continue;
+                    }
+
+                    const auto globalIndex = i * custom::MAX_ENTITIES_IN_CHUNK + j;
+                    if (const util::C_BaseEntityHandle identityHandle(identity.getEntityHandle());
+                        identityHandle.getEntryIndex() != globalIndex) {
+                        continue;
+                    }
+
+                    if constexpr (std::is_same_v<std::invoke_result_t<func_t, iface::C_EntityInstance*>, bool>) {
+                        if (!callback(static_cast<iface::C_EntityInstance*>(identity.getAssignedEntity()))) {
+                            return;
+                        }
+                    } else {
+                        callback(static_cast<iface::C_EntityInstance*>(identity.getAssignedEntity()));
+                    }
+                }
+            }
         }
 
         bool initialize();

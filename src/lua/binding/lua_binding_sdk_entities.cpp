@@ -26,42 +26,13 @@ namespace lua::binding
         luaEntityListView.set_function(sol::meta_function::length, &C_LuaEntityListView::size);
         luaEntityListView.set_function(sol::meta_function::index, &C_LuaEntityListView::get);
 
-        state.new_usertype<sdk::util::color_t>(
-            "sColor", sol::factories(
-                [] {
-                    return sdk::util::color_t{0, 0, 0, 255};
-                },
-                [](uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
-                    return sdk::util::color_t{r, g, b, a};
-                }
-            ),
-            "r", sol::property(
-                [](const sdk::util::color_t& c) { return c[0]; },
-                [](sdk::util::color_t& c, uint8_t v) { c[0] = v; }
-            ),
-            "g", sol::property(
-                [](const sdk::util::color_t& c) { return c[1]; },
-                [](sdk::util::color_t& c, uint8_t v) { c[1] = v; }
-            ),
-            "b", sol::property(
-                [](const sdk::util::color_t& c) { return c[2]; },
-                [](sdk::util::color_t& c, uint8_t v) { c[2] = v; }
-            ),
-            "a", sol::property(
-                [](const sdk::util::color_t& c) { return c[3]; },
-                [](sdk::util::color_t& c, uint8_t v) { c[3] = v; }
-            )
-        );
-
         auto luaEntityIdentity = state.new_usertype<sdk::iface::C_EntityIdentity>(
             "C_EntityIdentity", sol::no_constructor
         );
-        luaEntityIdentity.set_function("get_index", &sdk::iface::C_EntityIdentity::getIndex);
+        luaEntityIdentity.set_function("get_index", &sdk::iface::C_EntityIdentity::getEntityHandle);
         luaEntityIdentity.set_function("get_name", &sdk::iface::C_EntityIdentity::getName);
         luaEntityIdentity.set_function("get_designer_name", &sdk::iface::C_EntityIdentity::getDesignerName);
         luaEntityIdentity.set_function("get_flags", &sdk::iface::C_EntityIdentity::getFlags);
-        luaEntityIdentity.set_function("is_valid", &sdk::iface::C_EntityIdentity::isValid);
-        luaEntityIdentity.set_function("is_same_type", &sdk::iface::C_EntityIdentity::isSameType);
 
         auto luaEntityInstance = state.new_usertype<sdk::iface::C_EntityInstance>("C_EntityInstance", sol::no_constructor);
         luaEntityInstance.set_function("get_class_info", &sdk::iface::C_EntityInstance::getClassInfo);
@@ -114,7 +85,21 @@ namespace lua::binding
             "C_DOTA_BaseNPC", sol::no_constructor,
             sol::base_classes, sol::bases<sdk::iface::C_BaseModelEntity, sdk::iface::C_BaseEntity, sdk::iface::C_EntityInstance>()
         );
-        luaBaseNpc.set_function("remove_status_bar", [](sdk::iface::C_DotaBaseNPC* self) { self->getHealthbarOffset() = INT_MAX; });
+        luaBaseNpc.set_function("is_clone", &sdk::iface::C_DotaBaseNPC::isClone);
+        luaBaseNpc.set_function("get_modifier_manager", &sdk::iface::C_DotaBaseNPC::getModifierManager);
+        luaBaseNpc.set_function("get_unit_name", &sdk::iface::C_DotaBaseNPC::getUnitName);
+        luaBaseNpc.set_function("mark_as_illusion",
+            [](sdk::iface::C_DotaBaseNPC* self, const sdk::util::color_t& color) {
+                self->isSeenAsIllusion() = true;
+                self->changeModelColor(color);
+            }
+        );
+        luaBaseNpc.set_function("reset_illusion_state",
+            [](sdk::iface::C_DotaBaseNPC* self) {
+                self->isSeenAsIllusion() = false;
+                self->changeModelColor(sdk::util::color_t{255, 255, 255, 255});
+            }
+        );
 
         auto luaBaseNpcHero = state.new_usertype<sdk::iface::C_DotaBaseNPC_Hero>(
             "C_DOTA_BaseNPC_Hero", sol::no_constructor,
@@ -155,10 +140,6 @@ namespace lua::binding
 
             return C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>()->
                 getBaseEntity<sdk::iface::C_DotaPlayerController>(localPlayerID);
-        });
-
-        entitiesNamespace.set_function("total_count", [] {
-           return C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>()->numberOfEntities();
         });
 
         entitiesNamespace.set_function("find_by_handle",

@@ -52,9 +52,9 @@ namespace lua::binding
         std::shared_ptr<sdk::custom::C_EntityList> entities_;
 
         template<typename T>
-        void registerTypeCaster(const std::string& name)
+        void registerTypeCaster(const std::string_view& name)
         {
-            this->typeCasters_[name] = [](sol::state_view& lua, sdk::iface::C_EntityInstance* ptr) -> sol::object {
+            this->typeCasters_[name.data()] = [](sol::state_view& lua, sdk::iface::C_EntityInstance* ptr) -> sol::object {
                 return sol::make_object(lua, static_cast<T*>(ptr));
             };
         }
