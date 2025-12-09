@@ -22,3 +22,6 @@
 [submodule "external/xxhash3"]
 	path = external/xxhash3
 	url = https://github.com/pombredanne/xxHash-3.git
+[submodule "external/protobuf"]
+	path = external/protobuf
+	url = https://github.com/protocolbuffers/protobuf.git

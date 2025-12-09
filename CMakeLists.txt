@@ -11,6 +11,8 @@ add_definitions(-DLUA_BUILD_AS_STATIC)
 
 add_compile_options(-Wa,-mbig-obj)
 
+add_subdirectory(external/protobuf)
+
 add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         external/imgui/backends/imgui_impl_dx11.cpp
         external/imgui/backends/imgui_impl_win32.cpp
@@ -189,6 +191,10 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/lua/binding/lua_binding_utl_vector.h
         src/lua/binding/lua_binding_sdk_utils.cpp
         src/lua/binding/lua_binding_sdk_utils.h
+
+        src/sdk/protobuf/gen/dota_usercmd.pb.cc
+        src/sdk/protobuf/gen/usercmd.pb.cc
+        src/sdk/protobuf/gen/networkbasetypes.pb.cc
 )
 
 target_compile_options(dxx_dlc PRIVATE
@@ -204,7 +210,14 @@ set_target_properties(dxx_dlc PROPERTIES
 
 target_sources(dxx_dlc PRIVATE "empty.def")
 
-target_compile_definitions(dxx_dlc PRIVATE SOL_ALL_SAFETIES_ON=1 SOL_PRINT_ERRORS=1 SOL_EXCEPTIONS_SAFE_PROPAGATION=1)
+target_compile_definitions(dxx_dlc PRIVATE
+        SOL_ALL_SAFETIES_ON=1
+        SOL_PRINT_ERRORS=1
+        SOL_EXCEPTIONS_SAFE_PROPAGATION=1
+        PROTOBUF_USE_DLLS=0
+        ABSL_CONSUME_DLL=0
+        LIBPROTOBUF_EXPORTS
+)
 
 target_include_directories(dxx_dlc PUBLIC
         "external/"
@@ -218,7 +231,8 @@ target_include_directories(dxx_dlc PUBLIC
         "external/xenium/"
         "external/libguarded/src/"
         "src/"
+        "external/protobuf/src/"
         "."
 )
 
-target_link_libraries(dxx_dlc PRIVATE d3d11 d3dcompiler dwmapi ${CMAKE_SOURCE_DIR}/external/luajit/src/libluajit.a)
+target_link_libraries(dxx_dlc PRIVATE libprotobuf-lite d3d11 d3dcompiler dwmapi ${CMAKE_SOURCE_DIR}/external/luajit/src/libluajit.a)
