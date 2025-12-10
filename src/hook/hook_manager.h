@@ -5,32 +5,21 @@
 #ifndef DXX_DLC_HOOK_MANAGER_H
 #define DXX_DLC_HOOK_MANAGER_H
 
-#include <windows.h>
+#include "MinHook.h"
 
 namespace hook
 {
     class C_HookManager
     {
-    private:
-
-        bool initializeRender();
-
-        bool initializeWorld(HMODULE clientModule);
-
-        bool initializeEntity();
-
     public:
 
-        bool initialize();
+        static MH_STATUS Create(void *target, void *detour);
 
-        bool enable();
+        static bool Initialize();
 
-        // Костыли-костыли... Тут либо нужно настраивать пайплайн вызова деструкторов в C_ServiceContainer, либо так.
-        void disable();
+        static bool Enable();
 
-        C_HookManager() = default;
-
-        ~C_HookManager() = default;
+        static void Disable();
     };
 } // hook
 

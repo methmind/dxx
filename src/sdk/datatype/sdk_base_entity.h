@@ -7,7 +7,7 @@
 
 #include "sdk_entity_instance.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     class C_BaseEntity : public C_EntityInstance
     {

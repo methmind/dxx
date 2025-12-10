@@ -25,8 +25,7 @@ namespace app
             return false;
         }
 
-        const auto services = bootstrap::C_ApplicationBuilder::Build();
-        if (!services) {
+        if (const auto services = bootstrap::C_ApplicationBuilder::Build(); !services) {
             dbg("Unable to initialize application!");
             return false;
         }
@@ -37,8 +36,7 @@ namespace app
             }
         );
 
-        const auto hooks = services->get<hook::C_HookManager>();
-        if (!hooks->enable()) {
+        if (!hook::C_HookManager::Enable()) {
             dbg("Unable to enable hooks!");
             return false;
         }
@@ -48,7 +46,7 @@ namespace app
         }
 
         dbg("Unloading module from process...");
-        hooks->disable();
+        hook::C_HookManager::Disable();
         C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->clear(); // Освобождаем всех слушателей с хуков.
 
         return true;

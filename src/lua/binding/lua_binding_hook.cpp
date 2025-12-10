@@ -10,7 +10,7 @@
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_type.h"
 #include "lua/script/callback_api.h"
-#include "sdk/interface/sdk_base_model_entity.h"
+#include "sdk/datatype/sdk_base_model_entity.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
@@ -127,7 +127,7 @@ namespace lua::binding
             hookDispatcher
         );
 
-        RegisterHookCallback<sdk::iface::C_EntityInstance*>(
+        RegisterHookCallback<sdk::datatype::C_EntityInstance*>(
             hookNamespace,
             "set_on_entity_create",
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_ADD_ENTITY),
@@ -135,7 +135,7 @@ namespace lua::binding
             hookDispatcher
         );
 
-        RegisterHookCallback<sdk::iface::C_EntityInstance*>(
+        RegisterHookCallback<sdk::datatype::C_EntityInstance*>(
             hookNamespace,
             "set_on_entity_remove",
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_REMOVE_ENTITY),

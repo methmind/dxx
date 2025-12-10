@@ -9,7 +9,7 @@
 #include <vector>
 #include <array>
 
-#include "sdk/interface/sdk_entity_instance.h"
+#include "sdk/datatype/sdk_entity_instance.h"
 
 namespace sdk::custom
 {
@@ -23,7 +23,7 @@ namespace sdk::custom
     class C_EntityList
     {
     public:
-        using instance_list_t = std::vector<iface::C_EntityInstance*>;
+        using instance_list_t = std::vector<datatype::C_EntityInstance*>;
 
     private:
         std::unordered_map<std::string, instance_list_t, xx_hashier_s, std::equal_to<>> entities_;
@@ -32,11 +32,11 @@ namespace sdk::custom
 
         static std::optional<std::string_view> GetTruncatedIdentityName(const std::string_view& identityName);
 
-        static std::optional<std::string_view> GetSpecialEntityName(iface::C_EntityInstance* entity);
+        static std::optional<std::string_view> GetSpecialEntityName(datatype::C_EntityInstance* entity);
 
-        void removeFromSpecialEntity(iface::C_EntityInstance* entity);
+        void removeFromSpecialEntity(datatype::C_EntityInstance* entity);
 
-        void addToSpecialCategory(iface::C_EntityInstance* entity);
+        void addToSpecialCategory(datatype::C_EntityInstance* entity);
 
         void syncEntities();
 
@@ -44,9 +44,9 @@ namespace sdk::custom
 
         void onLevelShutdown() { this->entities_.clear(); }
 
-        void onAddEntity(iface::C_EntityInstance* entity);
+        void onAddEntity(datatype::C_EntityInstance* entity);
 
-        void onRemoveEntity(iface::C_EntityInstance* entity);
+        void onRemoveEntity(datatype::C_EntityInstance* entity);
 
     public:
 

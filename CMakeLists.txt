@@ -138,12 +138,12 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         external/xxhash3/xxhash.c
         src/hash/xxhash_wrapper.h
         src/sdk/sdk_schema_field_proxy.h
-        src/sdk/interface/sdk_entity_identity.h
+        src/sdk/datatype/sdk_entity_identity.h
         src/memory/offset.h
-        src/sdk/interface/sdk_entity_instance.h
+        src/sdk/datatype/sdk_entity_instance.h
         src/sdk/util/sdk_base_entity_handle.h
-        src/sdk/interface/sdk_base_entity.h
-        src/sdk/interface/sdk_dota_player_controller.h
+        src/sdk/datatype/sdk_base_entity.h
+        src/sdk/datatype/sdk_dota_player_controller.h
         src/hook/impl/hook_impl_on_level_state_change.cpp
         src/hook/impl/hook_impl_on_level_state_change.h
         src/hook/impl/hook_impl_on_entity_list_change.cpp
@@ -174,17 +174,17 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/lua/binding/lua_binding_sdk_entities.h
         src/lua/binding/lua_binding_sdk_schema.cpp
         src/lua/binding/lua_binding_sdk_schema.h
-        src/sdk/interface/sdk_base_model_entity.h
-        src/sdk/interface/sdk_base_model_entity.cpp
+        src/sdk/datatype/sdk_base_model_entity.h
+        src/sdk/datatype/sdk_base_model_entity.cpp
         src/sdk/util/sdk_color_t.h
-        src/sdk/interface/sdk_dota_base_npc.h
+        src/sdk/datatype/sdk_dota_base_npc.h
         src/lua/binding/lua_binding_source_engine.cpp
         src/lua/binding/lua_binding_source_engine.h
         src/sdk/memory/sdk_memory.cpp
         src/sdk/memory/sdk_memory.h
         src/sdk/memory/sdk_memory_utl_vector.h
-        src/sdk/interface/sdk_dota_modifier_manager.h
-        src/sdk/interface/sdk_dota_buff.h
+        src/sdk/datatype/sdk_dota_modifier_manager.h
+        src/sdk/datatype/sdk_dota_buff.h
         src/lua/binding/lua_binding_sdk_modifier.cpp
         src/lua/binding/lua_binding_sdk_modifier.h
         src/sdk/interface/sdk_entity_identities_chunk.h
@@ -199,9 +199,10 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/singleton/sdk_dota_input.h
         src/hook/impl/hook_impl_create_move.cpp
         src/hook/impl/hook_impl_create_move.h
-        src/sdk/interface/sdk_user_cmd.h
+        src/sdk/datatype/sdk_user_cmd.h
         src/sdk/custom/sdk_input_controller.cpp
         src/sdk/custom/sdk_input_controller.h
+        src/bootstrap/bootstrap_hook.cpp
 )
 
 target_compile_options(dxx_dlc PRIVATE

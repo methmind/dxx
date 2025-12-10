@@ -7,7 +7,7 @@
 #include "hook_impl_type.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_original_invoker.h"
-#include "sdk/interface/sdk_base_model_entity.h"
+#include "../../sdk/datatype/sdk_base_model_entity.h"
 #include "service_locator/service_locator.h"
 
 namespace hook::impl

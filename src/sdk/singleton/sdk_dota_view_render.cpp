@@ -13,7 +13,7 @@ namespace sdk::singleton
     bool C_DotaViewRender::findInstance(HMODULE clientModule)
     {
         const auto func = reinterpret_cast<get_view_render_instance_t>(memory::FindPattern(clientModule,
-        signature::GET_VIEW_RENDER_INSTANCE_FUNC
+            signature::GET_VIEW_RENDER_INSTANCE_FUNC
             )
         );
 

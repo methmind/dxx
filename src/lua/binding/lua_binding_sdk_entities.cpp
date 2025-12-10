@@ -5,10 +5,10 @@
 #include "lua_binding_sdk_entities.h"
 
 #include "debug/debug_output.h"
-#include "sdk/interface/sdk_base_entity.h"
-#include "sdk/interface/sdk_base_model_entity.h"
-#include "sdk/interface/sdk_dota_base_npc.h"
-#include "sdk/interface/sdk_dota_player_controller.h"
+#include "sdk/datatype/sdk_base_entity.h"
+#include "sdk/datatype/sdk_base_model_entity.h"
+#include "sdk/datatype/sdk_dota_base_npc.h"
+#include "sdk/datatype/sdk_dota_player_controller.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
 #include "sdk/singleton/sdk_source2_engine_to_client.h"
 
@@ -26,19 +26,19 @@ namespace lua::binding
         luaEntityListView.set_function(sol::meta_function::length, &C_LuaEntityListView::size);
         luaEntityListView.set_function(sol::meta_function::index, &C_LuaEntityListView::get);
 
-        auto luaEntityIdentity = state.new_usertype<sdk::iface::C_EntityIdentity>(
+        auto luaEntityIdentity = state.new_usertype<sdk::datatype::C_EntityIdentity>(
             "C_EntityIdentity", sol::no_constructor
         );
-        luaEntityIdentity.set_function("get_index", &sdk::iface::C_EntityIdentity::getEntityHandle);
-        luaEntityIdentity.set_function("get_name", &sdk::iface::C_EntityIdentity::getName);
-        luaEntityIdentity.set_function("get_designer_name", &sdk::iface::C_EntityIdentity::getDesignerName);
-        luaEntityIdentity.set_function("get_flags", &sdk::iface::C_EntityIdentity::getFlags);
+        luaEntityIdentity.set_function("get_index", &sdk::datatype::C_EntityIdentity::getEntityHandle);
+        luaEntityIdentity.set_function("get_name", &sdk::datatype::C_EntityIdentity::getName);
+        luaEntityIdentity.set_function("get_designer_name", &sdk::datatype::C_EntityIdentity::getDesignerName);
+        luaEntityIdentity.set_function("get_flags", &sdk::datatype::C_EntityIdentity::getFlags);
 
-        auto luaEntityInstance = state.new_usertype<sdk::iface::C_EntityInstance>("C_EntityInstance", sol::no_constructor);
-        luaEntityInstance.set_function("get_class_info", &sdk::iface::C_EntityInstance::getClassInfo);
-        luaEntityInstance.set_function("get_identity", &sdk::iface::C_EntityInstance::getIdentity);
+        auto luaEntityInstance = state.new_usertype<sdk::datatype::C_EntityInstance>("C_EntityInstance", sol::no_constructor);
+        luaEntityInstance.set_function("get_class_info", &sdk::datatype::C_EntityInstance::getClassInfo);
+        luaEntityInstance.set_function("get_identity", &sdk::datatype::C_EntityInstance::getIdentity);
         luaEntityInstance.set_function("as",
-            [this](sol::this_state state, sdk::iface::C_EntityInstance* self, const std::string& className) {
+            [this](sol::this_state state, sdk::datatype::C_EntityInstance* self, const std::string& className) {
                 sol::state_view lua(state);
 
                 const auto it = this->typeCasters_.find(className);
@@ -57,65 +57,65 @@ namespace lua::binding
             }
         );
 
-        auto luaBaseEntity = state.new_usertype<sdk::iface::C_BaseEntity>(
+        auto luaBaseEntity = state.new_usertype<sdk::datatype::C_BaseEntity>(
             "C_BaseEntity", sol::no_constructor,
-            sol::base_classes, sol::bases<sdk::iface::C_EntityInstance>()
+            sol::base_classes, sol::bases<sdk::datatype::C_EntityInstance>()
         );
-        luaBaseEntity.set_function("get_max_health", &sdk::iface::C_BaseEntity::getMaxHealth);
-        luaBaseEntity.set_function("get_health", &sdk::iface::C_BaseEntity::getHealth);
-        luaBaseEntity.set_function("get_flags", &sdk::iface::C_BaseEntity::getEntityFlags);
-        luaBaseEntity.set_function("get_team", &sdk::iface::C_BaseEntity::getTeam);
+        luaBaseEntity.set_function("get_max_health", &sdk::datatype::C_BaseEntity::getMaxHealth);
+        luaBaseEntity.set_function("get_health", &sdk::datatype::C_BaseEntity::getHealth);
+        luaBaseEntity.set_function("get_flags", &sdk::datatype::C_BaseEntity::getEntityFlags);
+        luaBaseEntity.set_function("get_team", &sdk::datatype::C_BaseEntity::getTeam);
 
-        auto luaPlayerController = state.new_usertype<sdk::iface::C_DotaPlayerController>(
+        auto luaPlayerController = state.new_usertype<sdk::datatype::C_DotaPlayerController>(
             "C_DotaPlayerController", sol::no_constructor,
-            sol::base_classes, sol::bases<sdk::iface::C_BaseEntity, sdk::iface::C_EntityInstance>()
+            sol::base_classes, sol::bases<sdk::datatype::C_BaseEntity, sdk::datatype::C_EntityInstance>()
         );
-        luaPlayerController.set_function("get_player_name", &sdk::iface::C_DotaPlayerController::getPlayerName);
-        luaPlayerController.set_function("get_steam_id", &sdk::iface::C_DotaPlayerController::getSteamID);
-        luaPlayerController.set_function("get_assigned_hero_handle", &sdk::iface::C_DotaPlayerController::getAssignedHeroHandle);
+        luaPlayerController.set_function("get_player_name", &sdk::datatype::C_DotaPlayerController::getPlayerName);
+        luaPlayerController.set_function("get_steam_id", &sdk::datatype::C_DotaPlayerController::getSteamID);
+        luaPlayerController.set_function("get_assigned_hero_handle", &sdk::datatype::C_DotaPlayerController::getAssignedHeroHandle);
 
-        auto luaBaseModelEntity = state.new_usertype<sdk::iface::C_BaseModelEntity>(
+        auto luaBaseModelEntity = state.new_usertype<sdk::datatype::C_BaseModelEntity>(
             "C_BaseModelEntity", sol::no_constructor,
-            sol::base_classes, sol::bases<sdk::iface::C_BaseEntity, sdk::iface::C_EntityInstance>()
+            sol::base_classes, sol::bases<sdk::datatype::C_BaseEntity, sdk::datatype::C_EntityInstance>()
         );
-        luaBaseModelEntity.set_function("get_model_color", &sdk::iface::C_BaseModelEntity::getRenderColor);
-        luaBaseModelEntity.set_function("set_model_color", &sdk::iface::C_BaseModelEntity::changeModelColor);
+        luaBaseModelEntity.set_function("get_model_color", &sdk::datatype::C_BaseModelEntity::getRenderColor);
+        luaBaseModelEntity.set_function("set_model_color", &sdk::datatype::C_BaseModelEntity::changeModelColor);
 
-        auto luaBaseNpc = state.new_usertype<sdk::iface::C_DotaBaseNPC>(
+        auto luaBaseNpc = state.new_usertype<sdk::datatype::C_DotaBaseNPC>(
             "C_DOTA_BaseNPC", sol::no_constructor,
-            sol::base_classes, sol::bases<sdk::iface::C_BaseModelEntity, sdk::iface::C_BaseEntity, sdk::iface::C_EntityInstance>()
+            sol::base_classes, sol::bases<sdk::datatype::C_BaseModelEntity, sdk::datatype::C_BaseEntity, sdk::datatype::C_EntityInstance>()
         );
-        luaBaseNpc.set_function("is_clone", &sdk::iface::C_DotaBaseNPC::isClone);
-        luaBaseNpc.set_function("get_modifier_manager", &sdk::iface::C_DotaBaseNPC::getModifierManager);
-        luaBaseNpc.set_function("get_unit_name", &sdk::iface::C_DotaBaseNPC::getUnitName);
+        luaBaseNpc.set_function("is_clone", &sdk::datatype::C_DotaBaseNPC::isClone);
+        luaBaseNpc.set_function("get_modifier_manager", &sdk::datatype::C_DotaBaseNPC::getModifierManager);
+        luaBaseNpc.set_function("get_unit_name", &sdk::datatype::C_DotaBaseNPC::getUnitName);
         luaBaseNpc.set_function("mark_as_illusion",
-            [](sdk::iface::C_DotaBaseNPC* self, const sdk::util::color_t& color) {
+            [](sdk::datatype::C_DotaBaseNPC* self, const sdk::util::color_t& color) {
                 self->isSeenAsIllusion() = true;
                 self->changeModelColor(color);
             }
         );
         luaBaseNpc.set_function("reset_illusion_state",
-            [](sdk::iface::C_DotaBaseNPC* self) {
+            [](sdk::datatype::C_DotaBaseNPC* self) {
                 self->isSeenAsIllusion() = false;
                 self->changeModelColor(sdk::util::color_t{255, 255, 255, 255});
             }
         );
 
-        auto luaBaseNpcHero = state.new_usertype<sdk::iface::C_DotaBaseNPC_Hero>(
+        auto luaBaseNpcHero = state.new_usertype<sdk::datatype::C_DotaBaseNPC_Hero>(
             "C_DOTA_BaseNPC_Hero", sol::no_constructor,
-            sol::base_classes, sol::bases<sdk::iface::C_DotaBaseNPC, sdk::iface::C_BaseModelEntity, sdk::iface::C_BaseEntity, sdk::iface::C_EntityInstance>()
+            sol::base_classes, sol::bases<sdk::datatype::C_DotaBaseNPC, sdk::datatype::C_BaseModelEntity, sdk::datatype::C_BaseEntity, sdk::datatype::C_EntityInstance>()
         );
-        luaBaseNpcHero.set_function("get_replicating_hero_handle", &sdk::iface::C_DotaBaseNPC_Hero::getReplicatingHeroHandle);
+        luaBaseNpcHero.set_function("get_replicating_hero_handle", &sdk::datatype::C_DotaBaseNPC_Hero::getReplicatingHeroHandle);
     }
 
     void C_LuaBindingSdkEntities::registerCaster()
     {
-        registerTypeCaster<sdk::iface::C_EntityInstance>("CEntityInstance");
-        registerTypeCaster<sdk::iface::C_BaseEntity>("C_BaseEntity");
-        registerTypeCaster<sdk::iface::C_DotaPlayerController>("C_DOTAPlayerController");
-        registerTypeCaster<sdk::iface::C_BaseModelEntity>("C_BaseModelEntity");
-        registerTypeCaster<sdk::iface::C_DotaBaseNPC>("C_DOTA_BaseNPC");
-        registerTypeCaster<sdk::iface::C_DotaBaseNPC_Hero>("C_DOTA_BaseNPC_Hero");
+        registerTypeCaster<sdk::datatype::C_EntityInstance>("CEntityInstance");
+        registerTypeCaster<sdk::datatype::C_BaseEntity>("C_BaseEntity");
+        registerTypeCaster<sdk::datatype::C_DotaPlayerController>("C_DOTAPlayerController");
+        registerTypeCaster<sdk::datatype::C_BaseModelEntity>("C_BaseModelEntity");
+        registerTypeCaster<sdk::datatype::C_DotaBaseNPC>("C_DOTA_BaseNPC");
+        registerTypeCaster<sdk::datatype::C_DotaBaseNPC_Hero>("C_DOTA_BaseNPC_Hero");
     }
 
     bool C_LuaBindingSdkEntities::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
@@ -132,20 +132,20 @@ namespace lua::binding
         registerEntities(luaState);
         registerCaster();
 
-        entitiesNamespace.set_function("get_local_controller", []() -> sdk::iface::C_DotaPlayerController* {
+        entitiesNamespace.set_function("get_local_controller", []() -> sdk::datatype::C_DotaPlayerController* {
             const auto localPlayerID = C_ServiceLocator::getInstance<sdk::singleton::C_Source2EngineToClient>()->getLocalPlayerID();
             if (!localPlayerID) {
                 return nullptr;
             }
 
             return C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>()->
-                getBaseEntity<sdk::iface::C_DotaPlayerController>(localPlayerID);
+                getBaseEntity<sdk::datatype::C_DotaPlayerController>(localPlayerID);
         });
 
         entitiesNamespace.set_function("find_by_handle",
             [](const sdk::util::C_BaseEntityHandle entityHandle) {
                 return C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>()->
-                    getBaseEntity<sdk::iface::C_EntityInstance>(entityHandle.getEntryIndex());
+                    getBaseEntity<sdk::datatype::C_EntityInstance>(entityHandle.getEntryIndex());
             }
         );
 

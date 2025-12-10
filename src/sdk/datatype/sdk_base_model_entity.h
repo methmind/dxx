@@ -8,7 +8,7 @@
 #include "sdk_base_entity.h"
 #include "sdk/util/sdk_color_t.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     class C_BaseModelEntity : public C_BaseEntity
     {

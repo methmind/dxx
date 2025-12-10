@@ -10,7 +10,6 @@
 #include "debug/debug_output.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_type.h"
-#include "service_locator/service_locator.h"
 
 namespace lua
 {
@@ -20,12 +19,8 @@ namespace lua
             return;
         }
 
-        /* Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
-         * todo Нарушение SOLID. Надо бы исправить...
-        */
-        C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->invoke<const std::string_view&>(
-            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_LUA_DISPOSE), scriptPath
-        );
+        // Deadlock prevention: invoke hooks before acquiring lua state lock (cuz in listener we may have another lock)
+        this->onLuaDisposeCallback_(scriptPath);
 
         auto locker = this->engine_->getLuaState(); // Ensure thread safety during disposal
         this->scripts_.erase(scriptPath.data());
@@ -93,13 +88,14 @@ namespace lua
         return it->second;
     }
 
-    bool C_LuaScriptManager::initialize() const
+    bool C_LuaScriptManager::initialize(const on_lua_dispose_callback_t& onLuaDisposeCallback) const
     {
         if (!this->engine_->initialize()) {
             dbg("Unable to initialize C_LuaScriptEngine!");
             return false;
         }
 
+        this->onLuaDisposeCallback_ = onLuaDisposeCallback;
         return true;
     }
 } // lua

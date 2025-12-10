@@ -8,7 +8,7 @@
 #include "memory/pattern_scanner.h"
 #include "sdk/sdk_signature.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     void C_BaseModelEntity::changeModelColor(const util::color_t color)
     {

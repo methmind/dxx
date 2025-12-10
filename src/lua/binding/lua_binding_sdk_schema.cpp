@@ -4,7 +4,7 @@
 
 #include "lua_binding_sdk_schema.h"
 
-#include "sdk/interface/sdk_base_entity.h"
+#include "sdk/interface/sdk_schema_system.h"
 
 namespace lua::binding
 {

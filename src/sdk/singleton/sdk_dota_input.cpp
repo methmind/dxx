@@ -19,7 +19,7 @@ namespace sdk::singleton
         }
 
         if (this->getScreenCmdBuffer_ = reinterpret_cast<get_screen_cmd_buffer_t>(
-            memory::FindPattern(clientModule, signature::GET_PLAYER_CMD_BUFFER_FUNC)); !this->getScreenCmdBuffer_) {
+            memory::FindPattern(clientModule, signature::GET_SCREEN_CMD_BUFFER_FUNC)); !this->getScreenCmdBuffer_) {
             dbg("Unable to find C_DotaInput::GetScreenCmdBuffer function!");
             return false;
         }
@@ -27,6 +27,13 @@ namespace sdk::singleton
         if (this->getUserCmd_ = reinterpret_cast<get_user_cmd_t>(
             memory::FindPattern(clientModule, signature::CINPUT_GET_USER_CMD_FUNC)); !this->getUserCmd_) {
             dbg("Unable to find C_DotaInput::GetUserCmd function!");
+            return false;
+        }
+
+        if (this->getScreenPlayerController_ = reinterpret_cast<get_screen_player_controller_t>(
+            memory::FindPattern(clientModule, signature::GET_SCREEN_PLAYER_CONTROLLER_FUNC));
+            this->getScreenPlayerController_) {
+            dbg("Unable to find ::GetScreenPlayerController function!");
             return false;
         }
 
@@ -80,8 +87,13 @@ namespace sdk::singleton
         return true;
     }
 
-    iface::user_cmd_s* C_DotaInput::getUserCmd(iface::C_DotaPlayerController* playerController) const
+    datatype::user_cmd_s* C_DotaInput::getUserCmd() const
     {
+        const auto localController = this->getScreenPlayerController_(0);
+        if (!localController) {
+            return nullptr;
+        }
+
         const auto cmdBufferForScreen = this->getScreenCmdBuffer_(this->cmdCircularBuffer_, 0);
         if (!cmdBufferForScreen) {
             return nullptr;
@@ -92,7 +104,7 @@ namespace sdk::singleton
             return nullptr;
         }
 
-        return static_cast<iface::user_cmd_s*>(this->getUserCmd_(playerController, sequenceNumber));
+        return static_cast<datatype::user_cmd_s*>(this->getUserCmd_(localController, sequenceNumber));
     }
 
     bool C_DotaInput::initialize()

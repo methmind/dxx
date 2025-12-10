@@ -19,13 +19,13 @@ namespace lua::binding
     class C_LuaEntityListView
     {
     private:
-        const std::vector<sdk::iface::C_EntityInstance*>* list_;
-        std::function<sol::object(sol::state_view&, sdk::iface::C_EntityInstance*)> caster_;
+        const std::vector<sdk::datatype::C_EntityInstance*>* list_;
+        std::function<sol::object(sol::state_view&, sdk::datatype::C_EntityInstance*)> caster_;
         mutable sol::state_view lua_;
 
     public:
 
-        C_LuaEntityListView(sol::state_view lua, const std::vector<sdk::iface::C_EntityInstance*>& list, decltype(caster_) caster)
+        C_LuaEntityListView(sol::state_view lua, const std::vector<sdk::datatype::C_EntityInstance*>& list, decltype(caster_) caster)
             : list_(&list), caster_(std::move(caster)), lua_(std::move(lua)) {}
 
         [[nodiscard]] size_t size() const
@@ -46,7 +46,7 @@ namespace lua::binding
     class C_LuaBindingSdkEntities final : public C_ILuaBinding
     {
     private:
-        using caster_func_t = std::function<sol::object(sol::state_view&, sdk::iface::C_EntityInstance*)>;
+        using caster_func_t = std::function<sol::object(sol::state_view&, sdk::datatype::C_EntityInstance*)>;
 
         std::unordered_map<std::string, caster_func_t, xx_hashier_s, std::equal_to<>> typeCasters_;
         std::shared_ptr<sdk::custom::C_EntityList> entities_;
@@ -54,7 +54,7 @@ namespace lua::binding
         template<typename T>
         void registerTypeCaster(const std::string_view& name)
         {
-            this->typeCasters_[name.data()] = [](sol::state_view& lua, sdk::iface::C_EntityInstance* ptr) -> sol::object {
+            this->typeCasters_[name.data()] = [](sol::state_view& lua, sdk::datatype::C_EntityInstance* ptr) -> sol::object {
                 return sol::make_object(lua, static_cast<T*>(ptr));
             };
         }

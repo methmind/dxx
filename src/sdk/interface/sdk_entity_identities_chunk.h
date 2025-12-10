@@ -5,7 +5,7 @@
 #ifndef DXX_DLC_SDK_IDENTITIES_CHUNK_H
 #define DXX_DLC_SDK_IDENTITIES_CHUNK_H
 
-#include "sdk/interface/sdk_entity_identity.h"
+#include "sdk/datatype/sdk_entity_identity.h"
 
 namespace sdk::iface
 {
@@ -17,7 +17,7 @@ namespace sdk::iface
 
     struct entity_identities_chunk_s
     {
-        C_EntityIdentity identities[MAX_ENTITIES_IN_CHUNK];
+        datatype::C_EntityIdentity identities[MAX_ENTITIES_IN_CHUNK];
     };
 }
 

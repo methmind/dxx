@@ -5,9 +5,9 @@
 #ifndef DXX_DLC_SDK_GAME_ENTITY_SYSTEM_H
 #define DXX_DLC_SDK_GAME_ENTITY_SYSTEM_H
 
-#include "../interface/sdk_entity_identities_chunk.h"
-#include "sdk/interface/sdk_dota_player_controller.h"
-#include "sdk/interface/sdk_entity_instance.h"
+#include "sdk/interface/sdk_entity_identities_chunk.h"
+#include "sdk/datatype/sdk_dota_player_controller.h"
+#include "sdk/datatype/sdk_entity_instance.h"
 
 namespace sdk::singleton
 {
@@ -26,11 +26,8 @@ namespace sdk::singleton
     class C_GameEntitySystem
     {
     private:
-        using get_player_controller_t = iface::C_DotaPlayerController*(__fastcall*)(int32_t playerID);
-
         void* instance_;
         iface::entity_identities_chunk_s** identitiesChunks_;
-        get_player_controller_t getPlayerController_;
 
         bool findInstance();
 
@@ -43,11 +40,6 @@ namespace sdk::singleton
         [[nodiscard]] void* getOnAddEntityFunc() const { return getVtable()[ON_ADD_ENTITY_VMT_INDEX]; }
 
         [[nodiscard]] void* getOnRemoveEntityFunc() const { return getVtable()[ON_REMOVE_ENTITY_VMT_INDEX]; }
-
-        iface::C_DotaPlayerController* getPlayerController(const int32_t playerID) const
-        {
-            return this->getPlayerController_(playerID);
-        }
 
         template<class T = void*>
         T* getBaseEntity(const int32_t index) const
@@ -76,12 +68,12 @@ namespace sdk::singleton
                         continue;
                     }
 
-                    if constexpr (std::is_same_v<std::invoke_result_t<func_t, iface::C_EntityInstance*>, bool>) {
-                        if (!callback(static_cast<iface::C_EntityInstance*>(identity.getAssignedEntity()))) {
+                    if constexpr (std::is_same_v<std::invoke_result_t<func_t, datatype::C_EntityInstance*>, bool>) {
+                        if (!callback(static_cast<datatype::C_EntityInstance*>(identity.getAssignedEntity()))) {
                             return;
                         }
                     } else {
-                        callback(static_cast<iface::C_EntityInstance*>(identity.getAssignedEntity()));
+                        callback(static_cast<datatype::C_EntityInstance*>(identity.getAssignedEntity()));
                     }
                 }
             }

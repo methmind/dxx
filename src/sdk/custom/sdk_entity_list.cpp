@@ -27,7 +27,7 @@ namespace sdk::custom
         return std::nullopt;
     }
 
-    std::optional<std::string_view> C_EntityList::GetSpecialEntityName(iface::C_EntityInstance* entity)
+    std::optional<std::string_view> C_EntityList::GetSpecialEntityName(datatype::C_EntityInstance* entity)
     {
         const auto classInfo = entity->getClassInfo();
         if (!classInfo) {
@@ -42,7 +42,7 @@ namespace sdk::custom
         return GetTruncatedIdentityName(className);
     }
 
-    void C_EntityList::removeFromSpecialEntity(iface::C_EntityInstance* entity)
+    void C_EntityList::removeFromSpecialEntity(datatype::C_EntityInstance* entity)
     {
         const auto truncatedIdentityName = GetSpecialEntityName(entity);
         if (!truncatedIdentityName.has_value()) {
@@ -59,7 +59,7 @@ namespace sdk::custom
         });
     }
 
-    void C_EntityList::addToSpecialCategory(iface::C_EntityInstance* entity)
+    void C_EntityList::addToSpecialCategory(datatype::C_EntityInstance* entity)
     {
         const auto truncatedIdentityName = GetSpecialEntityName(entity);
         if (!truncatedIdentityName.has_value()) {
@@ -72,13 +72,13 @@ namespace sdk::custom
     void C_EntityList::syncEntities()
     {
         C_ServiceLocator::getInstance<singleton::C_GameEntitySystem>()->iterateEntities(
-            [this](iface::C_EntityInstance* entity) {
+            [this](datatype::C_EntityInstance* entity) {
                 onAddEntity(entity);
             }
         );
     }
 
-    void C_EntityList::onAddEntity(iface::C_EntityInstance* entity)
+    void C_EntityList::onAddEntity(datatype::C_EntityInstance* entity)
     {
         const auto entityInfo = entity->getClassInfo();
         if (!entityInfo) {
@@ -93,7 +93,7 @@ namespace sdk::custom
         this->entities_[entityInfo->getName()].emplace_back(entity);
     }
 
-    void C_EntityList::onRemoveEntity(iface::C_EntityInstance* entity)
+    void C_EntityList::onRemoveEntity(datatype::C_EntityInstance* entity)
     {
         const auto entityInfo = entity->getClassInfo();
         if (!entityInfo) {
@@ -149,14 +149,14 @@ namespace sdk::custom
             [this]{ onLevelShutdown(); }
         );
 
-        hookDispatcher->subscribe<iface::C_EntityInstance*>(
+        hookDispatcher->subscribe<datatype::C_EntityInstance*>(
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_ADD_ENTITY),
-            [this](iface::C_EntityInstance* entity){ onAddEntity(entity); }
+            [this](datatype::C_EntityInstance* entity){ onAddEntity(entity); }
         );
 
-        hookDispatcher->subscribe<iface::C_EntityInstance*>(
+        hookDispatcher->subscribe<datatype::C_EntityInstance*>(
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_REMOVE_ENTITY),
-            [this](iface::C_EntityInstance* entity){ onRemoveEntity(entity); }
+            [this](datatype::C_EntityInstance* entity){ onRemoveEntity(entity); }
         );
 
         syncEntities();

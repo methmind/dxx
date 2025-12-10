@@ -19,6 +19,8 @@ namespace bootstrap
 
         static bool InitializeLuaStuff(const std::shared_ptr<C_ServiceContainer>& container);
 
+        static bool InitializeHookStuff();
+
     public:
         static std::shared_ptr<C_ServiceContainer> Build();
     };

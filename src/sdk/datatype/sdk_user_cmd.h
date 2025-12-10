@@ -7,7 +7,7 @@
 
 #include "sdk/protobuf/gen/dota_usercmd.pb.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     struct user_cmd_s
     {

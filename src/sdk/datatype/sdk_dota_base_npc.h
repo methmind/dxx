@@ -8,7 +8,7 @@
 #include "sdk_base_model_entity.h"
 #include "sdk_dota_modifier_manager.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     class C_DotaBaseNPC : public C_BaseModelEntity
     {

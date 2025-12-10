@@ -7,16 +7,11 @@
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
-#include "hook/hook_dispatcher.h"
-#include "hook/hook_manager.h"
 #include "input/bind_system.h"
-#include "lua/lua_script_manager.h"
 #include "renderer/renderer.h"
-#include "sdk/singleton/sdk_dota_view_render.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
-REGISTER_GLOBAL_SERVICE(hook::C_HookDispatcher);
 REGISTER_GLOBAL_SERVICE(input::C_BindSystem);
 
 namespace bootstrap
@@ -29,7 +24,7 @@ namespace bootstrap
             return nullptr;
         }
 
-        if (!container->add<hook::C_HookManager>()->initialize()) {
+        if (!InitializeHookStuff()) {
             dbg("Unable to initialize hooks!");
             return nullptr;
         }

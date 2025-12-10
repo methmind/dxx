@@ -4,6 +4,7 @@
 
 #ifndef DXX_DLC_LUA_BINDING_SDK_MODIFIER_H
 #define DXX_DLC_LUA_BINDING_SDK_MODIFIER_H
+
 #include "lua_binding_interface.h"
 
 namespace lua::binding

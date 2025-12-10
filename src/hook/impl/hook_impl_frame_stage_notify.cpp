@@ -8,7 +8,7 @@
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_original_invoker.h"
 #include "sdk/sdk_client_frame_stage_t.h"
-#include "sdk/interface/sdk_entity_instance.h"
+#include "../../sdk/datatype/sdk_entity_instance.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "service_locator/service_locator.h"
 

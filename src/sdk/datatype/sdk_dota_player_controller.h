@@ -8,7 +8,7 @@
 #include "sdk_base_entity.h"
 #include "sdk/util/sdk_base_entity_handle.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     class C_DotaPlayerController : public C_BaseEntity
     {

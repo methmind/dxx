@@ -68,7 +68,7 @@ namespace bootstrap
         }
 
         if (!sdk::custom::C_InputController::Initialize()) [[unlikely]] {
-            dbg("Unable to initialize sdk::singleton::C_InputController");
+            dbg("Unable to initialize sdk::singleton::C_InputController!");
             return false;
         }
 

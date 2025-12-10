@@ -9,7 +9,7 @@
 #include "sdk_dota_buff.h"
 #include "sdk/memory/sdk_memory_utl_vector.h"
 
-namespace sdk::iface
+namespace sdk::datatype
 {
     class C_DotaModifierManager
     {

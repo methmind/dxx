@@ -86,9 +86,9 @@ namespace sdk::signature
 
     /*
      * Can be found in CInput::CreateMove
-     * void*(__fastcall*)(int32_t playerID);
+     * void*(__fastcall*)(int32_t splitScreenID);
      */
-    constexpr auto GET_PLAYER_CONTROLLER_FUNC = "33 C0 83 F9 ? 0F 44 C8";
+    constexpr auto GET_SCREEN_PLAYER_CONTROLLER_FUNC = "33 C0 83 F9 ? 0F 44 C8";
 
     /*
      * Can be found in CInput::CreateMove
@@ -100,7 +100,7 @@ namespace sdk::signature
      * Can be found in CInput::CreateMove
      * void*(__fastcall*)(void* cmdCircularBuffer, int32_t screenID);
      */
-    constexpr auto GET_PLAYER_CMD_BUFFER_FUNC = "48 89 4C 24 ? 41 56 41 57";
+    constexpr auto GET_SCREEN_CMD_BUFFER_FUNC = "48 89 4C 24 ? 41 56 41 57";
 
     /*
      * Can be found in CInput::CreateMove

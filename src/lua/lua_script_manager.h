@@ -14,10 +14,14 @@ namespace lua
 {
     class C_LuaScriptManager final : public C_ILuaContainer, public std::enable_shared_from_this<C_LuaScriptManager>
     {
+    public:
+        using on_lua_dispose_callback_t = std::function<void(const std::string_view&)>;
+
     private:
         std::shared_ptr<C_LuaScriptEngine> engine_;
         //@note Сейчас модификация происходит только из GUI потока.
         std::unordered_map<std::string, std::shared_ptr<C_LuaScriptInstance>, xx_hashier_s, std::equal_to<>> scripts_;
+        mutable on_lua_dispose_callback_t onLuaDisposeCallback_;
 
     public:
 
@@ -31,7 +35,7 @@ namespace lua
 
         std::shared_ptr<C_LuaScriptInstance> getScriptInstance(const std::string_view& scriptPath) override;
 
-        bool initialize() const;
+        bool initialize(const on_lua_dispose_callback_t& onLuaDisposeCallback) const;
 
         C_LuaScriptManager() : engine_(std::make_shared<C_LuaScriptEngine>()) {}
 
