@@ -6,11 +6,10 @@
 #define DXX_DLC_HOOK_IMPL_PRESENT_H
 
 #include <dxgi.h>
-#include <string>
 
 namespace hook::impl
 {
-    HRESULT __fastcall hkPresent(IDXGISwapChain* self, UINT sync_interval, UINT flags);
+    HRESULT __fastcall hkPresent(IDXGISwapChain* instance, UINT sync_interval, UINT flags);
 } // hook
 
 #endif //DXX_DLC_HOOK_IMPL_PRESENT_H

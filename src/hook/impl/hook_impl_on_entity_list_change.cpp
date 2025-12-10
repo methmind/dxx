@@ -12,7 +12,7 @@
 
 namespace hook::impl
 {
-    void* hkOnAddEntity(void* instance, void* entityInstance, int32_t handle)
+    void* hkOnAddEntity(void* instance, void* entityInstance, const int32_t handle)
     {
         const auto result = MH_CALL_ORIGINAL(hkOnAddEntity)(instance, entityInstance, handle);
 
@@ -24,7 +24,7 @@ namespace hook::impl
         return result;
     }
 
-    void* hkOnRemoveEntity(void* instance, void* entityInstance, int32_t handle)
+    void* hkOnRemoveEntity(void* instance, void* entityInstance, const int32_t handle)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke<void*>(
             static_cast<hook_id_t>(hook_impl_type_e::ON_REMOVE_ENTITY),

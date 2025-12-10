@@ -7,9 +7,9 @@
 
 namespace hook::impl
 {
-    void* hkOnLevelInit(void* instance, const char* mapName);
+    void* __fastcall hkOnLevelInit(void* instance, const char* mapName);
 
-    void* hkOnLevelShutdown(void* instance);
+    void* __fastcall hkOnLevelShutdown(void* instance);
 } // hook
 
 #endif //DXX_DLC_HOOK_IMPL_ON_LEVEL_STATE_CHANGE_H

@@ -6,7 +6,9 @@
 
 #include "sdk_source2_client.h"
 #include "debug/debug_output.h"
+#include "memory/pattern_scanner.h"
 #include "minhook/src/hde/hde64.h"
+#include "sdk/sdk_signature.h"
 #include "service_locator/service_locator.h"
 
 namespace sdk::singleton
@@ -62,6 +64,12 @@ namespace sdk::singleton
     {
         if (!findInstance()) {
             dbg("Unable to find instance of C_GameEntitySystem!");
+            return false;
+        }
+
+        if (this->getPlayerController_ = reinterpret_cast<get_player_controller_t>(
+            memory::FindPattern(GetModuleHandleA("client.dll"), signature::GET_PLAYER_CONTROLLER_FUNC)); this->getPlayerController_) {
+            dbg("Unable to find C_GameEntitySystem::GetPlayerController function!");
             return false;
         }
 

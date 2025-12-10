@@ -17,7 +17,7 @@ namespace hook
 
         bool initializeWorld(HMODULE clientModule);
 
-        bool initializeEntity(HMODULE clientModule);
+        bool initializeEntity();
 
     public:
 

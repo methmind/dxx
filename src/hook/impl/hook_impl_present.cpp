@@ -11,12 +11,12 @@
 
 namespace hook::impl
 {
-    HRESULT hkPresent(IDXGISwapChain* self, UINT sync_interval, UINT flags)
+    HRESULT hkPresent(IDXGISwapChain* instance, UINT sync_interval, UINT flags)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke(
-            static_cast<hook_id_t>(hook_impl_type_e::PRESENT), self, sync_interval, flags
+            static_cast<hook_id_t>(hook_impl_type_e::PRESENT), instance, sync_interval, flags
         );
 
-        return MH_CALL_ORIGINAL(hkPresent)(self, sync_interval, flags);
+        return MH_CALL_ORIGINAL(hkPresent)(instance, sync_interval, flags);
     }
 } // hook

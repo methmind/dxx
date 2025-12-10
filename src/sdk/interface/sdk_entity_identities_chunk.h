@@ -7,7 +7,7 @@
 
 #include "sdk/interface/sdk_entity_identity.h"
 
-namespace sdk::custom
+namespace sdk::iface
 {
     constexpr auto MAX_ENTITIES_IN_CHUNK = 512;
 
@@ -17,7 +17,7 @@ namespace sdk::custom
 
     struct entity_identities_chunk_s
     {
-        iface::C_EntityIdentity identities[MAX_ENTITIES_IN_CHUNK];
+        C_EntityIdentity identities[MAX_ENTITIES_IN_CHUNK];
     };
 }
 

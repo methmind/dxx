@@ -187,7 +187,7 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/interface/sdk_dota_buff.h
         src/lua/binding/lua_binding_sdk_modifier.cpp
         src/lua/binding/lua_binding_sdk_modifier.h
-        src/sdk/custom/sdk_entity_identities_chunk.h
+        src/sdk/interface/sdk_entity_identities_chunk.h
         src/lua/binding/lua_binding_utl_vector.h
         src/lua/binding/lua_binding_sdk_utils.cpp
         src/lua/binding/lua_binding_sdk_utils.h
@@ -195,6 +195,13 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/protobuf/gen/dota_usercmd.pb.cc
         src/sdk/protobuf/gen/usercmd.pb.cc
         src/sdk/protobuf/gen/networkbasetypes.pb.cc
+        src/sdk/singleton/sdk_dota_input.cpp
+        src/sdk/singleton/sdk_dota_input.h
+        src/hook/impl/hook_impl_create_move.cpp
+        src/hook/impl/hook_impl_create_move.h
+        src/sdk/interface/sdk_user_cmd.h
+        src/sdk/custom/sdk_input_controller.cpp
+        src/sdk/custom/sdk_input_controller.h
 )
 
 target_compile_options(dxx_dlc PRIVATE

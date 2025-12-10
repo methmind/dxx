@@ -71,6 +71,48 @@ namespace sdk::signature
 
     // Can be found via xref on "OnColorChanged"
     constexpr auto BASE_MODEL_ENTITY_CHANGE_COLOR_FUNC = "40 53 48 83 EC ? 48 8B D9 48 8B 89 ? ? ? ? 48 8B 01 0F B6 93";
+
+    /*
+     * CInput::CreateMove == 5 VMT index
+     * void(__fastcall*)(void* cinput, int32_t slot, bool isActive);
+     */
+    constexpr auto CINPUT_CREATE_MOVE_FUNC = "85 D2 0F 85 ? ? ? ? 48 8B C4 44 88 40";
+
+    /*
+     * Can be found in CInput::CreateMove
+     * void*(__fastcall*)(void* playerController, int32_t sequenceNumber);
+     */
+    constexpr auto CINPUT_GET_USER_CMD_FUNC = "40 53 48 83 EC ? 8B DA E8 ? ? ? ? 4C 8B C0";
+
+    /*
+     * Can be found in CInput::CreateMove
+     * void*(__fastcall*)(int32_t playerID);
+     */
+    constexpr auto GET_PLAYER_CONTROLLER_FUNC = "33 C0 83 F9 ? 0F 44 C8";
+
+    /*
+     * Can be found in CInput::CreateMove
+     * void(__fastcall*)(void* playerController, int32_t& slot);
+     */
+    constexpr auto GET_PLAYER_SCREEN_ID_FUNC = "48 83 EC ? 4C 8B 0D ? ? ? ? 4C 8B DA";
+
+    /*
+     * Can be found in CInput::CreateMove
+     * void*(__fastcall*)(void* cmdCircularBuffer, int32_t screenID);
+     */
+    constexpr auto GET_PLAYER_CMD_BUFFER_FUNC = "48 89 4C 24 ? 41 56 41 57";
+
+    /*
+     * Can be found in CInput::CreateMove
+     * mov rcx, cs:off_18XXXXXXX
+     */
+    constexpr auto MOV_RCX_GLOBAL_CMD_CIRCULAR_BUFFER = "48 8B 0D ? ? ? ? E8 ? ? ? ? 49 8B CF";
+
+    /*
+     * Can be found in CInput::CreateMove
+     * mov r14d, [rax+5460h]
+     */
+    constexpr auto ADD_RAX_SEQUENCE_NUMBER_OFFSET = "44 8B B0 ? ? ? ? 41 8B D6";
 }
 
 #endif //DXX_DLC_SDK_SIGNATURE_H

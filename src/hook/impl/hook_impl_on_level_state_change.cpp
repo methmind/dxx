@@ -11,13 +11,13 @@
 
 namespace hook::impl
 {
-    void* hkOnLevelInit(void* instance, const char* mapName)
+    void* __fastcall hkOnLevelInit(void* instance, const char* mapName)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke(static_cast<hook_id_t>(hook_impl_type_e::ON_LEVEL_INIT));
         return MH_CALL_ORIGINAL(hkOnLevelInit)(instance, mapName);
     }
 
-    void* hkOnLevelShutdown(void* instance)
+    void* __fastcall hkOnLevelShutdown(void* instance)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke(static_cast<hook_id_t>(hook_impl_type_e::ON_LEVEL_SHUTDOWN));
         return MH_CALL_ORIGINAL(hkOnLevelShutdown)(instance);

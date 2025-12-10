@@ -5,7 +5,8 @@
 #ifndef DXX_DLC_SDK_GAME_ENTITY_SYSTEM_H
 #define DXX_DLC_SDK_GAME_ENTITY_SYSTEM_H
 
-#include "sdk/custom/sdk_entity_identities_chunk.h"
+#include "../interface/sdk_entity_identities_chunk.h"
+#include "sdk/interface/sdk_dota_player_controller.h"
 #include "sdk/interface/sdk_entity_instance.h"
 
 namespace sdk::singleton
@@ -25,14 +26,17 @@ namespace sdk::singleton
     class C_GameEntitySystem
     {
     private:
+        using get_player_controller_t = iface::C_DotaPlayerController*(__fastcall*)(int32_t playerID);
+
         void* instance_;
-        custom::entity_identities_chunk_s** identitiesChunks_;
+        iface::entity_identities_chunk_s** identitiesChunks_;
+        get_player_controller_t getPlayerController_;
 
         bool findInstance();
 
-        void* getBaseEntityImpl(int32_t index) const;
+        [[nodiscard]] void* getBaseEntityImpl(int32_t index) const;
 
-        auto getVtable() const { return *static_cast<void***>(this->instance_); }
+        [[nodiscard]] auto getVtable() const { return *static_cast<void***>(this->instance_); }
 
     public:
 
@@ -40,27 +44,33 @@ namespace sdk::singleton
 
         [[nodiscard]] void* getOnRemoveEntityFunc() const { return getVtable()[ON_REMOVE_ENTITY_VMT_INDEX]; }
 
+        iface::C_DotaPlayerController* getPlayerController(const int32_t playerID) const
+        {
+            return this->getPlayerController_(playerID);
+        }
+
         template<class T = void*>
-        T* getBaseEntity(const int32_t index) const {
+        T* getBaseEntity(const int32_t index) const
+        {
             return static_cast<T*>(getBaseEntityImpl(index));
         }
 
         template<typename func_t>
         void iterateEntities(func_t callback) const
         {
-            for (auto i = 0; i < custom::MAX_CHUNKS_COUNT; ++i) {
+            for (auto i = 0; i < iface::MAX_CHUNKS_COUNT; ++i) {
                 const auto chunk = this->identitiesChunks_[i];
                 if (!chunk) {
                     continue;
                 }
 
-                for (auto j = 0; j < custom::MAX_ENTITIES_IN_CHUNK; ++j) {
+                for (auto j = 0; j < iface::MAX_ENTITIES_IN_CHUNK; ++j) {
                     auto& identity = chunk->identities[j];
                     if (!identity.getAssignedEntity()) {
                         continue;
                     }
 
-                    const auto globalIndex = i * custom::MAX_ENTITIES_IN_CHUNK + j;
+                    const auto globalIndex = i * iface::MAX_ENTITIES_IN_CHUNK + j;
                     if (const util::C_BaseEntityHandle identityHandle(identity.getEntityHandle());
                         identityHandle.getEntryIndex() != globalIndex) {
                         continue;

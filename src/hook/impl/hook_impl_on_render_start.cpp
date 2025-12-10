@@ -12,12 +12,12 @@
 
 namespace hook::impl
 {
-    void hkOnRenderStart(void* self)
+    void hkOnRenderStart(void* instance)
     {
         C_ServiceLocator::getInstance<C_HookDispatcher>()->invoke(
             static_cast<hook_id_t>(hook_impl_type_e::ON_RENDER_START)
         );
 
-        MH_CALL_ORIGINAL(hkOnRenderStart)(self);
+        MH_CALL_ORIGINAL(hkOnRenderStart)(instance);
     }
 } // hook

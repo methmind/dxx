@@ -8,6 +8,7 @@
 #include "MinHook.h"
 #include "debug/debug_output.h"
 #include "dx/dx_present.h"
+#include "impl/hook_impl_create_move.h"
 #include "impl/hook_impl_on_render_start.h"
 #include "impl/hook_impl_frame_stage_notify.h"
 #include "impl/hook_impl_on_entity_list_change.h"
@@ -16,10 +17,10 @@
 #include "memory/pattern_scanner.h"
 #include "sdk/sdk_signature.h"
 #include "sdk/protobuf/gen/dota_usercmd.pb.h"
+#include "sdk/singleton/sdk_dota_input.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
 #include "sdk/singleton/sdk_source2_client.h"
-#include "sdk/singleton/sdk_source2_engine_to_client.h"
 #include "service_locator/service_locator.h"
 
 namespace hook
@@ -77,7 +78,7 @@ namespace hook
         return true;
     }
 
-    bool C_HookManager::initializeEntity(HMODULE clientModule)
+    bool C_HookManager::initializeEntity()
     {
         const auto entitySystem = C_ServiceLocator::getInstance<sdk::singleton::C_GameEntitySystem>();
         if (const auto err = MH_CreateHook(entitySystem->getOnAddEntityFunc(),
@@ -93,65 +94,6 @@ namespace hook
         }
 
         return true;
-    }
-
-    struct CUserCmd
-    {
-        void* vtable;
-        int32_t sequenceNumber;
-        dota::CDota2UserCmdPB cmd;
-        dota::CMsgVector* crosshair;
-    };
-
-    //40 53 48 83 EC ? 8B DA E8 ? ? ? ? 4C 8B C0 - get_user_cmd
-    //48 89 4C 24 ? 41 56 41 57 - get sequence number
-
-    using get_user_cmd_fn = CUserCmd * (__thiscall*)(void* entity, int32_t sequenceNumber);
-    using get_cmd_sequence_number_fn = void*(__thiscall*)(void* circularBuffer, int32_t playerID);
-
-    //33 C0 83 F9 ? 0F 44 C8
-    using get_xz_chto_fn = void*(__fastcall*)(int32_t i);
-
-    //48 83 EC ? 4C 8B 0D ? ? ? ? 4C 8B DA
-    using get_xz_chto_fn2 = void*(__fastcall*)(void* xz_chto_fn_ret, int32_t* out);
-
-    get_user_cmd_fn get_user_cmd;
-    get_cmd_sequence_number_fn get_cmd_sequence_number;
-
-    get_xz_chto_fn get_xz_chto;
-    get_xz_chto_fn2 get_xz_chto2;
-
-    void on_create_move(void* cinput, int32_t slot, bool isActive)
-    {
-        MH_CALL_ORIGINAL(on_create_move)(cinput, slot, isActive);
-
-        auto unk = get_xz_chto(0);
-        if (!unk) {
-            return;
-        }
-
-        int32_t unk2 = 0;
-        get_xz_chto2(unk, &unk2);
-
-        auto unk3 = unk2 - 1;
-        if (unk2 == -1) {
-            unk3 = -1;
-        }
-
-        auto xx = (uint8_t*)GetModuleHandleA("client.dll") + 0x50A5BF8;
-        void* global_input_ptr = *(void**)xx;
-
-        auto unk4 = get_cmd_sequence_number(global_input_ptr, unk3);
-        int32_t st = *(int32_t*)((uint8_t*)unk4 + 0x5460);
-
-        CUserCmd* userCmd = get_user_cmd(unk, st);
-        if (!userCmd) {
-            return;
-        }
-
-        auto cc = &userCmd->cmd;
-
-        return;
     }
 
     bool C_HookManager::initialize()
@@ -179,20 +121,15 @@ namespace hook
             return false;
         }
 
-        if (!initializeEntity(clientModule)) {
+        if (!initializeEntity()) {
             dbg("Unable to initialize entity list changes hook!");
             return false;
         }
 
-        //48 89 5C 24 ? 48 89 74 24 ? 57 48 83 EC ? 48 8B 01 8B F2 48 8D 54 24
-        auto onVerifyMove = memory::FindPattern(clientModule, "85 D2 0F 85 ? ? ? ? 48 8B C4 44 88 40");
-        get_user_cmd = reinterpret_cast<get_user_cmd_fn>(memory::FindPattern(clientModule, "40 53 48 83 EC ? 8B DA E8 ? ? ? ? 4C 8B C0"));
-        get_cmd_sequence_number = reinterpret_cast<get_cmd_sequence_number_fn>(memory::FindPattern(clientModule, "48 89 4C 24 ? 41 56 41 57"));
-        get_xz_chto = reinterpret_cast<get_xz_chto_fn>(memory::FindPattern(clientModule, "33 C0 83 F9 ? 0F 44 C8"));
-        get_xz_chto2 = reinterpret_cast<get_xz_chto_fn2>(memory::FindPattern(clientModule, "48 83 EC ? 4C 8B 0D ? ? ? ? 4C 8B DA"));
-
-        if (auto err = MH_CreateHook(onVerifyMove, reinterpret_cast<void*>(on_create_move), nullptr); err != MH_OK) {
-            dbg("Unable to create hook for CDOTAInput::onVerifyMove! err = %d", err);
+        const auto createMoveFunc = C_ServiceLocator::getInstance<sdk::singleton::C_DotaInput>()->getCreateMove();
+        if (const auto err = MH_CreateHook(reinterpret_cast<void*>(createMoveFunc),
+            reinterpret_cast<void*>(impl::hkCreateMove), nullptr); err != MH_OK) {
+            dbg("Unable to create hook for C_DotaInput::CreateMove! err = %d", err);
             return false;
         }
 

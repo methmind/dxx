@@ -12,15 +12,17 @@ namespace hook::impl
     enum class hook_impl_type_e : uint16_t
     {
         UNKNOWN = 0,
-        PRESENT,
-        ON_RENDER_START,
-        ON_LUA_DISPOSE,
-        ON_UPDATE,
-        ON_PRE_UPDATE,
-        ON_ADD_ENTITY,
-        ON_REMOVE_ENTITY,
-        ON_LEVEL_INIT,
-        ON_LEVEL_SHUTDOWN,
+        PRESENT, // HRESULT(__fastcall*)(IDXGISwapChain* self, UINT sync_interval, UINT flags)
+        ON_RENDER_START, // void(__fastcall*)(void* instance)
+        ON_LUA_DISPOSE, // void(__fastcall*)(const std::string_view& scriptID)
+        ON_UPDATE, // void(__fastcall*)()
+        ON_PRE_UPDATE, // void(__fastcall*)()
+        ON_ADD_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle
+        ON_REMOVE_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle
+        ON_LEVEL_INIT, // void(__fastcall*)(void* instance, const char* mapName)
+        ON_LEVEL_SHUTDOWN, // void(__fastcall*)(void* instance)
+        CREATE_MOVE_RAW, // void(__fastcall*)(void* instance, int32_t slot, bool isActive)
+        CREATE_MOVE, // void(__fastcall*)(void* CUserCmd)
     };
 }
 
