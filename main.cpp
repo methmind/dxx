@@ -12,6 +12,7 @@ DWORD WINAPI UnloadModule(LPVOID lpModule)
 DWORD WINAPI EntryModule(LPVOID lpModule)
 {
     {
+        MessageBoxA(nullptr, "Press F to pay respect", nullptr, 0);
         std::make_unique<app::C_Application>()->entry();
     }
 

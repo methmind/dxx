@@ -16,7 +16,6 @@
 #include "lua/binding/lua_binding_sdk_schema.h"
 #include "lua/binding/lua_binding_sdk_utils.h"
 #include "lua/binding/lua_binding_source_engine.h"
-#include "lua/binding/lua_binding_utl_vector.h"
 #include "sdk/custom/sdk_entity_list.h"
 
 namespace bootstrap

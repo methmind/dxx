@@ -203,6 +203,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/custom/sdk_input_controller.cpp
         src/sdk/custom/sdk_input_controller.h
         src/bootstrap/bootstrap_hook.cpp
+        src/feature/feature_virtual_camera.cpp
+        src/feature/feature_virtual_camera.h
 )
 
 target_compile_options(dxx_dlc PRIVATE

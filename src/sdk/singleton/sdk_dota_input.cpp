@@ -32,7 +32,7 @@ namespace sdk::singleton
 
         if (this->getScreenPlayerController_ = reinterpret_cast<get_screen_player_controller_t>(
             memory::FindPattern(clientModule, signature::GET_SCREEN_PLAYER_CONTROLLER_FUNC));
-            this->getScreenPlayerController_) {
+            !this->getScreenPlayerController_) {
             dbg("Unable to find ::GetScreenPlayerController function!");
             return false;
         }
@@ -99,7 +99,7 @@ namespace sdk::singleton
             return nullptr;
         }
 
-        const auto sequenceNumber = static_cast<uint8_t*>(cmdBufferForScreen)[this->sequenceNumberOffset_];
+        const auto sequenceNumber = *reinterpret_cast<int32_t*>(static_cast<uint8_t*>(cmdBufferForScreen) + this->sequenceNumberOffset_);
         if (!sequenceNumber) {
             return nullptr;
         }
