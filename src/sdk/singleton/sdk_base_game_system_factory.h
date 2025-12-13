@@ -16,7 +16,7 @@ namespace sdk::singleton
     public:
         C_IGameSystemFactory* next{};
         const char* name{};
-        void* gameSystem{};
+        void** gameSystem{};
     };
 
     class C_BaseGameSystemFactory

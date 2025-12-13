@@ -15,7 +15,7 @@ namespace sdk::singleton
 {
     float* C_RenderGameSystem::getWorldProjectionMatrix() const
     {
-        return memory::vmt::call<world_to_projection_matrix_t, WORLD_TO_PROJECTION_MATRIX_VMT_INDEX>(this->instance_, 0);
+        return memory::vmt::call<world_to_projection_matrix_t, WORLD_TO_PROJECTION_MATRIX_VMT_INDEX>(*static_cast<void**>(this->instance_), 0);
     }
 
     uint32_t C_RenderGameSystem::screenTransform(const math::vector3& in, math::vector3& out) const

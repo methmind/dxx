@@ -16,7 +16,7 @@ namespace sdk::singleton
      * 48 63 C2 48 8D 0D ? ? ? ? 48 C1 E0
      * float*(__fastcall*)(void* instance, int32_t screenSlot);
      */
-    constexpr auto WORLD_TO_PROJECTION_MATRIX_VMT_INDEX = 67;
+    constexpr auto WORLD_TO_PROJECTION_MATRIX_VMT_INDEX = 66;
 
     class C_RenderGameSystem
     {

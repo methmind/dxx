@@ -6,6 +6,11 @@
 
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_type.h"
+#include "memory/pattern_scanner.h"
+#include "sdk/sdk_signature.h"
+#include "sdk/math/sdk_math_vector3.h"
+#include "sdk/singleton/sdk_base_game_system_factory.h"
+#include "sdk/singleton/sdk_render_game_system.h"
 #include "service_locator/service_locator.h"
 
 namespace feature
@@ -13,7 +18,6 @@ namespace feature
     void C_FeatureCameraEmulator::onCreateMove(sdk::datatype::user_cmd_s* userCmd)
     {
         auto pbCmd = &userCmd->cmd;
-        dbg("Camera: %d | %d", pbCmd->cameraposition_x(), pbCmd->cameraposition_y());
     }
 
     bool C_FeatureCameraEmulator::initialize()

@@ -1,5 +1,5 @@
+#include <windows.h>
 #include <memory>
-#include <thread>
 
 #include "application.h"
 #include "debug/debug_output.h"
