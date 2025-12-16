@@ -18,21 +18,25 @@ namespace sdk::singleton
      */
     constexpr auto WORLD_TO_PROJECTION_MATRIX_VMT_INDEX = 66;
 
+    /*
+     * 8B 05 ? ? ? ? 83 F8 ? 7E ? F7 05
+     * float*(__fastcall*)(void* instance);
+     */
+    constexpr auto VIEW_MATRIX_VMT_INDEX = 65;
+
     class C_RenderGameSystem
     {
     private:
-        using screen_transform_t = uint32_t(__fastcall*)(const math::vector3& in, math::vector3& out);
-
         using world_to_projection_matrix_t = float*(__fastcall*)(void* instance, int32_t screenSlot);
+        using get_view_matrix_t = float*(__fastcall*)(void* instance);
 
         void* instance_;
-        screen_transform_t screenTransform_;
 
     public:
 
         [[nodiscard]] float* getWorldProjectionMatrix() const;
 
-        uint32_t screenTransform(const math::vector3& in, math::vector3& out) const;
+        [[nodiscard]] float* getViewMatrix() const;
 
         bool initialize();
 

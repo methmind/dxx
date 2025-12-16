@@ -124,7 +124,7 @@ namespace lua::binding
             return ImGui::CalcTextSize(text);
         });
 
-        rendererNamespace.set_function("get_world_projection_matrix", [] {
+        /*rendererNamespace.set_function("get_world_projection_matrix", [] {
             return C_ServiceLocator::getInstance<sdk::singleton::C_RenderGameSystem>()->getWorldProjectionMatrix();
         });
 
@@ -140,7 +140,7 @@ namespace lua::binding
             }
 
             return ImVec2(out.x, out.y);
-        });
+        });*/
 
         return true;
     }

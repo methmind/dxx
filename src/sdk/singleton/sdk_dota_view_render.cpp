@@ -12,7 +12,7 @@ namespace sdk::singleton
 {
     bool C_DotaViewRender::findInstance(HMODULE clientModule)
     {
-        const auto func = reinterpret_cast<get_view_render_instance_t>(memory::FindPattern(clientModule,
+        const auto func = reinterpret_cast<FARPROC>(memory::FindPattern(clientModule,
             signature::GET_VIEW_RENDER_INSTANCE_FUNC
             )
         );
@@ -22,7 +22,7 @@ namespace sdk::singleton
             return false;
         }
 
-        if (this->instance_ = func(); !this->instance_) {
+        if (this->instance_ = reinterpret_cast<void*>(func()); !this->instance_) {
             dbg("GetViewRenderInstance() returned nullptr!");
             return false;
         }

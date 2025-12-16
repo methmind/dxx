@@ -106,13 +106,25 @@ namespace sdk::signature
      * Can be found in CInput::CreateMove
      * mov rcx, cs:off_18XXXXXXX
      */
-    constexpr auto MOV_RCX_GLOBAL_CMD_CIRCULAR_BUFFER = "48 8B 0D ? ? ? ? E8 ? ? ? ? 49 8B CF";
+    constexpr auto MOV_RCX_GLOBAL_CMD_CIRCULAR_BUFFER = "48 8B 0D ? ? ? ? E8 ? ? ? ? 48 8B CF 48 8B F0";
 
     /*
      * Can be found in CInput::CreateMove
      * mov r14d, [rax+5460h]
      */
     constexpr auto ADD_RAX_SEQUENCE_NUMBER_OFFSET = "44 8B B0 ? ? ? ? 41 8B D6";
+
+    /*
+     * Can be found via `dota_camera_set_lookatpos`
+     * void*(__fastcall*)();
+     */
+    constexpr auto GET_DOTA_CAMERA_MANAGER_FUNC = "40 53 48 83 EC ? 8B 0D ? ? ? ? 48 8D 1D ? ? ? ? 65 48 8B 04 25 ? ? ? ? BA ? ? ? ? 48 8B 04 C8 8B 04 02 39 05 ? ? ? ? 7F ? 48 8B 0D";
+
+    /*
+     * Can be found via xref on dota_camera_set_lookatpos
+     * void(__fastcall*)(void* instance, float x, float y, bool forceApply, bool isCommitNeed, bool ignorePreviousPos);
+     */
+    constexpr auto SET_CAMERA_LOOK_AT_POS_FUNC = "48 8B C4 48 89 58 ? 57 48 81 EC ? ? ? ? 80 BC 24";
 }
 
 #endif //DXX_DLC_SDK_SIGNATURE_H

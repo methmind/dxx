@@ -205,12 +205,18 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/bootstrap/bootstrap_hook.cpp
         src/feature/feature_virtual_camera.cpp
         src/feature/feature_virtual_camera.h
+        src/sdk/math/sdk_math_quantize_point.h
+        src/sdk/datatype/sdk_dota_camera.h
+        src/sdk/singleton/sdk_dota_camera_manager.cpp
+        src/sdk/singleton/sdk_dota_camera_manager.h
+        src/sdk/datatype/sdk_dota_camera.cpp
 )
 
 target_compile_options(dxx_dlc PRIVATE
         $<$<CXX_COMPILER_ID:Clang>:-fvisibility=hidden>
         $<$<CXX_COMPILER_ID:Clang>:-fvisibility-inlines-hidden>
         -mavx2
+        -mfma
 )
 
 set_target_properties(dxx_dlc PROPERTIES

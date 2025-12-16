@@ -6,6 +6,7 @@
 #include "sdk/custom/sdk_entity_list.h"
 #include "sdk/custom/sdk_input_controller.h"
 #include "sdk/singleton/sdk_base_game_system_factory.h"
+#include "sdk/singleton/sdk_dota_camera_manager.h"
 #include "sdk/singleton/sdk_dota_input.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
@@ -22,6 +23,7 @@ REGISTER_GLOBAL_SERVICE(sdk::singleton::C_GameEntitySystem);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_Source2EngineToClient);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_BaseGameSystemFactory);
 REGISTER_GLOBAL_SERVICE(sdk::singleton::C_DotaInput);
+REGISTER_GLOBAL_SERVICE(sdk::singleton::C_DotaCamaraManager);
 
 namespace bootstrap
 {
@@ -64,6 +66,11 @@ namespace bootstrap
 
         if (!C_ServiceLocator::getInstance<sdk::singleton::C_DotaInput>()->initialize()) {
             dbg("Unable to initialize sdk::singleton::C_DotaInput");
+            return false;
+        }
+
+        if (!C_ServiceLocator::getInstance<sdk::singleton::C_DotaCamaraManager>()->initialize()) {
+            dbg("Unable to initialize sdk::singleton::C_DotaCamaraManager");
             return false;
         }
 

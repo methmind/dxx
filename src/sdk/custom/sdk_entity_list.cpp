@@ -82,6 +82,7 @@ namespace sdk::custom
     {
         const auto entityInfo = entity->getClassInfo();
         if (!entityInfo) {
+            assert("C_EntityInstance::getClassInfo == nullptr. Check signature!");
             return;
         }
 
@@ -97,6 +98,7 @@ namespace sdk::custom
     {
         const auto entityInfo = entity->getClassInfo();
         if (!entityInfo) {
+            assert("C_EntityInstance::getClassInfo == nullptr. Check signature!");
             return;
         }
 

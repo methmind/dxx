@@ -19,8 +19,8 @@ namespace hook::impl
         ON_PRE_UPDATE, // void(__fastcall*)()
         ON_ADD_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle
         ON_REMOVE_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle
-        ON_LEVEL_INIT, // void(__fastcall*)(void* instance, const char* mapName)
-        ON_LEVEL_SHUTDOWN, // void(__fastcall*)(void* instance)
+        ON_LEVEL_INIT, // void(__fastcall*)()
+        ON_LEVEL_SHUTDOWN, // void(__fastcall*)()
         CREATE_MOVE_RAW, // void(__fastcall*)(void* instance, int32_t slot, bool isActive)
         CREATE_MOVE, // void(__fastcall*)(void* CUserCmd)
     };

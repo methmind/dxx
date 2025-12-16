@@ -5,23 +5,26 @@
 #ifndef DXX_DLC_FEATURE_VIRTUAL_CAMERA_H
 #define DXX_DLC_FEATURE_VIRTUAL_CAMERA_H
 
+#include <optional>
+
+#include "sdk/datatype/sdk_dota_camera.h"
 #include "sdk/datatype/sdk_user_cmd.h"
 #include "sdk/math/sdk_math_vector3.h"
 
 namespace feature
 {
+    constexpr auto EDGE_PAN_THRESHOLD = 0.05f;
+
+    constexpr auto DEFAULT_CAMERA_DISTANCE = 1200.0f;
+
     class C_FeatureCameraEmulator
     {
     private:
-        sdk::math::vector3 m_vecVirtualCameraOrigin;
-        bool m_bIsInitialized = false;
+        std::optional<sdk::datatype::C_DotaCamera> dummyCamera_;
 
-        // Константы
-        const float CAMERA_SPEED = 20.0f; // Скорость скролла (можно менять)
-        const float EDGE_THRESHOLD = 0.05f; // 5% от края экрана
-        const float VIRTUAL_Z = 1200.0f;
+        void fixCameraPosition(sdk::datatype::user_cmd_s* userCmd);
 
-        void UpdateEdgePan(sdk::datatype::user_cmd_s* cmd, const sdk::math::vector3& cursorWorld);
+        void onLevelInit();
 
         void onCreateMove(sdk::datatype::user_cmd_s* userCmd);
 

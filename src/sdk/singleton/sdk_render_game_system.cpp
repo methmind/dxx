@@ -18,9 +18,9 @@ namespace sdk::singleton
         return memory::vmt::call<world_to_projection_matrix_t, WORLD_TO_PROJECTION_MATRIX_VMT_INDEX>(*static_cast<void**>(this->instance_), 0);
     }
 
-    uint32_t C_RenderGameSystem::screenTransform(const math::vector3& in, math::vector3& out) const
+    float* C_RenderGameSystem::getViewMatrix() const
     {
-        return this->screenTransform_(in, out);
+        return memory::vmt::call<get_view_matrix_t, VIEW_MATRIX_VMT_INDEX>(*static_cast<void**>(this->instance_));
     }
 
     bool C_RenderGameSystem::initialize()
@@ -28,13 +28,6 @@ namespace sdk::singleton
         if (this->instance_ = C_ServiceLocator::getInstance<C_BaseGameSystemFactory>()->find(RENDER_GAME_SYSTEM_SID);
             !this->instance_) {
             dbg("Unable to find C_RenderGameSystem!");
-            return false;
-        }
-
-        if (this->screenTransform_ = reinterpret_cast<screen_transform_t>(
-            memory::FindPattern(GetModuleHandleA("client.dll"), signature::SCREEN_TRANSFORM_FUNC));
-            !this->screenTransform_) {
-            dbg("Unable to find ScreenTransform function!");
             return false;
         }
 
