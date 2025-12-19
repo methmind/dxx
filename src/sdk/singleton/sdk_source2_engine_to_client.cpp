@@ -25,6 +25,16 @@ namespace sdk::singleton
         return playerSlot + 1;
     }
 
+    math::vector2 C_Source2EngineToClient::getScreenSize() const
+    {
+        int32_t left = 0, botton = 0;
+        memory::vmt::call<void(__fastcall*)(void*, int32_t*, int32_t*), GET_SCREEN_SIZE>(
+            this->instance_, &left, &botton
+        );
+
+        return { static_cast<float>(left), static_cast<float>(botton) };
+    }
+
     bool C_Source2EngineToClient::initialize()
     {
         if (this->instance_ = iface::Find(GetModuleHandleA("engine2.dll"), "Source2EngineToClient0"); !this->instance_) {

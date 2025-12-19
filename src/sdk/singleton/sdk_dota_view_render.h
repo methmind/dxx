@@ -9,6 +9,7 @@
 
 namespace sdk::singleton
 {
+    // 48 8B C4 48 89 58 ? 48 89 68 ? 48 89 70 ? 48 89 48
     constexpr auto ON_RENDER_START_VMT_INDEX = 4;
 
     class C_DotaViewRender

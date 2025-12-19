@@ -158,7 +158,6 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/lua/binding/lua_binding_renderer.h
         src/lua/binding/lua_binding_imgui.cpp
         src/lua/binding/lua_binding_imgui.h
-        src/sdk/math/sdk_math_vector3.cpp
         src/sdk/math/sdk_math_vector3.h
         src/sdk/custom/sdk_world_to_screen.cpp
         src/sdk/custom/sdk_world_to_screen.h
@@ -203,13 +202,23 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/custom/sdk_input_controller.cpp
         src/sdk/custom/sdk_input_controller.h
         src/bootstrap/bootstrap_hook.cpp
-        src/feature/feature_virtual_camera.cpp
-        src/feature/feature_virtual_camera.h
+        src/feature/feature_virtual_camera_manager.cpp
+        src/feature/feature_virtual_camera_manager.h
         src/sdk/math/sdk_math_quantize_point.h
         src/sdk/datatype/sdk_dota_camera.h
         src/sdk/singleton/sdk_dota_camera_manager.cpp
         src/sdk/singleton/sdk_dota_camera_manager.h
         src/sdk/datatype/sdk_dota_camera.cpp
+        src/hook/impl/hook_impl_get_matrices_for_view.cpp
+        src/hook/impl/hook_impl_get_matrices_for_view.h
+        src/sdk/custom/sdk_matrices_system.cpp
+        src/sdk/custom/sdk_matrices_system.h
+        src/feature/feature_virtual_camera.cpp
+        src/feature/feature_virtual_camera.h
+        src/renderer/renderer_math.cpp
+        src/renderer/renderer_math.h
+        external/dx_xtx/Inc/SimpleMath.inl
+        external/dx_math/Inc/DirectXMathMatrix.inl
 )
 
 target_compile_options(dxx_dlc PRIVATE
@@ -249,6 +258,8 @@ target_include_directories(dxx_dlc PUBLIC
         "src/"
         "external/protobuf/src/"
         "."
+        "external/dx_xtx/Inc/"
+        "external/dx_math/Inc/"
 )
 
 target_link_libraries(dxx_dlc PRIVATE libprotobuf-lite d3d11 d3dcompiler dwmapi ${CMAKE_SOURCE_DIR}/external/luajit/src/libluajit.a)

@@ -125,6 +125,12 @@ namespace sdk::signature
      * void(__fastcall*)(void* instance, float x, float y, bool forceApply, bool isCommitNeed, bool ignorePreviousPos);
      */
     constexpr auto SET_CAMERA_LOOK_AT_POS_FUNC = "48 8B C4 48 89 58 ? 57 48 81 EC ? ? ? ? 80 BC 24";
+
+    /*
+     * Can be found in CDOTAViewRender::OnRenderStart
+     * void*(__fastcall*)(void* renderGameSystem, void* viewRender, void* worldToView, void* viewToProjection, void* worldToProjection, void* worldToPixels);
+    */
+    constexpr auto GET_MATRICES_FOR_VIEW = "48 8B C4 48 89 68 ? 48 89 70 ? 57 48 81 EC ? ? ? ? 0F 29 70";
 }
 
 #endif //DXX_DLC_SDK_SIGNATURE_H

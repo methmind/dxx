@@ -5,6 +5,7 @@
 #include "application_builder.h"
 #include "sdk/custom/sdk_entity_list.h"
 #include "sdk/custom/sdk_input_controller.h"
+#include "sdk/custom/sdk_matrices_system.h"
 #include "sdk/singleton/sdk_base_game_system_factory.h"
 #include "sdk/singleton/sdk_dota_camera_manager.h"
 #include "sdk/singleton/sdk_dota_input.h"
@@ -81,6 +82,11 @@ namespace bootstrap
 
         if (!container->add<sdk::custom::C_EntityList>()->initialize()) {
             dbg("Unable to initialize sdk::custom::C_EntityList!");
+            return false;
+        }
+
+        if (!container->add<sdk::custom::C_MatricesSystem>()->initialize()) {
+            dbg("Unable to initialize sdk::custom::C_MatricesSystem");
             return false;
         }
 

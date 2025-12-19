@@ -10,7 +10,6 @@
 #include "cs_plain_guarded.h"
 #include "binding/lua_binding_interface.h"
 #include "binding/lua_guarded_state_interface.h"
-#include "gui/gui_widget_regedit.h"
 
 namespace lua
 {

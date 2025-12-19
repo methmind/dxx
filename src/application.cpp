@@ -6,13 +6,14 @@
 
 #include "bootstrap/application_builder.h"
 #include "debug/debug_output.h"
-#include "feature/feature_virtual_camera.h"
+#include "feature/feature_virtual_camera_manager.h"
 #include "gui/gui_widget_regedit.h"
 #include "gui/widget/gui_widget_root.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_manager.h"
 #include "input/bind_system.h"
 #include "menu/menu_settings_form.h"
+#include "sdk/interface/sdk_interface_scanner.h"
 #include "service_locator/service_locator.h"
 
 namespace app
@@ -30,7 +31,7 @@ namespace app
             return false;
         }
 
-        if (!services->add<feature::C_FeatureCameraEmulator>()->initialize()) {
+        if (!services->add<feature::C_FeatureVirtualCameraManager>(services->get<sdk::custom::C_MatricesSystem>(), services->get<render::C_Renderer>())->initialize()) {
             return false;
         }
 

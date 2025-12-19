@@ -7,7 +7,10 @@
 
 namespace sdk::math
 {
-    using matrix_t = float[4][4];
+    struct matrix4x4_s
+    {
+        float m[4][4];
+    };
 }
 
 #endif //DXX_DLC_SDK_MATH_MATRIX_H

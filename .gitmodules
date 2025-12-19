@@ -25,6 +25,9 @@
 [submodule "external/protobuf"]
 	path = external/protobuf
 	url = https://github.com/protocolbuffers/protobuf.git
-[submodule "directx"]
-	path = directx
+[submodule "external/dx_xtx"]
+	path = external/dx_xtx
+	url = https://github.com/microsoft/DirectXTK.git
+[submodule "external/dx_math"]
+	path = external/dx_math
 	url = https://github.com/microsoft/DirectXMath.git

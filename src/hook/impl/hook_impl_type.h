@@ -23,6 +23,7 @@ namespace hook::impl
         ON_LEVEL_SHUTDOWN, // void(__fastcall*)()
         CREATE_MOVE_RAW, // void(__fastcall*)(void* instance, int32_t slot, bool isActive)
         CREATE_MOVE, // void(__fastcall*)(void* CUserCmd)
+        GET_MATRICES_FOR_VIEW, // void*(__fastcall*)(void* renderGameSystem, void* viewRender, void* worldToView, void* viewToProjection, void* worldToProjection, void* worldToPixels)
     };
 }
 

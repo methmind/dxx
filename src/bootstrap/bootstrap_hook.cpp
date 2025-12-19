@@ -8,6 +8,7 @@
 #include "hook/hook_manager.h"
 #include "hook/impl/hook_impl_create_move.h"
 #include "hook/impl/hook_impl_frame_stage_notify.h"
+#include "hook/impl/hook_impl_get_matrices_for_view.h"
 #include "hook/impl/hook_impl_on_entity_list_change.h"
 #include "hook/impl/hook_impl_on_level_state_change.h"
 #include "hook/impl/hook_impl_on_render_start.h"
@@ -17,6 +18,7 @@
 #include "sdk/singleton/sdk_dota_input.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
+#include "sdk/singleton/sdk_render_game_system.h"
 #include "sdk/singleton/sdk_source2_client.h"
 #include "service_locator/service_locator.h"
 
@@ -42,6 +44,13 @@ namespace bootstrap
         if (const auto err = hook::C_HookManager::Create(reinterpret_cast<void*>(onRenderStart),
             reinterpret_cast<void*>(hook::impl::hkOnRenderStart)); err != MH_OK) {
             dbg("Unable to create hook for C_DotaViewRender::OnRenderStart! err = %d", err);
+            return false;
+        }
+
+        const auto getMatricesForView = C_ServiceLocator::getInstance<sdk::singleton::C_RenderGameSystem>()->getMatricesForView();
+        if (const auto err = hook::C_HookManager::Create(reinterpret_cast<void*>(getMatricesForView),
+            reinterpret_cast<void*>(hook::impl::hkGetMatricesForView)); err != MH_OK) {
+            dbg("Unable to create hook for C_RenderGameSystem::GetMatricesForView! err = %d", err);
             return false;
         }
 
