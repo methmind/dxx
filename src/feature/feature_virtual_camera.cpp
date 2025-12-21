@@ -10,47 +10,59 @@
 
 namespace feature
 {
+    void C_FeatureVirtualCamera::UpdateCameraMatrix(DirectX::SimpleMath::Matrix& target,
+        const DirectX::SimpleMath::Matrix& source, const DirectX::SimpleMath::Vector3& newPosition, const float newDistance,
+        const DirectX::SimpleMath::Vector3& oldPosition, const float oldDistance)
+    {
+        target = source;
 
-    void AdjustCameraMatrix(DirectX::SimpleMath::Matrix& target, const DirectX::SimpleMath::Matrix& source,
-                       const sdk::math::vector3& oldPos, float oldDist,
-                       const sdk::math::vector3& newPos, float newDist) {
-        // 1. Копируем неизменяемые первые 3 столбца (M: ориентация + проекция)
-        for (int row = 0; row < 4; ++row) {
-            for (int col = 0; col < 3; ++col) {
-                target.m[row][col] = source.m[row][col];
-            }
+        const DirectX::SimpleMath::Vector3 diffPosition = newPosition - oldPosition;
+        const float diffDistance = newDistance - oldDistance;
+
+        // Эпсилон для игнорирования шума
+        constexpr float EPSILON_SQ = 1e-5f;
+        if (diffPosition.LengthSquared() > EPSILON_SQ)
+        {
+            // Это эквивалентно: diff.x * Col1 + diff.y * Col2 + diff.z * Col3 (для первых 3 строк)
+            const auto deltaTranslation = DirectX::SimpleMath::Vector3::TransformNormal(diffPosition, source);
+
+            // Нам нужно скалярное произведение diffPosition на 4-й столбец матрицы (оси проекции).
+            const DirectX::SimpleMath::Vector3 column4(source._14, source._24, source._34);
+            const float deltaW = diffPosition.Dot(column4);
+
+            // Вычитаем дельту из трансляции (инвертируем движение мира относительно камеры)
+            target._41 -= deltaTranslation.x;
+            target._42 -= deltaTranslation.y;
+            target._43 -= deltaTranslation.z;
+            target._44 -= deltaW;
         }
 
-        // 2. Δpos = newPos - oldPos
-        sdk::math::vector3 dpos = {
-            newPos.x - oldPos.x,
-            newPos.y - oldPos.y,
-            newPos.z - oldPos.z
-        };
+        // Source 2 изменяет дистанцию специфично: игнорируя ось Y, но учитывая "перекос" проекции в X и Z.
+        if (std::abs(diffDistance) > 1e-4f && source._34 != 0.f)
+        {
+            // _34 отвечает за перспективное искажение по Z (обычно -1 или близко к нему в ViewProj)
+            const float projectionScale = diffDistance / source._34;
 
-        // 3. Вычисляем M · Δpos (4-мерный вектор)
-        float m_dpos[4] = {0.0f};
-        for (int row = 0; row < 4; ++row) {
-            m_dpos[row] = source.m[row][0] * dpos.x +
-                          source.m[row][1] * dpos.y +
-                          source.m[row][2] * dpos.z;
+            // Корректируем X пропорционально "повороту" матрицы (_31)
+            target._41 += source._31 * projectionScale;
+
+            // Y (_42) НЕ ТРОГАЕМ. В Dota 2 зум не смещает центр экрана по вертикали.
+
+            // Корректируем Z пропорционально направлению взгляда (_33)
+            target._43 += source._33 * projectionScale;
+
+            // Линейное изменение проекционного смещения W
+            target._44 += diffDistance;
         }
+    }
 
-        // 4. T_pos = T_source - M · Δpos
-        float t_pos[4];
-        for (int row = 0; row < 4; ++row) {
-            t_pos[row] = source.m[row][3] - m_dpos[row];
-        }
+    DirectX::SimpleMath::Vector2 C_FeatureVirtualCamera::CalculateLookAt(const DirectX::SimpleMath::Vector3& position,
+        const float distance, const float pitch)
+    {
+        const float pitchRad = DirectX::XMConvertToRadians(pitch);
+        const float horizontalDist = distance * std::cos(pitchRad);
 
-        // 5. Δdist = newDist - oldDist, K · Δdist ≈ [0, 0, Δdist, Δdist]
-        // (Точная K из дампа: z=1.00146, но 1.0f достаточно для float precision)
-        float ddist = newDist - oldDist;
-        float k_ddist[4] = {0.0f, 0.0f, ddist, ddist};
-
-        // 6. Финальный 4-й столбец: T_pos + K · Δdist
-        for (int row = 0; row < 4; ++row) {
-            target.m[row][3] = t_pos[row] + k_ddist[row];
-        }
+        return { position.x, position.y - horizontalDist };
     }
 
     bool C_FeatureVirtualCamera::recalculateMatrix()
@@ -61,19 +73,12 @@ namespace feature
             return false;
         }
 
-        AdjustCameraMatrix(this->virtualWorldPixelMatrix_, this->matricesSystem_->getWorldProjectionMatrix(),
-           this->virtualCamera_.getCameraPosition(),
-           this->virtualCamera_.getCameraDistance(),
-           originalCamera->getCameraPosition(),
-           originalCamera->getCameraDistance()
+        UpdateCameraMatrix(this->virtualWorldPixelMatrix_, this->matricesSystem_->getWorldToProjection(),
+            reinterpret_cast<const DirectX::SimpleMath::Vector3&>(this->virtualCamera_.getCameraPosition()),
+            this->virtualCamera_.getCameraDistance(),
+            reinterpret_cast<const DirectX::SimpleMath::Vector3&>(originalCamera->getCameraPosition()),
+            originalCamera->getCameraDistance()
         );
-
-        /*renderer::AdjustMatrix(this->virtualWorldPixelMatrix_, this->matricesSystem_->getWorldPixelMatrix(),
-           reinterpret_cast<const DirectX::SimpleMath::Vector3&>(this->virtualCamera_.getCameraPosition()),
-           this->virtualCamera_.getCameraDistance(),
-           reinterpret_cast<const DirectX::SimpleMath::Vector3&>(originalCamera->getCameraPosition()),
-           originalCamera->getCameraDistance()
-        );*/
 
         return true;
     }
@@ -92,13 +97,21 @@ namespace feature
         }
 
         this->virtualCamera_ = *originalCamera;
-        this->virtualCamera_.getCameraDistance() = 1200;
+        this->virtualCamera_.getCameraDistance() = originalCamera->getCameraDefaultDistance();
         if (!updateCameraPosition(originalCameraPosition)) {
             dbg("Unable to update virtual camera position!");
             return false;
         }
 
         return true;
+    }
+
+    DirectX::SimpleMath::Vector2 C_FeatureVirtualCamera::getLookAt() const
+    {
+        return CalculateLookAt(reinterpret_cast<DirectX::SimpleMath::Vector3&>(this->virtualCamera_.getCameraPosition()),
+            this->virtualCamera_.getCameraDistance(),
+            this->virtualCamera_.getViewAngles().x
+        );
     }
 
     bool C_FeatureVirtualCamera::updateCameraPosition(const sdk::math::vector3& position)

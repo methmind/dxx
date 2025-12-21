@@ -7,15 +7,11 @@
 
 #include "SimpleMath.h"
 
-namespace renderer
+namespace render
 {
-    void AdjustMatrix(DirectX::SimpleMath::Matrix& target, const DirectX::SimpleMath::Matrix& source,
-        const DirectX::SimpleMath::Vector3& targetPosition, float targetDistance,
-        const DirectX::SimpleMath::Vector3& sourcePosition, float sourceDistance
-    );
-
-    bool WorldToScreen_Pixel(const DirectX::SimpleMath::Vector3& worldPosition, DirectX::SimpleMath::Vector2& screenPosition,
-        const DirectX::SimpleMath::Matrix& worldPixelMatrix
+    bool WorldToScreen(const DirectX::SimpleMath::Vector3& vecOrigin, DirectX::SimpleMath::Vector2& vecScreen,
+        const DirectX::SimpleMath::Vector2& screenSize,
+        const DirectX::SimpleMath::Matrix& worldToProjectionMatrix
     );
 } // renderer
 

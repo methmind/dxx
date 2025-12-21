@@ -405,7 +405,7 @@ namespace lua::script
                 local success, err = pcall(function()
                     local rendererFrame = renderer.get_renderer_primitives()
                     callback.trigger("on_render_start", rendererFrame)
-                    --rendererFrame:bake()
+                    rendererFrame:bake()
                 end)
 
                 if not success then

@@ -19,8 +19,9 @@ namespace sdk::datatype
         uint8_t size_[0x380]{}; //@note Got it via MemAlloc_GetSizeFunc
 
     public:
-        OFFSET(math::vector2, getLookAt, 0x38);
-        OFFSET(float, getCameraDefaultDistance, 0x158);
+        //OFFSET(math::vector2, getLookAt, 0x38); We should calculate itself...
+        OFFSET(math::vector2, getViewAngles, 0x44);
+        OFFSET(float, getCameraDefaultDistance, 0x70);
         OFFSET(float, getCameraDistance, 0x15C);
         OFFSET(math::vector3, getCameraPosition, 0x2EC);
 

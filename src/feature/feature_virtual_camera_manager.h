@@ -7,7 +7,6 @@
 
 #include "feature_virtual_camera.h"
 #include "renderer/renderer.h"
-#include "renderer/renderer_math.h"
 #include "sdk/custom/sdk_matrices_system.h"
 #include "sdk/datatype/sdk_user_cmd.h"
 
@@ -15,17 +14,23 @@ namespace feature
 {
     constexpr auto EDGE_PAN_THRESHOLD = 50.0f;
 
+    constexpr auto EDGE_PAN_EXTENDED_THRESHOLD = 300.0f;
+
     class C_FeatureVirtualCameraManager
     {
     private:
         bool isInitialized_;
         C_FeatureVirtualCamera serverCamera_;
-        std::shared_ptr<sdk::custom::C_MatricesSystem> matricesSystem_;
-        std::shared_ptr<render::C_Renderer> render_;
 
         bool initializeCamera();
 
         void onLevelInit() { this->isInitialized_ = false; }
+
+        bool getCameraPixelDelta(const DirectX::SimpleMath::Vector3& worldPosition, DirectX::SimpleMath::Vector2& output) const;
+
+        bool getCameraWorldDelta(const DirectX::SimpleMath::Vector3& worldPosition, DirectX::SimpleMath::Vector2& output) const;
+
+        void edgePanThink(const DirectX::SimpleMath::Vector3& crosshairTrace);
 
         void onCreateMove(sdk::datatype::user_cmd_s* userCmd);
 
@@ -33,8 +38,8 @@ namespace feature
 
         bool initialize();
 
-        explicit C_FeatureVirtualCameraManager(const std::shared_ptr<sdk::custom::C_MatricesSystem>& matricesSystem, const std::shared_ptr<render::C_Renderer>& rener) :
-            isInitialized_(false), serverCamera_(matricesSystem), matricesSystem_(matricesSystem), render_(rener) { }
+        explicit C_FeatureVirtualCameraManager(const std::shared_ptr<sdk::custom::C_MatricesSystem>& matricesSystem) :
+            isInitialized_(false), serverCamera_(matricesSystem) { }
 
         ~C_FeatureVirtualCameraManager() = default;
     };

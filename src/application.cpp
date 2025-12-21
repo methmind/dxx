@@ -31,7 +31,7 @@ namespace app
             return false;
         }
 
-        if (!services->add<feature::C_FeatureVirtualCameraManager>(services->get<sdk::custom::C_MatricesSystem>(), services->get<render::C_Renderer>())->initialize()) {
+        if (!services->add<feature::C_FeatureVirtualCameraManager>(services->get<sdk::custom::C_MatricesSystem>())->initialize()) {
             return false;
         }
 

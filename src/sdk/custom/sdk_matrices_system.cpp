@@ -11,14 +11,10 @@
 
 namespace sdk::custom
 {
-    void C_MatricesSystem::onGetMatricesFunc(math::matrix4x4_s* viewWorld, math::matrix4x4_s* worldProjection, math::matrix4x4_s* worldPixel)
+    void C_MatricesSystem::onGetMatricesFunc(math::matrix4x4_s* worldToView, math::matrix4x4_s* worldToProjection)
     {
-        this->viewMatrix_ = *reinterpret_cast<DirectX::SimpleMath::Matrix*>(viewWorld);
-        this->worldPixelMatrix_ = *reinterpret_cast<DirectX::SimpleMath::Matrix*>(worldPixel);
-        this->worldProjectionMatrix_ = *reinterpret_cast<DirectX::SimpleMath::Matrix*>(worldProjection);
-        //reinterpret_cast<DirectX::SimpleMath::Matrix*>(viewWorld)->Transpose(this->viewMatrix_);
-        //reinterpret_cast<DirectX::SimpleMath::Matrix*>(worldProjection)->Transpose(this->worldProjectionMatrix_);
-        //reinterpret_cast<DirectX::SimpleMath::Matrix*>(worldPixel)->Transpose(this->worldPixelMatrix_);
+        reinterpret_cast<DirectX::SimpleMath::Matrix*>(worldToView)->Transpose(this->worldToView_);
+        reinterpret_cast<DirectX::SimpleMath::Matrix*>(worldToProjection)->Transpose(this->worldToProjection_);
     }
 
     bool C_MatricesSystem::initialize()
@@ -26,9 +22,9 @@ namespace sdk::custom
         C_ServiceLocator::getInstance<hook::C_HookDispatcher>()->
         subscribe<void*, void*, math::matrix4x4_s*, math::matrix4x4_s*, math::matrix4x4_s*, math::matrix4x4_s*>(
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::GET_MATRICES_FOR_VIEW),
-            [this](void* renderSystem, void* viewRender, math::matrix4x4_s* worldView,
-                math::matrix4x4_s* viewProjection, math::matrix4x4_s* worldProjection, math::matrix4x4_s* worldPixel) {
-                onGetMatricesFunc(worldView, worldProjection, worldPixel);
+            [this](void* renderSystem, void* viewRender, math::matrix4x4_s* worldToView,
+                math::matrix4x4_s* viewToProjection, math::matrix4x4_s* worldToProjection, math::matrix4x4_s* worldToScreen) {
+                onGetMatricesFunc(worldToView, worldToProjection);
             }
         );
 

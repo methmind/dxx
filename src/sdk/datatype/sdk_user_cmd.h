@@ -14,7 +14,7 @@ namespace sdk::datatype
         void* vtable;
         int32_t sequenceNumber;
         dota::CDota2UserCmdPB cmd;
-        dota::CMsgVector* crosshair;
+        //dota::CInButtonStatePB buttonState;
     };
 }
 

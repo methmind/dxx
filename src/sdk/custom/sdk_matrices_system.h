@@ -13,19 +13,16 @@ namespace sdk::custom
     class C_MatricesSystem
     {
     private:
-        DirectX::SimpleMath::Matrix viewMatrix_;
-        DirectX::SimpleMath::Matrix worldProjectionMatrix_;
-        DirectX::SimpleMath::Matrix worldPixelMatrix_;
+        DirectX::SimpleMath::Matrix worldToView_;
+        DirectX::SimpleMath::Matrix worldToProjection_;
 
-        void onGetMatricesFunc(math::matrix4x4_s* viewWorld, math::matrix4x4_s* worldProjection, math::matrix4x4_s* worldPixel);
+        void onGetMatricesFunc(math::matrix4x4_s* worldToView, math::matrix4x4_s* worldToProjection);
 
     public:
 
-        [[nodiscard]] const DirectX::SimpleMath::Matrix& getViewMatrix() const { return this->viewMatrix_; }
+        [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldToView() const { return this->worldToView_; }
 
-        [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldProjectionMatrix() const { return this->worldProjectionMatrix_; }
-
-        [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldPixelMatrix() const { return this->worldPixelMatrix_; }
+        [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldToProjection() const { return this->worldToProjection_; }
 
         bool initialize();
 
