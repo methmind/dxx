@@ -37,7 +37,7 @@ namespace hook
     };
 
     #define MH_CALL_ORIGINAL(detour) []() -> auto& { \
-        static C_HookOriginalInvoker invoker(reinterpret_cast<void*>(detour)); \
+        static hook::C_HookOriginalInvoker invoker(reinterpret_cast<void*>(detour)); \
         return invoker; \
     }().invoke<decltype(&detour)>
 }

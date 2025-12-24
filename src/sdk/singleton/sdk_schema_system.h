@@ -34,7 +34,7 @@ namespace sdk::singleton
 
         [[nodiscard]] iface::C_SchemaTypeScope* findTypeScopeForModule(const char* moduleName) const
         {
-            return memory::vmt::call<
+            return ::memory::vmt::call<
                 iface::C_SchemaTypeScope*(__fastcall*)(void*, const char*, void*),
                 FIND_TYPE_SCOPE_FOR_MODULE_VMT_INDEX
             >(this->instance_, moduleName, nullptr);

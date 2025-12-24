@@ -8,6 +8,7 @@
 #include <string>
 #include <cstring>
 #include "xxhash3/xxhash.h"
+#include "xxh64.hpp"
 
 struct xx_hashier_s
 {
@@ -24,6 +25,13 @@ struct xx_hashier_s
     {
         return str ? XXH64(str, strlen(str), 0) : 0;
     }
+
+    static constexpr uint64_t cx_hash(const std::string_view& str)
+    {
+        return xxh64::hash(str.data(), str.size(), 0);
+    }
 };
+
+#define XXHASH_STR(str) xx_hashier_s::cx_hash(str)
 
 #endif //DXX_DLC_XXHASH_WRAPPER_H

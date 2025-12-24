@@ -5,6 +5,7 @@
 #ifndef DXX_DLC_SDK_BASE_ENTITY_H
 #define DXX_DLC_SDK_BASE_ENTITY_H
 
+#include "sdk_collision_property.h"
 #include "sdk_entity_instance.h"
 
 namespace sdk::datatype
@@ -17,6 +18,7 @@ namespace sdk::datatype
         SCHEMA_FIELD("C_BaseEntity", "m_fFlags", getEntityFlags, int32_t);
         SCHEMA_FIELD("C_BaseEntity", "m_iTeamNum", getTeam, int32_t);
         SCHEMA_FIELD("C_BaseEntity", "m_flSimulationTime", getSimulationTime, float);
+        SCHEMA_FIELD("C_BaseEntity", "m_pCollision", getCollisionComponent, C_CollisionProperty*);
     };
 }
 

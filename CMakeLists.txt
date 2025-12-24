@@ -3,6 +3,7 @@ project(dxx_dlc)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
+set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 
 file(GLOB_RECURSE minhook_files "./external/minhook/src/*.c")
 
@@ -219,6 +220,26 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/renderer/renderer_math.h
         external/dx_xtx/Inc/SimpleMath.inl
         external/dx_math/Inc/DirectXMathMatrix.inl
+        src/feature/feature_fog_controller.cpp
+        src/feature/feature_fog_controller.h
+        src/sdk/datatype/sdk_fog_controller.h
+        src/sdk/datatype/sdk_fog_params.h
+        src/sdk/datatype/sdk_game_event.h
+        src/sdk/datatype/sdk_game_event.cpp
+        src/sdk/datatype/sdk_event_hash.h
+        src/sdk/util/sdk_hash_seed.h
+        external/murmur/MurmurHash2.c
+        src/hook/impl/hook_impl_fire_event.cpp
+        src/hook/impl/hook_impl_fire_event.h
+        src/sdk/util/sdk_game_state.h
+        src/sdk/custom/sdk_event_game_state.cpp
+        src/sdk/custom/sdk_event_game_state.h
+        src/sdk/singleton/sdk_phys2_world.cpp
+        src/sdk/singleton/sdk_phys2_world.h
+        src/sdk/datatype/sdk_ray.h
+        src/sdk/datatype/sdk_trace_filter.h
+        src/sdk/datatype/sdk_collision_property.h
+        src/sdk/datatype/sdk_game_trace.h
 )
 
 target_compile_options(dxx_dlc PRIVATE
@@ -260,6 +281,8 @@ target_include_directories(dxx_dlc PUBLIC
         "."
         "external/dx_xtx/Inc/"
         "external/dx_math/Inc/"
+        "external/xxhash_cx/"
+        "external/xxhashct/"
 )
 
 target_link_libraries(dxx_dlc PRIVATE libprotobuf-lite d3d11 d3dcompiler dwmapi ${CMAKE_SOURCE_DIR}/external/luajit/src/libluajit.a)

@@ -7,6 +7,9 @@
 #include "debug/debug_output.h"
 #include "sdk/singleton/sdk_dota_camera_manager.h"
 #include "renderer/renderer_math.h"
+#include "sdk/singleton/sdk_game_entity_system.h"
+#include "sdk/singleton/sdk_phys2_world.h"
+#include "sdk/singleton/sdk_source2_engine_to_client.h"
 
 namespace feature
 {
@@ -65,43 +68,31 @@ namespace feature
         return { position.x, position.y - horizontalDist };
     }
 
-    bool C_FeatureVirtualCamera::recalculateMatrix()
+    void C_FeatureVirtualCamera::recalculateMatrix()
     {
-        const auto originalCamera = C_ServiceLocator::getInstance<sdk::singleton::C_DotaCamaraManager>()->getPrimaryCamera();
-        if (!originalCamera) {
-            dbg("sdk::singleton::C_DotaCamaraManager::getPrimaryCamera == nullptr!");
-            return false;
-        }
-
-        UpdateCameraMatrix(this->virtualWorldPixelMatrix_, this->matricesSystem_->getWorldToProjection(),
+        UpdateCameraMatrix(this->virtualWorldToProjectionMatrix_, this->matricesSystem_->getWorldToProjection(),
             reinterpret_cast<const DirectX::SimpleMath::Vector3&>(this->virtualCamera_.getCameraPosition()),
             this->virtualCamera_.getCameraDistance(),
-            reinterpret_cast<const DirectX::SimpleMath::Vector3&>(originalCamera->getCameraPosition()),
-            originalCamera->getCameraDistance()
+            reinterpret_cast<const DirectX::SimpleMath::Vector3&>(this->originalCamera_->getCameraPosition()),
+            this->originalCamera_->getCameraDistance()
         );
-
-        return true;
     }
 
     bool C_FeatureVirtualCamera::initialize()
     {
-        const auto originalCamera = C_ServiceLocator::getInstance<sdk::singleton::C_DotaCamaraManager>()->getPrimaryCamera();
-        if (!originalCamera) {
+        this->originalCamera_ = C_ServiceLocator::getInstance<sdk::singleton::C_DotaCamaraManager>()->getPrimaryCamera();
+        if (!this->originalCamera_) {
             dbg("sdk::singleton::C_DotaCamaraManager::getPrimaryCamera == nullptr!");
             return false;
         }
 
-        const auto originalCameraPosition = originalCamera->getCameraPosition();
-        if (originalCamera->getCameraDistance() < 100.0f || std::fabs(originalCameraPosition.z) < 1.0f) {
+        const auto& originalCameraPosition = this->originalCamera_->getCameraPosition();
+        if (this->originalCamera_->getCameraDistance() < 100.0f || std::fabs(originalCameraPosition.z) < 1.0f) {
             return false;
         }
 
-        this->virtualCamera_ = *originalCamera;
-        this->virtualCamera_.getCameraDistance() = originalCamera->getCameraDefaultDistance();
-        if (!updateCameraPosition(originalCameraPosition)) {
-            dbg("Unable to update virtual camera position!");
-            return false;
-        }
+        updateCameraPosition(originalCameraPosition);
+        this->isInitialized_ = true;
 
         return true;
     }
@@ -114,9 +105,12 @@ namespace feature
         );
     }
 
-    bool C_FeatureVirtualCamera::updateCameraPosition(const sdk::math::vector3& position)
+    void C_FeatureVirtualCamera::updateCameraPosition(const sdk::math::vector3& position)
     {
+        this->virtualCamera_ = *this->originalCamera_; //todo We truly should reverse traceray...
+        this->virtualCamera_.getCameraDistance() = DEFAULT_CAMERA_DISTANCE;
         this->virtualCamera_.setCameraPosition(position);
-        return recalculateMatrix();
+
+        recalculateMatrix();
     }
 } // feature

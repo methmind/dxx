@@ -11,12 +11,16 @@
 
 namespace feature
 {
+    constexpr auto DEFAULT_CAMERA_DISTANCE = 1200.0f;
+
     class C_FeatureVirtualCamera
     {
     private:
+        bool isInitialized_;
         sdk::datatype::C_DotaCamera virtualCamera_;
-        DirectX::SimpleMath::Matrix virtualWorldPixelMatrix_;
+        DirectX::SimpleMath::Matrix virtualWorldToProjectionMatrix_;
         std::shared_ptr<sdk::custom::C_MatricesSystem> matricesSystem_;
+        sdk::datatype::C_DotaCamera* originalCamera_{};
 
         static void UpdateCameraMatrix(DirectX::SimpleMath::Matrix& target, const DirectX::SimpleMath::Matrix& source,
             const DirectX::SimpleMath::Vector3& newPosition, float newDistance,
@@ -27,13 +31,13 @@ namespace feature
             float distance, float pitch
         );
 
-        __forceinline bool recalculateMatrix();
+        __forceinline void recalculateMatrix();
 
     public:
 
         [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldToViewMatrix() const { return this->matricesSystem_->getWorldToView(); }
 
-        [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldToProjectionMatrix() const { return this->virtualWorldPixelMatrix_; }
+        [[nodiscard]] const DirectX::SimpleMath::Matrix& getWorldToProjectionMatrix() const { return this->virtualWorldToProjectionMatrix_; }
 
         [[nodiscard]] const sdk::math::vector3& getCameraPosition() const { return this->virtualCamera_.getCameraPosition(); }
 
@@ -41,11 +45,16 @@ namespace feature
 
         [[nodiscard]] DirectX::SimpleMath::Vector2 getLookAt() const;
 
-        bool updateCameraPosition(const sdk::math::vector3& position);
+        void updateCameraPosition(const sdk::math::vector3& position);
 
         bool initialize();
 
-        explicit C_FeatureVirtualCamera(const std::shared_ptr<sdk::custom::C_MatricesSystem>& matricesSystem) : matricesSystem_(matricesSystem) {}
+        bool isInitialized() const { return this->isInitialized_; }
+
+        void dispose() { this->isInitialized_ = false; }
+
+        explicit C_FeatureVirtualCamera(const std::shared_ptr<sdk::custom::C_MatricesSystem>& matricesSystem) :
+           isInitialized_(false), matricesSystem_(matricesSystem) {}
 
         ~C_FeatureVirtualCamera() = default;
     };

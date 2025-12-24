@@ -31,3 +31,9 @@
 [submodule "external/dx_math"]
 	path = external/dx_math
 	url = https://github.com/microsoft/DirectXMath.git
+[submodule "external/murmur"]
+	path = external/murmur
+	url = https://github.com/abrandoned/murmur2.git
+[submodule "external/xxhashct"]
+	path = external/xxhashct
+	url = https://github.com/ekpyron/xxhashct.git

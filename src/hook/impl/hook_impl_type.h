@@ -17,13 +17,14 @@ namespace hook::impl
         ON_LUA_DISPOSE, // void(__fastcall*)(const std::string_view& scriptID)
         ON_UPDATE, // void(__fastcall*)()
         ON_PRE_UPDATE, // void(__fastcall*)()
-        ON_ADD_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle
-        ON_REMOVE_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle
+        ON_ADD_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle)
+        ON_REMOVE_ENTITY, // void*(__fastcall*)(instance, void* entityInstance, int32_t handle)
         ON_LEVEL_INIT, // void(__fastcall*)()
         ON_LEVEL_SHUTDOWN, // void(__fastcall*)()
         CREATE_MOVE_RAW, // void(__fastcall*)(void* instance, int32_t slot, bool isActive)
         CREATE_MOVE, // void(__fastcall*)(void* CUserCmd)
         GET_MATRICES_FOR_VIEW, // void*(__fastcall*)(void* renderGameSystem, void* viewRender, void* worldToView, void* viewToProjection, void* worldToProjection, void* worldToPixels)
+        FIRE_EVENT, // bool(__fastcall*)(void* instance, void* event);
     };
 }
 

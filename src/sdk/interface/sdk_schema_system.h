@@ -40,7 +40,7 @@ namespace sdk::iface
         C_SchemaClassInfo* findDeclaredClass(const char* className)
         {
             C_SchemaClassInfo* res = nullptr;
-            memory::vmt::call<void(__fastcall*)(void*, void*, const char*), FIND_DECLARED_CLASS_VMT_INDEX>(
+            ::memory::vmt::call<void(__fastcall*)(void*, void*, const char*), FIND_DECLARED_CLASS_VMT_INDEX>(
                 this, &res, className
             );
 

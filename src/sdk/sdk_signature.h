@@ -131,6 +131,25 @@ namespace sdk::signature
      * void*(__fastcall*)(void* renderGameSystem, void* viewRender, void* worldToView, void* viewToProjection, void* worldToProjection, void* worldToPixels);
     */
     constexpr auto GET_MATRICES_FOR_VIEW = "48 8B C4 48 89 68 ? 48 89 70 ? 57 48 81 EC ? ? ? ? 0F 29 70";
+
+    /*
+     * Can be found in CSource2Client::Init(). Near "g_GameEventManager.Init()" string
+     * mov rcx, [XXXXXXXXX]
+     */
+    constexpr auto GAME_EVENT_MANGER_PTR = "48 8B 0D ? ? ? ? E8 ? ? ? ? 48 8B 0D ? ? ? ? 48 85 C9 74 ? 48 8B 01 FF 50";
+
+    /*
+     * Can be found in CGameEventManager::vtable[8] or via "Game event \"%s\"" string
+     */
+    constexpr auto FIRE_EVENT_INTERNAL_FUNC = "40 53 41 54 41 56 48 83 EC ? 4C 8B F2";
+
+    constexpr auto MOV_R12_GLOBAL_VPHYS2_WORLD = "4C 8B 25 ? ? ? ? 24 ? 0C ? 66 0F 7F 44 24";
+
+    /*
+     * Can be via "Physics/TraceShape (Client)" string
+     * bool(__fastcall*)(void* instance, ray*, vec3*, vec3*, trace_filter*, game_trace*);
+     */
+    constexpr auto VPHYS2_WORLD_TRACE_SHAPE_FUNC = "48 89 5C 24 ? 48 89 4C 24 ? 55 57";
 }
 
 #endif //DXX_DLC_SDK_SIGNATURE_H

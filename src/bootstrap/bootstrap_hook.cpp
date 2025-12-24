@@ -6,6 +6,7 @@
 #include "dx/dx_present.h"
 #include "hook/hook_dispatcher.h"
 #include "hook/hook_manager.h"
+#include "hook/hook_original_invoker.h"
 #include "hook/impl/hook_impl_create_move.h"
 #include "hook/impl/hook_impl_frame_stage_notify.h"
 #include "hook/impl/hook_impl_get_matrices_for_view.h"
@@ -15,6 +16,7 @@
 #include "hook/impl/hook_impl_present.h"
 #include "memory/pattern_scanner.h"
 #include "sdk/sdk_signature.h"
+#include "hook/impl/hook_impl_fire_event.h"
 #include "sdk/singleton/sdk_dota_input.h"
 #include "sdk/singleton/sdk_dota_view_render.h"
 #include "sdk/singleton/sdk_game_entity_system.h"
@@ -104,7 +106,7 @@ namespace bootstrap
         return true;
     }
 
-    bool SetupFrameStageHook()
+    bool SetupFrameStageHook(HMODULE clientModule)
     {
         const auto fsnFunc = C_ServiceLocator::getInstance<sdk::singleton::C_Source2Client>()->getFrameStageNotify();
         if (const auto err = hook::C_HookManager::Create(reinterpret_cast<void*>(fsnFunc),
@@ -116,6 +118,12 @@ namespace bootstrap
         const auto createMoveFunc = C_ServiceLocator::getInstance<sdk::singleton::C_DotaInput>()->getCreateMove();
         if (const auto err = hook::C_HookManager::Create(reinterpret_cast<void*>(createMoveFunc),
             reinterpret_cast<void*>(hook::impl::hkCreateMove)); err != MH_OK) {
+            dbg("Unable to create hook for C_DotaInput::CreateMove! err = %d", err);
+            return false;
+        }
+
+        if (const auto err = hook::C_HookManager::Create(memory::FindPattern(clientModule, sdk::signature::FIRE_EVENT_INTERNAL_FUNC),
+            reinterpret_cast<void*>(hook::impl::hkFireEvent)); err != MH_OK) {
             dbg("Unable to create hook for C_DotaInput::CreateMove! err = %d", err);
             return false;
         }
@@ -140,12 +148,13 @@ namespace bootstrap
             return false;
         }
 
-        if (!SetupWorldStateHook(GetModuleHandleA("client.dll"))) {
+        const auto clientModule = GetModuleHandleA("client.dll");
+        if (!SetupWorldStateHook(clientModule)) {
             dbg("Unable to setup world state change hooks!");
             return false;
         }
 
-        if (!SetupFrameStageHook()) {
+        if (!SetupFrameStageHook(clientModule)) {
             dbg("Unable to setup frame stage hooks!");
             return false;
         }

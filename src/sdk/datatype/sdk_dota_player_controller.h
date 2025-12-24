@@ -15,6 +15,7 @@ namespace sdk::datatype
     public:
         SCHEMA_FIELD("CBasePlayerController", "m_iszPlayerName", getPlayerName, char[128]);
         SCHEMA_FIELD("CBasePlayerController", "m_steamID", getSteamID, uint64_t);
+        SCHEMA_FIELD("CBasePlayerController", "m_hPawn", getPlayerPawn, util::C_BaseEntityHandle);
         //
         SCHEMA_FIELD("C_DOTAPlayerController", "m_hAssignedHero", getAssignedHeroHandle, util::C_BaseEntityHandle);
     };

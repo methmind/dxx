@@ -8,13 +8,14 @@
 #include "feature_virtual_camera.h"
 #include "renderer/renderer.h"
 #include "sdk/custom/sdk_matrices_system.h"
+#include "sdk/datatype/sdk_game_event.h"
 #include "sdk/datatype/sdk_user_cmd.h"
 
 namespace feature
 {
     constexpr auto EDGE_PAN_THRESHOLD = 50.0f;
 
-    constexpr auto EDGE_PAN_EXTENDED_THRESHOLD = 300.0f;
+    constexpr auto EDGE_PAN_EXTENDED_THRESHOLD = 250.0f;
 
     class C_FeatureVirtualCameraManager
     {
@@ -22,9 +23,7 @@ namespace feature
         bool isInitialized_;
         C_FeatureVirtualCamera serverCamera_;
 
-        bool initializeCamera();
-
-        void onLevelInit() { this->isInitialized_ = false; }
+        void onFireEvent(sdk::datatype::C_GameEvent* event);
 
         bool getCameraPixelDelta(const DirectX::SimpleMath::Vector3& worldPosition, DirectX::SimpleMath::Vector2& output) const;
 

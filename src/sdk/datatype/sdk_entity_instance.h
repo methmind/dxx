@@ -24,7 +24,7 @@ namespace sdk::datatype
         iface::C_SchemaClassInfo* getClassInfo()
         {
             iface::C_SchemaClassInfo* classInfo = nullptr;
-            memory::vmt::call<void(__fastcall*)(void* instance, void* out), GET_SCHEMA_CLASS_INFO_VMT_INDEX>(
+            ::memory::vmt::call<void(__fastcall*)(void* instance, void* out), GET_SCHEMA_CLASS_INFO_VMT_INDEX>(
                 this, &classInfo
             );
 

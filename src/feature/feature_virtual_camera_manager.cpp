@@ -13,23 +13,21 @@
 #include "service_locator/service_locator.h"
 #include "sdk/singleton/sdk_dota_camera_manager.h"
 #include "sdk/singleton/sdk_source2_engine_to_client.h"
-
 #include "renderer/renderer_math.h"
+#include "sdk/util/sdk_game_state.h"
+#include "sdk/custom/sdk_event_game_state.h"
 
 namespace feature
 {
-    bool C_FeatureVirtualCameraManager::initializeCamera()
+    void C_FeatureVirtualCameraManager::onFireEvent(sdk::datatype::C_GameEvent* event)
     {
-        if (this->isInitialized_) {
-            return true;
+        if (!sdk::custom::ValidateGameState(event, sdk::util::game_state_e::DOTA_GAMERULES_STATE_STRATEGY_TIME)) {
+            return;
         }
 
         if (!this->serverCamera_.initialize()) {
-            return false;
+            assert("Unable to initialize server camera!");
         }
-
-        this->isInitialized_ = true;
-        return true;
     }
 
     bool C_FeatureVirtualCameraManager::getCameraPixelDelta(const DirectX::SimpleMath::Vector3& worldPosition, DirectX::SimpleMath::Vector2& output) const
@@ -43,8 +41,8 @@ namespace feature
             return false;
         }
 
-        float threshold = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) ? EDGE_PAN_EXTENDED_THRESHOLD : EDGE_PAN_THRESHOLD;
-
+        //todo Change this `GetAsyncKeyState` meme to something normal...
+        const float threshold = (GetAsyncKeyState(VK_RBUTTON) & 0x8000) ? EDGE_PAN_EXTENDED_THRESHOLD : EDGE_PAN_THRESHOLD;
         if (screenPosition.x > display.x - threshold) {
             output.x = screenPosition.x - (display.x - threshold);
         } else if (screenPosition.x < threshold) {
@@ -104,16 +102,16 @@ namespace feature
 
     void C_FeatureVirtualCameraManager::onCreateMove(sdk::datatype::user_cmd_s* userCmd)
     {
-        if (const auto primaryCamera = C_ServiceLocator::getInstance<sdk::singleton::C_DotaCamaraManager>()->getPrimaryCamera();
-            primaryCamera->getCameraDistance() <= primaryCamera->getCameraDefaultDistance()) {
-            return;
-        }
-
-        if (!initializeCamera()) {
-            return;
-        }
-
         auto& cmd = userCmd->cmd;
+        if (const auto primaryCamera = C_ServiceLocator::getInstance<sdk::singleton::C_DotaCamaraManager>()->getPrimaryCamera();
+            primaryCamera->getCameraDistance() <= DEFAULT_CAMERA_DISTANCE) {
+            return;
+        }
+
+        if (!this->serverCamera_.isInitialized()) {
+            return;
+        }
+
         const auto displaySize = C_ServiceLocator::getInstance<sdk::singleton::C_Source2EngineToClient>()->getScreenSize();
         const DirectX::SimpleMath::Vector3 crosshairTrace = {
             cmd.crosshairtrace().x(),
@@ -149,9 +147,16 @@ namespace feature
             }
         );
 
+        hookDispatcher->subscribe<void*, void*>(
+            static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::FIRE_EVENT),
+            [this](void*, void* event){
+                onFireEvent(static_cast<sdk::datatype::C_GameEvent*>(event));
+            }
+        );
+
         hookDispatcher->subscribe(
             static_cast<hook::hook_id_t>(hook::impl::hook_impl_type_e::ON_LEVEL_INIT),
-            [this]{ onLevelInit(); }
+            [this] { this->serverCamera_.dispose(); }
         );
 
         return true;
