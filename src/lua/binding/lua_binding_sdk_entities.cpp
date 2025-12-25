@@ -38,22 +38,8 @@ namespace lua::binding
         luaEntityInstance.set_function("get_class_info", &sdk::datatype::C_EntityInstance::getClassInfo);
         luaEntityInstance.set_function("get_identity", &sdk::datatype::C_EntityInstance::getIdentity);
         luaEntityInstance.set_function("as",
-            [this](sol::this_state state, sdk::datatype::C_EntityInstance* self, const std::string& className) {
-                sol::state_view lua(state);
-
-                const auto it = this->typeCasters_.find(className);
-                if (it == this->typeCasters_.end()) {
-                    luaL_error(state.lua_state(), "Unable to cast entity!");
-                    __builtin_unreachable();
-                }
-
-                auto casted = it->second(lua, self);
-                if (!casted.valid()) {
-                    luaL_error(state.lua_state(), "Unable to cast entity!");
-                    __builtin_unreachable();
-                }
-
-                return casted;
+            [this](sol::this_state state, sdk::datatype::C_EntityInstance* self, const std::string_view& className) {
+                return this->caster_.cast(sol::state_view(state), self, className);
             }
         );
 
@@ -110,12 +96,12 @@ namespace lua::binding
 
     void C_LuaBindingSdkEntities::registerCaster()
     {
-        registerTypeCaster<sdk::datatype::C_EntityInstance>("CEntityInstance");
-        registerTypeCaster<sdk::datatype::C_BaseEntity>("C_BaseEntity");
-        registerTypeCaster<sdk::datatype::C_DotaPlayerController>("C_DOTAPlayerController");
-        registerTypeCaster<sdk::datatype::C_BaseModelEntity>("C_BaseModelEntity");
-        registerTypeCaster<sdk::datatype::C_DotaBaseNPC>("C_DOTA_BaseNPC");
-        registerTypeCaster<sdk::datatype::C_DotaBaseNPC_Hero>("C_DOTA_BaseNPC_Hero");
+        this->caster_.add<sdk::datatype::C_EntityInstance>("CEntityInstance");
+        this->caster_.add<sdk::datatype::C_BaseEntity>("C_BaseEntity");
+        this->caster_.add<sdk::datatype::C_DotaPlayerController>("C_DOTAPlayerController");
+        this->caster_.add<sdk::datatype::C_BaseModelEntity>("C_BaseModelEntity");
+        this->caster_.add<sdk::datatype::C_DotaBaseNPC>("C_DOTA_BaseNPC");
+        this->caster_.add<sdk::datatype::C_DotaBaseNPC_Hero>("C_DOTA_BaseNPC_Hero");
     }
 
     bool C_LuaBindingSdkEntities::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
@@ -161,13 +147,13 @@ namespace lua::binding
             [this](sol::this_state state, const std::string& className, const std::string& castTo) {
                 const auto& list = this->entities_->find(className);
 
-                const auto caster = this->typeCasters_.find(castTo);
-                if (caster == this->typeCasters_.end()) {
+                const auto caster = this->caster_.find(castTo);
+                if (!caster) {
                     luaL_error(state.lua_state(), "Unable to get lua container!");
                     __builtin_unreachable();
                 }
 
-                return sol::make_object(state, C_LuaEntityListView(state, list, caster->second));
+                return sol::make_object(state, C_LuaEntityListView(state, list, caster));
             }
         );
 

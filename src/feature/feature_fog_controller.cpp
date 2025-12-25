@@ -21,7 +21,9 @@ namespace feature
 
         for (const auto& controllerList = this->eventList_->find(FOG_CONTROLLER_NAME);
             const auto& controller : controllerList) {
-            reinterpret_cast<sdk::datatype::C_FogController*>(controller)->getParams().getPlaneFarZ() = NEAR_FAR_PLANE_Z;
+            auto& params = reinterpret_cast<sdk::datatype::C_FogController*>(controller)->getParams();
+            params.getPlaneFarZ() = NEAR_FAR_PLANE_Z;
+            params.isEnabled() = false;
         }
     }
 

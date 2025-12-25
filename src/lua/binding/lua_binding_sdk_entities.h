@@ -8,8 +8,8 @@
 #include <utility>
 
 #include "lua_binding_interface.h"
-#include "hash/xxhash_wrapper.h"
 #include "sdk/custom/sdk_entity_list.h"
+#include "util/lua_binding_dynamic_cast.h"
 
 namespace lua::binding
 
@@ -20,7 +20,7 @@ namespace lua::binding
     {
     private:
         const std::vector<sdk::datatype::C_EntityInstance*>* list_;
-        std::function<sol::object(sol::state_view&, sdk::datatype::C_EntityInstance*)> caster_;
+        util::C_LuaBindingDynamicCast<sdk::datatype::C_EntityInstance>::caster_func_t caster_;
         mutable sol::state_view lua_;
 
     public:
@@ -46,18 +46,8 @@ namespace lua::binding
     class C_LuaBindingSdkEntities final : public C_ILuaBinding
     {
     private:
-        using caster_func_t = std::function<sol::object(sol::state_view&, sdk::datatype::C_EntityInstance*)>;
-
-        std::unordered_map<std::string, caster_func_t, xx_hashier_s, std::equal_to<>> typeCasters_;
+        util::C_LuaBindingDynamicCast<sdk::datatype::C_EntityInstance> caster_;
         std::shared_ptr<sdk::custom::C_EntityList> entities_;
-
-        template<typename T>
-        void registerTypeCaster(const std::string_view& name)
-        {
-            this->typeCasters_[name.data()] = [](sol::state_view& lua, sdk::datatype::C_EntityInstance* ptr) -> sol::object {
-                return sol::make_object(lua, static_cast<T*>(ptr));
-            };
-        }
 
         void registerEntities(sol::state& state);
 

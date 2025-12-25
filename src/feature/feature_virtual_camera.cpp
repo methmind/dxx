@@ -7,9 +7,6 @@
 #include "debug/debug_output.h"
 #include "sdk/singleton/sdk_dota_camera_manager.h"
 #include "renderer/renderer_math.h"
-#include "sdk/singleton/sdk_game_entity_system.h"
-#include "sdk/singleton/sdk_phys2_world.h"
-#include "sdk/singleton/sdk_source2_engine_to_client.h"
 
 namespace feature
 {

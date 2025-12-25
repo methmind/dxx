@@ -12,6 +12,7 @@ namespace sdk::datatype
     struct fog_params_t_s
     {
         SCHEMA_FIELD("fogparams_t", "farz", getPlaneFarZ, float);
+        SCHEMA_FIELD("fogparams_t", "enable", isEnabled, bool);
     };
 }
 

@@ -130,8 +130,8 @@ namespace feature
 
         const auto quantized = sdk::math::QuantizePoint(displaySize, reinterpret_cast<sdk::math::vector2&>(crosshairScreenPosition));
         const auto cameraLookAt = this->serverCamera_.getLookAt();
-        cmd.set_cameraposition_x(cameraLookAt.x);
-        cmd.set_cameraposition_y(cameraLookAt.y);
+        cmd.set_cameraposition_x(static_cast<int32_t>(cameraLookAt.x));
+        cmd.set_cameraposition_y(static_cast<int32_t>(cameraLookAt.y));
         cmd.mutable_base()->set_mousedx(quantized.x);
         cmd.mutable_base()->set_mousedy(quantized.y);
     }
