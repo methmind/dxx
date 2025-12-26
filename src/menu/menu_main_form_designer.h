@@ -14,7 +14,6 @@
 
 namespace menu
 {
-    constexpr auto NAVBAR_ID = "navbar";
     constexpr auto MAIN_FORM_ID = "menu_main_form";
 
     class C_MenuMainFormDesigner : public C_IMenuForm

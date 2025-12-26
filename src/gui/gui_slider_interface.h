@@ -7,8 +7,8 @@
 
 #include <format>
 
+#include "gui_widget_interface.h"
 #include "imgui.h"
-#include "gui/gui_clickable_interface.h"
 
 namespace gui
 {
@@ -31,7 +31,17 @@ namespace gui
 
     public:
 
-        [[nodiscard]] widget_type_e getType() const override { return widget_type_e::SLIDER; }
+        [[nodiscard]] widget_type_e getType() const override
+        {
+            if constexpr (std::is_integral_v<T>) {
+                return widget_type_e::SLIDER_INT;
+            } else if constexpr (std::is_floating_point_v<T>) {
+                return widget_type_e::SLIDER_FLOAT;
+            } else {
+                static_assert(std::is_arithmetic_v<T>, "C_ISlider supports only arithmetic types");
+                return widget_type_e::SLIDER;
+            }
+        }
 
         T getValue() const { return this->value_; }
 
@@ -61,7 +71,7 @@ namespace gui
             T newValue = this->value_;
 
             ImGui::PushItemWidth(rect.x);
-            if constexpr (std::is_same<T, int32_t>::value) {
+            if constexpr (std::is_same_v<T, int32_t>) {
                 ImGui::SliderInt(getID().c_str(), &newValue, this->minValue_, this->maxValue_);
             } else {
                 ImGui::SliderFloat(getID().c_str(), &newValue, this->minValue_, this->maxValue_);

@@ -30,24 +30,24 @@ namespace config
         it->clear(); // So... We anyway wanna to remove this
     }
 
-    bool C_Config::Load(const std::filesystem::path& path, const gui::C_WidgetRegedit::widget_list_t& widgets)
+    bool C_Config::Load(const std::filesystem::path& path, const std::shared_ptr<gui::C_WidgetRegedit>& regedit)
     {
         try {
             nlohmann::json document = nlohmann::json::parse(std::fstream(path));
 
-            LoadPriority(document, widgets);
+            LoadPriority(document, regedit->list());
             for (const auto& data : document) {
                 if (data.empty()) {
                     continue;
                 }
 
-                auto widgetID = data.at("id").get<std::string>();
+                auto widgetID = data.at("id").get<std::string_view>();
                 if (widgetID.empty()) {
                     continue;
                 }
 
-                if (auto widget = widgets.find(widgetID); widget != widgets.end()) {
-                    widget->second->deserialize(data.at("data"));
+                if (const auto widget = regedit->find(widgetID); widget) {
+                    widget->deserialize(data.at("data"));
                 }
             }
 

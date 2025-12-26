@@ -29,7 +29,7 @@ namespace gui
 
         [[nodiscard]] virtual widget_type_e getType() const { return widget_type_e::ROOT; }
 
-        virtual void setVisible(const bool isVisible) {
+        virtual void setVisibleState(const bool isVisible) {
             this->isVisible_ = isVisible;
         }
 

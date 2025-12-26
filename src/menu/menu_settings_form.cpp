@@ -80,14 +80,26 @@ namespace menu
 
     void C_MenuSettingsForm::onConfigLoadButtonClick(gui::C_IClickable* obj)
     {
-        if (!config::C_Config::Load(getConfigPath(), this->widgetRegedit_.lock()->list())) {
+        const auto regedit = this->widgetRegedit_.lock();
+        if (!regedit) {
+            dbg("Unable to get widget regedit!");
+            return;
+        }
+
+        if (!config::C_Config::Load(getConfigPath(), regedit)) {
             dbg("Unable to load config!");
         }
     }
 
     void C_MenuSettingsForm::onConfigSaveButtonClick(gui::C_IClickable* obj)
     {
-        if (!config::C_Config::Save(getConfigPath(), this->widgetRegedit_.lock()->list())) {
+        const auto regedit = this->widgetRegedit_.lock();
+        if (!regedit) {
+            dbg("Unable to get widget regedit!");
+            return;
+        }
+
+        if (!config::C_Config::Save(getConfigPath(), regedit->list())) {
             dbg("Unable to save config!");
         }
     }

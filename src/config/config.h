@@ -18,7 +18,7 @@ namespace config
 
     public:
 
-        static bool Load(const std::filesystem::path& path, const gui::C_WidgetRegedit::widget_list_t& widgets);
+        static bool Load(const std::filesystem::path& path, const std::shared_ptr<gui::C_WidgetRegedit>& regedit);
 
         static bool Save(const std::filesystem::path& path, const gui::C_WidgetRegedit::widget_list_t& widgets);
     };

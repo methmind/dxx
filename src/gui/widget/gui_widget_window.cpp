@@ -34,7 +34,7 @@ namespace gui::widget
         }
 
         if (!isStillActive) {
-            setVisible(false);
+            setVisibleState(false);
         }
 
         ImGui::End();

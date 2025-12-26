@@ -49,7 +49,6 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/gui/widget/gui_widget_same_line.h
         src/gui/widget/gui_widget_checkbox.cpp
         src/gui/widget/gui_widget_checkbox.h
-        src/gui/widget/gui_widget_slider_int.cpp
         src/gui/widget/gui_widget_slider_int.h
         src/home/home_directory.cpp
         src/home/home_directory.h
@@ -81,7 +80,6 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/gui/widget/gui_widget_button.cpp
         src/gui/widget/gui_widget_button.h
         src/gui/gui_slider_interface.h
-        src/gui/widget/gui_widget_slider_float.cpp
         src/gui/widget/gui_widget_slider_float.h
         src/gui/widget/gui_widget_lua_list.cpp
         src/gui/widget/gui_widget_lua_list.h

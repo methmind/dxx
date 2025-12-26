@@ -14,7 +14,8 @@ namespace lua::binding
 {
     constexpr auto MENU_NAMESPACE_NAME = "menu";
 
-    class C_LuaBindingWidgetWrapper : public std::any {
+    class C_LuaBindingWidgetWrapper : public std::any
+    {
     private:
         std::shared_ptr<gui::C_IWidget> instance_;
         std::shared_ptr<gui::C_WidgetRegedit> regedit_;
@@ -35,7 +36,13 @@ namespace lua::binding
 
         static void RegisterBasicInterfaces(sol::state& state);
 
-        static void RegisterWidgets(sol::state& state);
+        static void RegisterWindowWidgets(sol::state& state);
+
+        static void RegisterClickableWidgets(sol::state& state);
+
+        static void RegisterSliderWidgets(sol::state& state);
+
+        static void RegisterSimpleWidgets(sol::state& state);
 
     public:
 

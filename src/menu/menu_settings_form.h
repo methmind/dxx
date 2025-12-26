@@ -42,8 +42,8 @@ namespace menu
 
         bool initialize() override;
 
-        void setVisible(const bool isVisible) override {
-            this->settingsWindow_->setVisible(isVisible);
+        void setVisibleState(const bool isVisible) override {
+            this->settingsWindow_->setVisibleState(isVisible);
         }
 
         explicit C_MenuSettingsForm(

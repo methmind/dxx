@@ -6,7 +6,6 @@
 #define MENU_MAIN_FORM_H
 
 #include "menu_main_form_designer.h"
-#include "gui/widget/gui_widget_menu_item.h"
 #include "input/bind_system.h"
 
 namespace menu
@@ -17,9 +16,9 @@ namespace menu
         std::shared_ptr<C_IMenuForm> settingsForm_;
         std::unique_ptr<input::C_KeyBindHandle> showBind_;
 
-        void onSettingButtonClick(gui::C_IClickable* obj) override { this->settingsForm_->setVisible(true); }
+        void onSettingButtonClick(gui::C_IClickable* obj) override { this->settingsForm_->setVisibleState(true); }
 
-        void menuShowBinding() { setVisible(!isVisible()); }
+        void menuShowBinding() { setVisibleState(!isVisible()); }
 
     public:
 

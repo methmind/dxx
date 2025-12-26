@@ -4,14 +4,11 @@
 
 #include "menu_main_form_designer.h"
 
-#include "gui/gui_widget_regedit.h"
-#include "service_locator/service_locator.h"
-
 namespace menu
 {
     bool C_MenuMainFormDesigner::initialize()
     {
-        this->navbar_ = C_ServiceLocator::getInstance<gui::C_WidgetRegedit>()->createWidget<gui::widget::C_WidgetNavbar>(NAVBAR_ID);
+        this->navbar_ = std::make_shared<gui::widget::C_WidgetNavbar>("navbar");
         this->contextMenu_ = std::make_shared<gui::widget::C_WidgetContextMenu>("navbar_main_menu", "Dota++");
         this->scriptSeparator_ = std::make_shared<gui::widget::C_WidgetSeparator>("script_separator", "Scripts");
         this->windowsContainer_ = std::make_shared<gui::widget::C_WidgetWindowsContainer>("navbar_windows_container");

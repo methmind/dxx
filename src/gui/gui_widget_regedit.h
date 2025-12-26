@@ -18,9 +18,10 @@ namespace gui
     {
     public:
         using widget_list_t = std::unordered_map<std::string, widget_ptr_t, xx_hashier_s, std::equal_to<>>;
+        using shared_list_t = libguarded::shared_guarded<widget_list_t>;
 
     private:
-        libguarded::shared_guarded<widget_list_t> widgets_;
+        shared_list_t widgets_;
 
     public:
 
