@@ -25,6 +25,15 @@ namespace gui
 
     public:
 
+        void* metacast(const widget_flags_e type) override
+        {
+            if (type == widget_flags_e::CONTAINER) {
+                return this;
+            }
+
+            return C_IWidget::metacast(type);
+        }
+
         [[nodiscard]] widget_flags_e getFlags() const override { return widget_flags_e::CONTAINER; }
 
         void render() override

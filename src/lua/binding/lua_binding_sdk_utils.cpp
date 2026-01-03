@@ -13,7 +13,7 @@ namespace lua::binding
         const auto tmp = guardedState.lock()->getLuaState();
         auto& luaState = *tmp;
 
-        luaState.new_usertype<sdk::util::color_t>(
+        luaState->new_usertype<sdk::util::color_t>(
             "sColor", sol::factories(
                 [] {
                     return sdk::util::color_t{0, 0, 0, 255};

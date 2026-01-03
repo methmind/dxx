@@ -67,10 +67,10 @@ namespace lua
             // Handle жив на протяжении всей инициализации, поэтому ссылка валидна.
             #pragma clang diagnostic push
             #pragma clang diagnostic ignored "-Wdangling"
-            auto& luaState = *this->luaState_.lock();
+            const auto& luaState = *this->luaState_.lock();
             #pragma clang diagnostic pop
 
-            luaState.open_libraries(
+            luaState->open_libraries(
                 sol::lib::base,
                 sol::lib::package,
                 sol::lib::coroutine,
@@ -84,9 +84,9 @@ namespace lua
                 sol::lib::ffi
             );
 
-            luaState.set_exception_handler(ExceptionHandler);
-            luaState.set_panic(sol::c_call<decltype(&LuaPanicHandler), &LuaPanicHandler>);
-            luaState.set_function("print", [](sol::this_state state, sol::variadic_args args) {
+            luaState->set_exception_handler(ExceptionHandler);
+            luaState->set_panic(sol::c_call<decltype(&LuaPanicHandler), &LuaPanicHandler>);
+            luaState->set_function("print", [](sol::this_state state, sol::variadic_args args) {
                 PrintOverride(state, std::move(args));
             });
 

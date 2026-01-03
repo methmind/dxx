@@ -21,6 +21,15 @@ namespace gui
 
     public:
 
+        virtual void* metacast(const widget_flags_e type)
+        {
+            if (type == widget_flags_e::DEFAULT) {
+                return this;
+            }
+
+            return nullptr;
+        }
+
         void setParent(const std::weak_ptr<C_IWidget>& parent) { this->parent_ = parent; }
 
         [[nodiscard]] std::weak_ptr<C_IWidget> getParent() const { return this->parent_; }

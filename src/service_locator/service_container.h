@@ -5,9 +5,13 @@
 #ifndef SERVICE_CONTAINER_H
 #define SERVICE_CONTAINER_H
 
+#include <algorithm>
 #include <memory>
+#include <queue>
 #include <string_view>
 #include <unordered_map>
+#include <vector>
+
 #include "debug/debug_output.h"
 
 namespace detail
@@ -46,6 +50,7 @@ struct type_hash_s
 class C_ServiceContainer
 {
 private:
+    std::queue<std::shared_ptr<void>> destructionOrder_;
     std::unordered_map<uint64_t, std::shared_ptr<void>> services_;
 
 public:
@@ -59,21 +64,9 @@ public:
         dbg("Registered service: '%s' (hash: %llu)", typeName.data(), key);
 
         auto it = this->services_.emplace(key, std::make_shared<int_t>(std::forward<args_t>(args)...));
+        this->destructionOrder_.push(it.first->second);
+
         return std::static_pointer_cast<int_t>(it.first->second);
-    }
-
-    template<typename int_t>
-    void add(std::shared_ptr<int_t> service)
-    {
-        constexpr auto key = type_hash_s<int_t>::Get();
-        constexpr auto typeName = type_hash_s<int_t>::GetName();
-
-        if (this->services_.contains(key)) {
-            return;
-        }
-
-        dbg("Registered service: '%s' (hash: %llu)", typeName, key);
-        this->services_[key] = service;
     }
 
     template<typename int_t>

@@ -40,7 +40,7 @@ namespace lua::binding
 
         static void RegisterClickableWidgets(sol::state& state);
 
-        static void RegisterSliderWidgets(sol::state& state);
+        static void RegisterSliderWidgets(sol::state& state, const std::weak_ptr<C_ILuaGuardedState>& guardedState);
 
         static void RegisterSimpleWidgets(sol::state& state);
 

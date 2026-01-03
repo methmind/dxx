@@ -239,6 +239,8 @@ add_library(dxx_dlc SHARED main.cpp ${minhook_files}
         src/sdk/datatype/sdk_collision_property.h
         src/sdk/datatype/sdk_game_trace.h
         src/lua/binding/util/lua_binding_dynamic_cast.h
+        src/lua/binding/lua_binding_camera.cpp
+        src/lua/binding/lua_binding_camera.h
 )
 
 target_compile_options(dxx_dlc PRIVATE

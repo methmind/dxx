@@ -81,19 +81,44 @@ namespace lua::binding
         );
     }
 
-    void C_LuaBindingMenu::RegisterSliderWidgets(sol::state& state)
+    void C_LuaBindingMenu::RegisterSliderWidgets(sol::state& state, const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
-        auto luaSliderIntWidget = state.new_usertype<gui::widget::C_WidgetSliderInt>(
-            "C_WidgetSliderInt", sol::no_constructor,
-            sol::base_classes, sol::bases<gui::C_IWidget>()
-        );
-        luaSliderIntWidget.set_function("set_value", &gui::widget::C_WidgetSliderInt::setValue);
+        auto bindSlider = [&]<class widget_t>(const std::string_view& luaName)
+        {
+            auto ut = state.new_usertype<widget_t>(
+                luaName,
+                sol::no_constructor,
+                sol::base_classes, sol::bases<gui::C_IWidget>()
+            );
 
-        auto luaSliderFloatWidget = state.new_usertype<gui::widget::C_WidgetSliderFloat>(
-            "C_WidgetSliderFloat", sol::no_constructor,
-            sol::base_classes, sol::bases<gui::C_IWidget>()
-        );
-        luaSliderFloatWidget.set_function("set_value", &gui::widget::C_WidgetSliderFloat::setValue);
+            ut.set_function("get_value",  &widget_t::getValue);
+            ut.set_function("set_value",  &widget_t::setValue);
+            ut.set_function("set_bounds", &widget_t::setBounds);
+
+            ut.set_function("set_callback",
+                [guardedState](widget_t* self, const sol::protected_function& callback)
+                {
+                    self->setCallback([guardedState, callback](auto* obj)
+                    {
+                        const auto sharedState = guardedState.lock();
+                        if (!sharedState) {
+                            dbg("Lua state is no longer available in hook callback");
+                            return;
+                        }
+
+                        [[maybe_unused]] const auto safetyState = sharedState->getLuaState();
+                        if (const auto result = callback(obj); !result.valid()) {
+                            dbg("Callback failed: %s", sol::error(result).what());
+                        }
+                    });
+                }
+            );
+
+            return ut;
+        };
+
+        bindSlider.operator()<gui::widget::C_WidgetSliderInt>("C_WidgetSliderInt");
+        bindSlider.operator()<gui::widget::C_WidgetSliderFloat>("C_WidgetSliderFloat");
     }
 
     void C_LuaBindingMenu::RegisterSimpleWidgets(sol::state& state)
@@ -115,13 +140,19 @@ namespace lua::binding
     }
 
     template<typename widget_t, typename... args_t>
-    gui::widget_ptr_t CreateWidgetHelper(sol::this_state state, const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
+    std::shared_ptr<widget_t> CreateWidgetHelper(sol::this_state state, const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
         std::weak_ptr<C_ILuaContainer>& luaContainer, const gui::widget_ptr_t& parent,
         std::invocable<std::shared_ptr<widget_t>&> auto&& customizer, args_t&&... args
     )
     {
         if (!parent || !(parent->getFlags() & gui::widget_flags_e::CONTAINER)) {
             luaL_error(state.lua_state(), "Invalid parent widget!");
+            __builtin_unreachable();
+        }
+
+        auto casted = static_cast<gui::C_IContainer*>(parent->metacast(gui::widget_flags_e::CONTAINER));
+        if (!casted) {
+            luaL_error(state.lua_state(), "Unable to cast parent to gui::C_IContainer!");
             __builtin_unreachable();
         }
 
@@ -151,7 +182,7 @@ namespace lua::binding
 
         std::invoke(std::forward<decltype(customizer)>(customizer), newWidget); // Call widget decorator
 
-        std::dynamic_pointer_cast<gui::C_IContainer>(parent)->addChild(newWidget);
+        casted->addChild(newWidget);
         scriptInstance->addDependency(std::make_shared<C_LuaBindingWidgetWrapper>(newWidget, widgetRegedit));
 
         return newWidget;
@@ -160,32 +191,27 @@ namespace lua::binding
     bool C_LuaBindingMenu::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
         const auto tmp = guardedState.lock()->getLuaState();
-        auto& luaState = *tmp;
+        const auto& luaState = *tmp;
 
-        auto menuNamespace = luaState[MENU_NAMESPACE_NAME].get_or_create<sol::table>();
+        auto menuNamespace = luaState->create_named_table(MENU_NAMESPACE_NAME);
         if (!menuNamespace.valid()) {
             dbg("Unable to create menu namespace!");
             return false;
         }
 
-        RegisterBasicInterfaces(luaState);
-        RegisterWindowWidgets(luaState);
-        RegisterClickableWidgets(luaState);
-        RegisterSliderWidgets(luaState);
-        RegisterSimpleWidgets(luaState);
+        RegisterBasicInterfaces(*luaState);
+        RegisterWindowWidgets(*luaState);
+        RegisterClickableWidgets(*luaState);
+        RegisterSliderWidgets(*luaState, guardedState);
+        RegisterSimpleWidgets(*luaState);
 
         menuNamespace.set_function("get_widget", [this](const std::string_view& id){
             return this->widgetRegedit_->find(id);
         });
 
         menuNamespace.set_function("create_window",
-            [this](sol::this_state state, sol::optional<gui::widget_ptr_t> parent,
-            const std::string_view& id, const std::string_view& label, const ImVec2& pos, const ImVec2& size, bool isVisible) {
-                if (!parent) {
-                    luaL_error(state.lua_state(), "Parent pointer cant be a nullptr!");
-                    __builtin_unreachable();
-                }
-
+            [this](sol::this_state state, gui::widget_ptr_t parent, const std::string_view& id,
+                const std::string_view& label, const ImVec2& pos, const ImVec2& size, bool isVisible) {
                 const auto mainForm = this->widgetRegedit_->find<menu::C_MenuMainForm>(menu::MAIN_FORM_ID);
                 if (!mainForm) {
                     luaL_error(state.lua_state(), "Unable to find menu::C_MenuMainForm!");
@@ -193,7 +219,7 @@ namespace lua::binding
                 }
 
                 auto newWnd = CreateWidgetHelper<gui::widget::C_WidgetWindow>(state,
-                    this->widgetRegedit_, this->luaContainer_, parent.value(),
+                    this->widgetRegedit_, this->luaContainer_, parent,
                     [&](const std::shared_ptr<gui::widget::C_WidgetWindow>& wnd) {
                         wnd->setPosition(pos);
                         wnd->setSize(size);
@@ -218,20 +244,17 @@ namespace lua::binding
         );
 
         menuNamespace.set_function("create_slider_int",
-            [this](sol::this_state state, sol::optional<gui::widget_ptr_t> parent, const std::string_view& id,
+            [this](sol::this_state state, gui::widget_ptr_t parent, const std::string_view& id,
                 int32_t value, int32_t minValue, int32_t maxValue) {
-                if (!parent) {
-                    luaL_error(state.lua_state(), "Parent pointer cant be a nullptr!");
-                    __builtin_unreachable();
-                }
-
                 auto newSlider = CreateWidgetHelper<gui::widget::C_WidgetSliderInt>(
-                    state, this->widgetRegedit_, this->luaContainer_, parent.value(),
+                    state, this->widgetRegedit_, this->luaContainer_, parent,
                     [&](const std::shared_ptr<gui::widget::C_WidgetSliderInt>& slider){
                         slider->setValue(value);
                         slider->setBounds(minValue, maxValue);
                     }, id
                 );
+
+                return newSlider;
             }
         );
 

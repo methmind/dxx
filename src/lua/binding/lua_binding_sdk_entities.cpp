@@ -107,15 +107,15 @@ namespace lua::binding
     bool C_LuaBindingSdkEntities::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
         const auto tmp = guardedState.lock()->getLuaState();
-        auto& luaState = *tmp;
+        const auto& luaState = *tmp;
 
-        auto entitiesNamespace = luaState[ENTITIES_NAMESPACE_NAME].get_or_create<sol::table>();
+        auto entitiesNamespace = luaState->create_named_table(ENTITIES_NAMESPACE_NAME);
         if (!entitiesNamespace.valid()) {
             dbg("Unable to create entities namespace!");
             return false;
         }
 
-        registerEntities(luaState);
+        registerEntities(*luaState);
         registerCaster();
 
         entitiesNamespace.set_function("get_local_controller", []() -> sdk::datatype::C_DotaPlayerController* {

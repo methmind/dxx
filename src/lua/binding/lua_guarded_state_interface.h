@@ -10,7 +10,9 @@
 
 namespace lua::binding
 {
-    using lua_guarded_state_t = libguarded::plain_guarded<sol::state>;
+    using lua_state_ptr_t = std::shared_ptr<sol::state>;
+
+    using lua_guarded_state_t = libguarded::plain_guarded<lua_state_ptr_t>;
 
     using lua_guarded_handle_t = typename lua_guarded_state_t::handle;
 

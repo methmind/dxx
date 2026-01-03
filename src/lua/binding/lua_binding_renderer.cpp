@@ -7,9 +7,7 @@
 #include "imgui_internal.h"
 #include "debug/debug_output.h"
 #include "sdk/custom/sdk_entity_list.h"
-#include "sdk/custom/sdk_world_to_screen.h"
-#include "sdk/math/sdk_math_vector3.h"
-#include "sdk/singleton/sdk_render_game_system.h"
+#include "sdk/singleton/sdk_source2_engine_to_client.h"
 
 namespace lua::binding
 {
@@ -93,15 +91,15 @@ namespace lua::binding
     bool C_LuaBindingRenderer::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
         const auto tmp = guardedState.lock()->getLuaState();
-        auto& luaState = *tmp;
+        const auto& luaState = *tmp;
 
-        auto rendererNamespace = luaState[RENDERER_NAMESPACE_NAME].get_or_create<sol::table>();
+        auto rendererNamespace = luaState->create_named_table(RENDERER_NAMESPACE_NAME);
         if (!rendererNamespace.valid()) {
             dbg("Unable to create renderer namespace!");
             return false;
         }
 
-        RegisterRendererPrimitivesFrame(luaState);
+        RegisterRendererPrimitivesFrame(*luaState);
 
         //@note Undocumented feature!!!
         rendererNamespace.set_function("get_renderer_primitives", [this] {
@@ -109,11 +107,8 @@ namespace lua::binding
         });
 
         rendererNamespace.set_function("get_screen_size", [] {
-            if (!GImGui) {
-                return ImVec2(-1, -1);
-            }
-
-            return ImGui::GetIO().DisplaySize;
+            const auto [x, y] = C_ServiceLocator::getInstance<sdk::singleton::C_Source2EngineToClient>()->getScreenSize();
+            return ImVec2{ x, y };
         });
 
         rendererNamespace.set_function("measure_text", [](const char* text) {

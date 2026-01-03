@@ -9,7 +9,6 @@
 
 #include "debug/debug_output.h"
 #include "hook/hook_dispatcher.h"
-#include "hook/impl/hook_impl_type.h"
 
 namespace lua
 {
@@ -38,7 +37,7 @@ namespace lua
                 return false;
             }
 
-            const auto luaState = this->engine_->getLuaState();
+            const auto luaState = *this->engine_->getLuaState();
 
             auto payloadData = luaState->load_file(scriptPath.data());
             if (!payloadData.valid()) {

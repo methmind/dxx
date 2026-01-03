@@ -12,21 +12,21 @@ namespace lua::binding
     bool C_LuaBindingImgui::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
         const auto tmp = guardedState.lock()->getLuaState();
-        auto& luaState = *tmp;
+        const auto& luaState = *tmp;
 
-        auto imguiNamespace = luaState[IMGUI_NAMESPACE_NAME].get_or_create<sol::table>();
+        auto imguiNamespace = luaState->create_named_table(IMGUI_NAMESPACE_NAME);
         if (!imguiNamespace.valid()) {
             dbg("Unable to create imgui namespace!");
             return false;
         }
 
-        luaState.new_usertype<ImVec2>("ImVec2",
+        luaState->new_usertype<ImVec2>("ImVec2",
             sol::constructors<ImVec2(), ImVec2(float, float)>(),
             "x", &ImVec2::x,
             "y", &ImVec2::y
         );
 
-        luaState.new_usertype<ImVec4>("ImVec4",
+        luaState->new_usertype<ImVec4>("ImVec4",
             sol::constructors<ImVec4(), ImVec4(float, float, float, float)>(),
             "x", &ImVec4::x,
             "y", &ImVec4::y,

@@ -25,7 +25,7 @@ namespace sdk::datatype
 
         __forceinline void setCameraDistance(const float distance)
         {
-            *reinterpret_cast<float*>(this + 0x2E4) = distance;
+            *reinterpret_cast<float*>(reinterpret_cast<uint8_t*>(this) + 0x2E4) = distance;
         }
 
         void setCameraPosition(const math::vector2& pos);

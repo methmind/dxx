@@ -93,9 +93,9 @@ namespace lua::binding
     bool C_LuaBindingHook::apply(const std::weak_ptr<C_ILuaGuardedState>& guardedState)
     {
         const auto tmp = guardedState.lock()->getLuaState();
-        auto& luaState = *tmp;
+        const auto& luaState = *tmp;
 
-        auto hookNamespace = luaState[HOOK_NAMESPACE_NAME].get_or_create<sol::table>();
+        auto hookNamespace = luaState->create_named_table(HOOK_NAMESPACE_NAME);
         if (!hookNamespace.valid()) {
             dbg("Unable to create hook namespace!");
             return false;
@@ -168,7 +168,7 @@ namespace lua::binding
         );
 
         // Скрипт нужен исключительно для pull-style архи. Так lua-скрипты должны меньше влиять на производительность.
-        if (const auto callbackAPI = luaState.require_script(script::CALLBACK_API_CHUNK_NAME,
+        if (const auto callbackAPI = luaState->require_script(script::CALLBACK_API_CHUNK_NAME,
             script::CALLBACK_API_SCRIPT); !callbackAPI.valid()) {
             dbg("Unable to load callback api script!");
             return false;

@@ -33,7 +33,7 @@ namespace lua
 
         binding::lua_guarded_handle_t getLuaState() override { return this->luaState_.lock(); }
 
-        C_LuaScriptEngine() = default;
+        C_LuaScriptEngine() : luaState_(std::make_shared<sol::state>()) {}
 
         ~C_LuaScriptEngine() override { auto _ = this->luaState_.lock(); }
     };

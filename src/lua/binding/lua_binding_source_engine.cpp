@@ -15,7 +15,7 @@ namespace lua::binding
         const auto tmp = guardedState.lock()->getLuaState();
         auto& luaState = *tmp;
 
-        auto engineNamespace = luaState[ENGINE_NAMESPACE_NAME].get_or_create<sol::table>();
+        auto engineNamespace = luaState->create_named_table(ENGINE_NAMESPACE_NAME);
         if (!engineNamespace.valid()) {
             dbg("Unable to create engine namespace!");
             return false;

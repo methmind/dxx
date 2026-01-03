@@ -6,6 +6,7 @@
 #include "hook/hook_dispatcher.h"
 #include "hook/impl/hook_impl_type.h"
 #include "lua/lua_script_manager.h"
+#include "lua/binding/lua_binding_camera.h"
 #include "lua/binding/lua_binding_hook.h"
 #include "lua/binding/lua_binding_imgui.h"
 #include "lua/binding/lua_binding_menu.h"
@@ -52,6 +53,7 @@ namespace bootstrap
         luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingMenu>(
             container->get<gui::C_WidgetRegedit>(), luaManager
         ));
+        luaEngine->addBinding(std::make_unique<lua::binding::C_LuaBindingCamera>());
 
         return true;
     }

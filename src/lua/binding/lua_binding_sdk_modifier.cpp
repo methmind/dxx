@@ -15,12 +15,12 @@ namespace lua::binding
         const auto tmp = guardedState.lock()->getLuaState();
         auto& luaState = *tmp;
 
-        auto luaDotaBuff = luaState.new_usertype<sdk::datatype::C_DotaBuff>(
+        auto luaDotaBuff = luaState->new_usertype<sdk::datatype::C_DotaBuff>(
             "C_DotaBuff", sol::no_constructor
         );
         luaDotaBuff.set_function("get_name", &sdk::datatype::C_DotaBuff::getName);
 
-        auto luaModifierManager = luaState.new_usertype<sdk::datatype::C_DotaModifierManager>(
+        auto luaModifierManager = luaState->new_usertype<sdk::datatype::C_DotaModifierManager>(
             "C_DotaModifierManager", sol::no_constructor
         );
         luaModifierManager.set_function("get_assigned_hero", &sdk::datatype::C_DotaModifierManager::getAssignedEntity);
