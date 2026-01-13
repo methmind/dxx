@@ -17,7 +17,7 @@ namespace gui::widget
             newPaths.emplace(file);
         }
 
-        for (const auto tmpList = getChildList(); const auto& c : tmpList) {
+        for (const auto tmpList = getChildList(); const auto& c : *tmpList) {
             const auto child = std::dynamic_pointer_cast<C_IClickable>(c);
             if (!child) {
                 continue;
@@ -51,33 +51,30 @@ namespace gui::widget
             return;
         }
 
-        for (auto& childVector = getChildList(); const auto& child : childVector) {
-            child->render();
-        }
+        C_IContainer::render();
     }
 
     //todo What is performance and optimization?
     void C_WidgetLuaList::deserialize(const nlohmann::json& document)
     {
-        auto& childVector = getChildList();
+        const auto childVector = getChildList();
+
         for (auto& data : document) {
             const auto targetID = data.at("id").get<std::string_view>();
+            for (const auto& it : *childVector) {
+                if (it->getID() != targetID.data()) {
+                    continue;
+                }
 
-            auto it = std::ranges::find_if(childVector,
-               [&targetID](const widget_ptr_t& widget) {
-                   return widget->getID().compare(targetID) == 0;
-               }
-            );
-
-            if (it != childVector.end()) {
-                it->get()->deserialize(data);
+                it->deserialize(data);
+                break;
             }
         }
     }
 
     void C_WidgetLuaList::serialize(nlohmann::json& document)
     {
-        for (auto& childVector = getChildList(); const auto& child : childVector) {
+        for (const auto childVector = getChildList(); const auto& child : *childVector) {
             nlohmann::json block;
             block["id"] = child->getID();
             child->serialize(block);

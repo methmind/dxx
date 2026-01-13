@@ -15,9 +15,7 @@ namespace gui::widget
         }
 
         if (ImGui::BeginChild(getID().c_str(), this->size_, this->childFlags_, this->flags_)) {
-            for (auto& childVector = getChildList(); const auto& child : childVector) {
-                child->render();
-            }
+            C_IContainer::render();
         }
 
         ImGui::EndChild();

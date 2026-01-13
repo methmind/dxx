@@ -20,7 +20,7 @@ namespace menu
     private:
         home::C_HomeDirectory home_;
         std::weak_ptr<gui::C_WidgetRegedit> widgetRegedit_;
-        std::shared_ptr<lua::C_LuaScriptManager> lua_;
+        std::weak_ptr<lua::C_LuaScriptManager> lua_;
 
         std::filesystem::path getConfigPath() const;
 
@@ -48,7 +48,7 @@ namespace menu
 
         explicit C_MenuSettingsForm(
             const std::weak_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-            const std::shared_ptr<lua::C_LuaScriptManager>& luaManager
+            const std::weak_ptr<lua::C_LuaScriptManager>& luaManager
         ) :
             C_IWidget(SETTINGS_FORM_ID), widgetRegedit_(widgetRegedit), lua_(luaManager) {}
 

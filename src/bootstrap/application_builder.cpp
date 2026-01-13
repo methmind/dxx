@@ -4,29 +4,50 @@
 
 #include "application_builder.h"
 
+#include "../memory/offset_manager.h"
 #include "debug/debug_output.h"
 #include "gui/gui_widget_regedit.h"
-#include "gui/widget/gui_widget_checkbox.h"
-#include "home/home_directory.h"
-#include "lua/lua_script_manager.h"
+#include "gui/widget/gui_widget_root.h"
+#include "input/bind_system.h"
+#include "renderer/renderer.h"
 #include "service_locator/service_container.h"
 #include "service_locator/service_locator.h"
 
-REGISTER_GLOBAL_SERVICE(gui::C_WidgetRegedit);
+REGISTER_GLOBAL_SERVICE(input::C_BindSystem);
 
 namespace bootstrap
 {
     std::shared_ptr<C_ServiceContainer> C_ApplicationBuilder::Build()
     {
+        memory::OffsetManager::Initialize();
+
         auto container = std::make_shared<C_ServiceContainer>();
-        if (!container->add<home::C_HomeDirectory>()->initialize()) {
-            dbg("Unable to initialize home::C_HomeDirectory");
+        if (!InitializeSdkStuff(container)) {
+            dbg("Unable to initialize SDK stuff!");
+            return nullptr;
+        }
+
+        if (!InitializeHookStuff()) {
+            dbg("Unable to initialize hooks!");
             return nullptr;
         }
 
         const auto widgetRegedit = container->add<gui::C_WidgetRegedit>();
-        if (!container->add<lua::C_LuaScriptManager>(widgetRegedit)->initialize()) {
-            dbg("Unable to initialize lua::C_LuaScriptEngine");
+        const auto renderer = container->add<render::C_Renderer>();
+
+        if (!InitializeLuaStuff(container)) {
+            dbg("Unable to initialize Lua stuff!");
+            return nullptr;
+        }
+
+        if (!InitializeGuiStuff(container)) {
+            dbg("Unable to initialize GUI stuff!");
+            return nullptr;
+        }
+
+        if (auto rootWidget = widgetRegedit->find(gui::widget::ROOT_WIDGET_ID);
+            !renderer->initialize([rootWidget]{ rootWidget->render(); })) {
+            dbg("Unable to initialize renderer!");
             return nullptr;
         }
 

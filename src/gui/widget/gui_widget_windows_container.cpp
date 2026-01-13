@@ -14,13 +14,13 @@ namespace gui::widget
             return;
         }
 
-        auto& childVector = getChildList();
-        if (childVector.empty()) {
+        const auto childVector = getChildList();
+        if (childVector->begin() == childVector->end()) {
             ImGui::TextDisabled("N/A");
             return;
         }
 
-        for (const auto& child : childVector) {
+        for (const auto& child : *childVector) {
             child->render();
         }
     }

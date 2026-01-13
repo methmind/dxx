@@ -5,6 +5,8 @@
 #ifndef GUI_WIDGET_LUA_LIST_H
 #define GUI_WIDGET_LUA_LIST_H
 
+#include <list>
+
 #include "gui/gui_clickable_interface.h"
 #include "gui/gui_container_interface.h"
 

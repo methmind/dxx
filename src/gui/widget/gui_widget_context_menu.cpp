@@ -15,10 +15,7 @@ namespace gui::widget
         }
 
         if (ImGui::BeginMenu(this->label_.c_str())) {
-            for (auto& childVector = getChildList(); const auto& child : childVector) {
-                child->render();
-            }
-
+            C_IContainer::render();
             ImGui::EndMenu();
         }
     }

@@ -9,7 +9,7 @@
 
 namespace lua
 {
-    std::optional<std::string> GetScriptPath(lua_State* L);
+    std::string GetScriptPath(lua_State* L);
 } // lua
 
 #endif //LUA_UTILS_H

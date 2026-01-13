@@ -7,31 +7,40 @@
 
 #include "lua_script_engine.h"
 #include "lua_script_instance.h"
-#include "binding/lua_container_interface.h"
+#include "lua_container_interface.h"
+#include "hash/xxhash_wrapper.h"
+#include "cs_shared_guarded.h"
 
 namespace lua
 {
-    class C_LuaScriptManager : public binding::C_ILuaContainer, public std::enable_shared_from_this<C_LuaScriptManager>
+    class C_LuaScriptManager final : public C_ILuaContainer, public std::enable_shared_from_this<C_LuaScriptManager>
     {
-    private:
-        C_LuaScriptEngine engine_;
-        std::shared_ptr<gui::C_WidgetRegedit> widgetRegedit_;
-        std::unordered_map<std::string_view, std::unique_ptr<C_LuaScriptInstance>> scripts_;
+    public:
+        using on_lua_dispose_callback_t = std::function<void(const std::string_view&)>;
 
-        bool bindWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget) override;
+        using script_map_t = std::unordered_map<std::string, std::shared_ptr<C_LuaScriptInstance>, xx_hashier_s, std::equal_to<>>;
+
+    private:
+        std::shared_ptr<C_LuaScriptEngine> engine_;
+        //@note Сейчас модификация происходит только из GUI потока.
+        libguarded::shared_guarded<script_map_t> scripts_;
+        mutable on_lua_dispose_callback_t onLuaDisposeCallback_;
 
     public:
+
+        std::shared_ptr<C_LuaScriptEngine> getEngine() { return this->engine_; }
 
         void disposeScript(const std::string_view& scriptPath);
 
         bool loadScript(const std::string_view& scriptPath);
 
-        bool isScriptLoaded(const std::string_view& scriptPath) const { return this->scripts_.contains(scriptPath); }
+        bool isScriptLoaded(const std::string_view& scriptPath) const;
 
-        bool initialize();
+        std::shared_ptr<C_LuaScriptInstance> getScriptInstance(const std::string_view& scriptPath) override;
 
-        explicit C_LuaScriptManager(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit) :
-            widgetRegedit_(widgetRegedit) {}
+        bool initialize(const on_lua_dispose_callback_t& onLuaDisposeCallback) const;
+
+        C_LuaScriptManager() : engine_(std::make_shared<C_LuaScriptEngine>()) {}
 
         ~C_LuaScriptManager() override = default;
     };

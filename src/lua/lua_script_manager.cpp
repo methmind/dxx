@@ -8,30 +8,40 @@
 #include <format>
 
 #include "debug/debug_output.h"
+#include "hook/hook_dispatcher.h"
+#include "hook/impl/hook_impl_type.h"
 
 namespace lua
 {
-    bool C_LuaScriptManager::bindWidget(const std::string_view& luaID, const gui::widget_ptr_t& widget)
-    {
-        const auto it = this->scripts_.find(luaID);
-        if (it == this->scripts_.end()) {
-            dbg("Unable to find lua script: %s!", luaID.data());
-            return false;
-        }
-
-        it->second->addWidget(widget);
-        return true;
-    }
-
     void C_LuaScriptManager::disposeScript(const std::string_view& scriptPath)
     {
-        this->scripts_.erase(scriptPath);
+        if (!isScriptLoaded(scriptPath)) {
+            return;
+        }
+
+        // Deadlock prevention: invoke hooks before acquiring lua state lock
+        this->onLuaDisposeCallback_(scriptPath);
+
+        std::shared_ptr<C_LuaScriptInstance> scriptToDispose;
+
+        {
+            auto scripts = this->scripts_.lock();
+            if (auto it = scripts->find(scriptPath.data()); it != scripts->end()) {
+                scriptToDispose = it->second;
+                scripts->erase(it);
+            }
+        } // Release scripts lock
+
+        if (scriptToDispose) {
+            auto locker = this->engine_->getLuaState(); // Ensure thread safety during disposal (destructor calls Lua)
+            scriptToDispose.reset();
+        }
     }
 
     bool C_LuaScriptManager::loadScript(const std::string_view& scriptPath)
     {
         try {
-            if (this->scripts_.contains(scriptPath)) {
+            if (isScriptLoaded(scriptPath)) {
                 return true;
             }
 
@@ -40,48 +50,75 @@ namespace lua
                 return false;
             }
 
-            auto payloadData = this->engine_.getLuaState().load_file(scriptPath.data());
-            if (!payloadData.valid()) {
-                dbg("Script load failed!");
-                return false;
-            }
+            auto newInstance = std::make_shared<C_LuaScriptInstance>(this->engine_);
 
-            auto [it, inserted] = this->scripts_.emplace(scriptPath,
-                std::make_unique<C_LuaScriptInstance>(this->widgetRegedit_)
-            );
-            if (!inserted) {
-                throw std::runtime_error("Script already exists!");
-            }
+            // Scope for Lua initialization
+            {
+                const auto luaState = this->engine_->getLuaState();
 
-            sol::protected_function_result payloadResult = payloadData();
-            if (!payloadResult.valid()) {
-                throw std::runtime_error(std::format("[{}] got:err = {}", scriptPath.data(), sol::error(payloadResult).what()));
-            }
+                auto payloadData = luaState->load_file(scriptPath.data());
+                if (!payloadData.valid()) {
+                    dbg("Unable to load user script: %s!", sol::error(payloadData).what());
+                    return false;
+                }
 
-            if (payloadResult.get_type() != sol::type::table) {
-                throw std::runtime_error("Invalid lua structure!");
-            }
+                const sol::protected_function_result payloadResult = payloadData();
+                if (!payloadResult.valid()) {
+                    throw std::runtime_error(std::format("[{}] got:err = {}", scriptPath.data(), sol::error(payloadResult).what()));
+                }
 
-            if (!it->second->initialize(payloadResult)) {
-                throw std::runtime_error("Script execution failed!");
+                if (payloadResult.get_type() != sol::type::table) {
+                    throw std::runtime_error("Invalid lua structure!");
+                }
+
+                if (!newInstance->initialize(payloadResult)) {
+                    throw std::runtime_error("Script execution failed!");
+                }
+            } // Release Lua lock
+
+            // Scope for Script registration
+            {
+                auto scripts = this->scripts_.lock();
+                if (scripts->contains(scriptPath.data())) {
+                     // Maybe it was added while we were initializing?
+                    throw std::runtime_error("Script already exists!");
+                }
+                scripts->emplace(scriptPath.data(), newInstance);
             }
 
             dbg("Lua script loaded: %s", scriptPath.data());
             return true;
         } catch (const std::exception& ex) {
             dbg("Critical exception: %s", ex.what());
-            this->scripts_.erase(scriptPath);
             return false;
         }
     }
 
-    bool C_LuaScriptManager::initialize()
+    bool C_LuaScriptManager::isScriptLoaded(const std::string_view& scriptPath) const
     {
-        if (!this->engine_.initialize(this->widgetRegedit_, weak_from_this())) {
+        auto scripts = this->scripts_.lock_shared();
+        return scripts->contains(scriptPath.data());
+    }
+
+    std::shared_ptr<C_LuaScriptInstance> C_LuaScriptManager::getScriptInstance(const std::string_view& scriptPath)
+    {
+        auto scripts = this->scripts_.lock_shared();
+        const auto it = scripts->find(scriptPath.data());
+        if (it == scripts->end()) {
+            return nullptr;
+        }
+
+        return it->second;
+    }
+
+    bool C_LuaScriptManager::initialize(const on_lua_dispose_callback_t& onLuaDisposeCallback) const
+    {
+        if (!this->engine_->initialize()) {
             dbg("Unable to initialize C_LuaScriptEngine!");
             return false;
         }
 
+        this->onLuaDisposeCallback_ = onLuaDisposeCallback;
         return true;
     }
 } // lua

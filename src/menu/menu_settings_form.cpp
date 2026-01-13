@@ -60,15 +60,21 @@ namespace menu
 
     void C_MenuSettingsForm::onLuaButtonClick(gui::C_IClickable* obj)
     {
+        const auto luaManager = this->lua_.lock();
+        if (!luaManager) {
+            dbg("Unable to get ref of lua manager!");
+            return;
+        }
+
         const auto objectID = obj->getID().c_str();
         if (obj->getState()) {
-            if (this->lua_->isScriptLoaded(objectID)) {
-                this->lua_->disposeScript(objectID); // Reload all active scripts...
+            if (luaManager->isScriptLoaded(objectID)) {
+                luaManager->disposeScript(objectID); // Reload all active scripts...
             }
 
-            this->lua_->loadScript(objectID);
+            luaManager->loadScript(objectID);
         } else {
-            this->lua_->disposeScript(objectID);
+            luaManager->disposeScript(objectID);
         }
     }
 

@@ -16,7 +16,7 @@ namespace menu
         this->luaDockPanel_ = std::make_shared<gui::widget::C_WidgetChildWindow>("lua_dock_panel",
             ImGuiWindowFlags_None, ImGuiChildFlags_None);
         this->luaList_ = std::make_shared<gui::widget::C_WidgetLuaList>("lua_list_view");
-        this->luaList_->setCallback(std::bind(&C_MenuSettingsFormDesigner::onLuaButtonClick, this, std::placeholders::_1));
+        this->luaList_->setCallback([this](gui::C_IClickable* obj){ onLuaButtonClick(obj); });
 
         this->dockComposer_ = std::make_shared<gui::widget::C_WidgetSameLine>("");
         this->mainDockTitle_ = std::make_shared<gui::widget::C_WidgetSeparator>("main_dock_separator", "Main");
@@ -46,15 +46,15 @@ namespace menu
         this->luaListUpdateButton_ = std::make_shared<gui::widget::C_WidgetButton>("lua_list_update_button",
             "Update Lua List"
         );
-        this->luaListUpdateButton_->setCallback(std::bind(&C_MenuSettingsFormDesigner::onLuaRefreshListButtonClick, this, std::placeholders::_1));
+        this->luaListUpdateButton_->setCallback([this](gui::C_IClickable* obj){ onLuaRefreshListButtonClick(obj); });
         this->luaListUpdateButton_->setWidthMode(true);
 
         this->configLoadButton_ = std::make_shared<gui::widget::C_WidgetButton>("config_load_button", "Load");
-        this->configLoadButton_->setCallback(std::bind(&C_MenuSettingsFormDesigner::onConfigLoadButtonClick, this, std::placeholders::_1));
+        this->configLoadButton_->setCallback([this](gui::C_IClickable* obj){ onConfigLoadButtonClick(obj); });
         this->configLoadButton_->setWidthMode(true);
 
         this->configSaveButton_ = std::make_shared<gui::widget::C_WidgetButton>("config_save_button", "Save");
-        this->configSaveButton_->setCallback(std::bind(&C_MenuSettingsFormDesigner::onConfigSaveButtonClick, this, std::placeholders::_1));
+        this->configSaveButton_->setCallback([this](gui::C_IClickable* obj){ onConfigSaveButtonClick(obj); });
         this->configSaveButton_->setWidthMode(true);
 
         this->luaDockPanel_->setSize({250, 0});

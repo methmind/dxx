@@ -4,11 +4,13 @@
 
 #include "lua_script_instance.h"
 
+#include "debug/debug_output.h"
+
 namespace lua
 {
-    void C_LuaScriptInstance::addWidget(const gui::widget_ptr_t& widget)
+    void C_LuaScriptInstance::addDependency(const dependency_t& dependency)
     {
-        this->widgets_.push_back(widget);
+        this->dependencies_.lock()->push_back(dependency);
     }
 
     bool C_LuaScriptInstance::initialize(const sol::protected_function_result& instance)
@@ -23,18 +25,22 @@ namespace lua
             return false;
         }
 
-        this->entryPoint_(0);
+        if (const auto result = this->entryPoint_(0); !result.valid()) {
+            dbg("[Lua] error: %s", sol::error(result).what());
+            return false;
+        }
+
         return true;
     }
 
     C_LuaScriptInstance::~C_LuaScriptInstance()
     {
         if (this->entryPoint_.valid()) {
-            this->entryPoint_(1337);
-        }
-
-        for (const auto& widget : this->widgets_) {
-            this->widgetRegedit_->remove(widget->getID().c_str());
+            // Fix: acquire lua lock before calling destructor in lua
+            if (auto engine = this->engine_.lock()) {
+                auto _ = engine->getLuaState();
+                this->entryPoint_(1337);
+            }
         }
     }
 } // lua

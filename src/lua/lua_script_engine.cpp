@@ -4,29 +4,15 @@
 
 #include "lua_script_engine.h"
 
+#include <windows.h>
 #include <format>
 
+#include "binding/lua_binding_hook.h"
 #include "binding/lua_binding_menu.h"
 #include "debug/debug_output.h"
 
 namespace lua
 {
-    bool C_LuaScriptEngine::applyBindings()
-    {
-        const auto lockPtr = this->luaContainer_.lock();
-        if (!lockPtr) {
-            dbg("Unable to get shared ptr for lua container!");
-            return false;
-        }
-
-        if (!binding::RegisterMenuApi(this->luaState_, this->widgetRegedit_, lockPtr)) {
-            dbg("binding::RegisterMenuApi got:err = Unable to apply menu api binding!");
-            return false;
-        }
-
-        return true;
-    }
-
     int C_LuaScriptEngine::ExceptionHandler(lua_State* L, sol::optional<const std::exception&> maybe_exception,
         sol::string_view description)
     {
@@ -34,10 +20,15 @@ namespace lua
         return sol::stack::push(L, description);
     }
 
-    void C_LuaScriptEngine::printOverride(sol::variadic_args args) const
+    void C_LuaScriptEngine::LuaPanicHandler(sol::optional<std::string> message)
     {
-        sol::state_view lua_state = this->luaState_;
-        const sol::protected_function tostring = lua_state["tostring"];
+        MessageBoxA(nullptr, (message) ? message.value().c_str() : "Unknown panic!", "LuaVM", 0);
+    }
+
+    void C_LuaScriptEngine::PrintOverride(sol::this_state state, sol::variadic_args args)
+    {
+        sol::state_view lua(state);
+        const sol::protected_function tostring = lua["tostring"];
         std::string output;
         bool first = true;
         for (auto arg : args) {
@@ -62,13 +53,24 @@ namespace lua
         dbg("[Lua]: %s", output.c_str());
     }
 
-    bool C_LuaScriptEngine::initialize(const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-        const std::weak_ptr<binding::C_ILuaContainer>& luaContainer)
+    void C_LuaScriptEngine::addBinding(std::unique_ptr<binding::C_ILuaBinding> bind)
+    {
+        bind->apply(weak_from_this());
+        this->bindings_.push_back(std::move(bind));
+    }
+
+    bool C_LuaScriptEngine::initialize()
     {
         try {
-            this->widgetRegedit_ = widgetRegedit;
-            this->luaContainer_ = luaContainer;
-            this->luaState_.open_libraries(
+            // SAFETY: Инициализация вызывается ТОЛЬКО один раз из одного потока
+            // ПЕРЕД тем как другие потоки получат доступ к luaState_.
+            // Handle жив на протяжении всей инициализации, поэтому ссылка валидна.
+            #pragma clang diagnostic push
+            #pragma clang diagnostic ignored "-Wdangling"
+            auto& luaState = *this->luaState_.lock();
+            #pragma clang diagnostic pop
+
+            luaState.open_libraries(
                 sol::lib::base,
                 sol::lib::package,
                 sol::lib::coroutine,
@@ -82,15 +84,11 @@ namespace lua
                 sol::lib::ffi
             );
 
-            this->luaState_.set_exception_handler(ExceptionHandler);
-            this->luaState_.set_function("print", [this](sol::variadic_args args) {
-                printOverride(std::move(args));
+            luaState.set_exception_handler(ExceptionHandler);
+            luaState.set_panic(sol::c_call<decltype(&LuaPanicHandler), &LuaPanicHandler>);
+            luaState.set_function("print", [](sol::this_state state, sol::variadic_args args) {
+                PrintOverride(state, std::move(args));
             });
-
-            if (!applyBindings()) {
-                dbg("Unable to apply api bindings to lua engine!");
-                return false;
-            }
 
             return true;
         } catch (const std::exception& ex) {

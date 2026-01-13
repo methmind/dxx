@@ -17,9 +17,7 @@ namespace gui::widget
         if (!ImGui::BeginMainMenuBar())
             return;
 
-        for (auto& childVector = getChildList(); const auto& child : childVector) {
-            child->render();
-        }
+        C_IContainer::render();
 
         ImGui::EndMainMenuBar();
     }

@@ -3,24 +3,15 @@
 //
 
 #include "gui_widget_regedit.h"
-
 #include "gui_container_interface.h"
 
 namespace gui
 {
-    widget_ptr_t C_WidgetRegedit::find(const std::string_view& id)
-    {
-        const auto it = this->widgets_.find(id);
-        if (it == this->widgets_.end()) {
-            return nullptr;
-        }
-
-        return it->second;
-    }
-
     bool C_WidgetRegedit::add(const widget_ptr_t& ptr)
     {
-        auto [it, inserted] = this->widgets_.emplace(ptr->getID(), ptr);
+        const auto guarded = this->widgets_.lock();
+        auto [it, inserted] = guarded->emplace(ptr->getID(), ptr);
+
         return inserted;
     }
 
@@ -31,10 +22,17 @@ namespace gui
             return;
         }
 
+        const auto guarded = this->widgets_.lock();
         if (const auto parent = obj->getParent().lock(); parent) {
             std::dynamic_pointer_cast<C_IContainer>(parent)->removeChild(obj);
         }
 
-        this->widgets_.erase(id);
+        guarded->erase(id.data());
+    }
+
+    C_WidgetRegedit::widget_list_t C_WidgetRegedit::list() const
+    {
+        const auto guarded = this->widgets_.lock_shared();
+        return *guarded;
     }
 } // gui
