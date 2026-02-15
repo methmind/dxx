@@ -2,288 +2,44 @@ cmake_minimum_required(VERSION 4.0)
 project(dxx_dlc)
 
 set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
-set(protobuf_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-
-file(GLOB_RECURSE minhook_files "./external/minhook/src/*.c")
 
 add_definitions(-DDEBUG_OUTPUT)
 add_definitions(-DLUA_BUILD_AS_STATIC)
 
 add_compile_options(-Wa,-mbig-obj)
 
-add_subdirectory(external/protobuf)
+file(GLOB_RECURSE MINHOOK_MODULE "${CMAKE_SOURCE_DIR}/external/minhook/src/*.c")
 
-add_library(dxx_dlc SHARED main.cpp ${minhook_files}
-        external/imgui/backends/imgui_impl_dx11.cpp
-        external/imgui/backends/imgui_impl_win32.cpp
-        external/imgui/imgui.cpp
-        external/imgui/imgui_demo.cpp
-        external/imgui/imgui_draw.cpp
-        external/imgui/imgui_widgets.cpp
-        external/imgui/imgui_tables.cpp
-        src/gui/gui_widget_interface.h
-        src/gui/gui_widget_regedit.cpp
-        src/gui/gui_widget_regedit.h
-        src/gui/widget/gui_widget_window.cpp
-        src/gui/widget/gui_widget_window.h
-        src/gui/gui_container_interface.h
-        src/gui/widget/gui_widget_navbar.cpp
-        src/gui/widget/gui_widget_navbar.h
-        src/gui/widget/gui_widget_context_menu.cpp
-        src/gui/widget/gui_widget_context_menu.h
-        src/gui/gui_clickable_interface.h
-        src/gui/widget/gui_widget_menu_item.cpp
-        src/gui/widget/gui_widget_menu_item.h
-        src/gui/widget/gui_widget_separator.cpp
-        src/gui/widget/gui_widget_separator.h
-        src/menu/menu_main_form.cpp
-        src/menu/menu_main_form.h
-        src/gui/widget/gui_widget_child_window.cpp
-        src/gui/widget/gui_widget_child_window.h
-        src/gui/widget/gui_widget_unformatted_text.cpp
-        src/gui/widget/gui_widget_unformatted_text.h
-        src/menu/menu_settings_form.cpp
-        src/menu/menu_settings_form.h
-        src/gui/widget/gui_widget_same_line.cpp
-        src/gui/widget/gui_widget_same_line.h
-        src/gui/widget/gui_widget_checkbox.cpp
-        src/gui/widget/gui_widget_checkbox.h
-        src/gui/widget/gui_widget_slider_int.h
-        src/home/home_directory.cpp
-        src/home/home_directory.h
-        src/lua/lua_script_engine.cpp
-        src/lua/lua_script_engine.h
+add_library(dxx_dlc SHARED main.cpp ${MINHOOK_MODULE}
         src/debug/debug_output.cpp
-        src/lua/lua_script_manager.cpp
-        src/lua/lua_script_manager.h
-        src/lua/lua_script_instance.cpp
-        src/lua/lua_script_instance.h
-        src/lua/binding/lua_binding_menu.cpp
-        src/lua/binding/lua_binding_menu.h
-        src/gui/gui_widget_type.h
-        src/gui/widget/gui_widget_root.cpp
-        src/gui/widget/gui_widget_root.h
-        src/bootstrap/application_builder.cpp
-        src/bootstrap/application_builder.h
-        src/service_locator/service_container.h
-        src/menu/menu_main_form_designer.cpp
-        src/menu/menu_main_form_designer.h
-        src/menu/menu_form_interface.h
-        src/menu/menu_settings_form_designer.cpp
-        src/menu/menu_settings_form_designer.h
-        src/lua/lua_container_interface.h
-        src/lua/lua_utils.cpp
-        src/lua/lua_utils.h
-        src/gui/widget/gui_widget_windows_container.cpp
-        src/gui/widget/gui_widget_windows_container.h
-        src/gui/widget/gui_widget_button.cpp
-        src/gui/widget/gui_widget_button.h
-        src/gui/gui_slider_interface.h
-        src/gui/widget/gui_widget_slider_float.h
-        src/gui/widget/gui_widget_lua_list.cpp
-        src/gui/widget/gui_widget_lua_list.h
-        src/config/config.cpp
-        src/config/config.h
-        src/application.cpp
-        src/application.h
-        src/bootstrap/bootstrap_gui.cpp
-        src/dx/dx_present.cpp
-        src/dx/dx_present.h
-        src/hook/hook_dispatcher.cpp
-        src/hook/hook_dispatcher.h
-        src/hook/hook_manager.cpp
-        src/hook/hook_manager.h
-        src/hook/impl/hook_impl_present.cpp
-        src/hook/impl/hook_impl_present.h
-        src/hook/hook_original_invoker.h
-        src/renderer/renderer.cpp
-        src/renderer/renderer.h
-        src/input/bind_system.cpp
-        src/input/bind_system.h
-        src/sdk/singleton/sdk_dota_view_render.cpp
-        src/sdk/singleton/sdk_dota_view_render.h
-        external/mem_scanner/src/CpuInfo.cpp
-        external/mem_scanner/src/backends/Avx2.cpp
-        external/mem_scanner/src/backends/Scalar.cpp
-        external/mem_scanner/src/backends/Sse42.cpp
-        external/mem_scanner/src/backends/StdFind.cpp
-        src/memory/pattern_scanner.cpp
-        src/memory/pattern_scanner.h
-        src/sdk/sdk_signature.h
-        src/hook/impl/hook_impl_on_render_start.cpp
-        src/hook/impl/hook_impl_on_render_start.h
-        src/sdk/interface/sdk_interface_scanner.cpp
-        src/sdk/interface/sdk_interface_scanner.h
-        src/sdk/singleton/sdk_source2_client.cpp
-        src/sdk/singleton/sdk_source2_client.h
-        src/lua/script/callback_api.h
-        src/lua/binding/lua_binding_hook.cpp
-        src/lua/binding/lua_binding_hook.h
-        src/lua/binding/lua_guarded_state_interface.h
-        src/hook/impl/hook_impl_type.h
-        src/hook/impl/hook_impl_frame_stage_notify.cpp
-        src/hook/impl/hook_impl_frame_stage_notify.h
-        src/sdk/sdk_client_frame_stage_t.h
-        src/sdk/singleton/sdk_source2_engine_to_client.cpp
-        src/sdk/singleton/sdk_source2_engine_to_client.h
-        src/memory/vmt_call.h
-        src/bootstrap/bootstrap_sdk.cpp
-        src/sdk/singleton/sdk_game_entity_system.cpp
-        src/sdk/singleton/sdk_game_entity_system.h
-        src/sdk/singleton/sdk_schema_system.cpp
-        src/sdk/singleton/sdk_schema_system.h
-        src/sdk/interface/sdk_schema_system.h
-        external/xxhash3/xxhash.c
-        src/hash/xxhash_wrapper.h
-        src/sdk/sdk_schema_field_proxy.h
-        src/sdk/datatype/sdk_entity_identity.h
-        src/memory/offset.h
-        src/sdk/datatype/sdk_entity_instance.h
-        src/sdk/util/sdk_base_entity_handle.h
-        src/sdk/datatype/sdk_base_entity.h
-        src/sdk/datatype/sdk_dota_player_controller.h
-        src/hook/impl/hook_impl_on_level_state_change.cpp
-        src/hook/impl/hook_impl_on_level_state_change.h
-        src/hook/impl/hook_impl_on_entity_list_change.cpp
-        src/hook/impl/hook_impl_on_entity_list_change.h
-        src/sdk/custom/sdk_entity_list.cpp
-        src/sdk/custom/sdk_entity_list.h
-        src/renderer/renderer_frame.cpp
-        src/renderer/renderer_frame.h
-        src/lua/binding/lua_binding_interface.h
-        src/bootstrap/bootstrap_lua.cpp
-        src/lua/binding/lua_binding_renderer.cpp
-        src/lua/binding/lua_binding_renderer.h
-        src/lua/binding/lua_binding_imgui.cpp
-        src/lua/binding/lua_binding_imgui.h
-        src/sdk/math/sdk_math_vector3.h
-        src/sdk/custom/sdk_world_to_screen.cpp
-        src/sdk/custom/sdk_world_to_screen.h
-        src/sdk/singleton/sdk_base_game_system_factory.cpp
-        src/sdk/singleton/sdk_base_game_system_factory.h
-        src/sdk/singleton/sdk_render_game_system.cpp
-        src/sdk/singleton/sdk_render_game_system.h
-        src/sdk/math/sdk_math_matrix.h
-        src/sdk/math/sdk_math_vector2.h
-        src/lua/binding/lua_binding_sdk_math.cpp
-        src/lua/binding/lua_binding_sdk_math.h
-        src/lua/binding/lua_binding_sdk_entities.cpp
-        src/lua/binding/lua_binding_sdk_entities.h
-        src/lua/binding/lua_binding_sdk_schema.cpp
-        src/lua/binding/lua_binding_sdk_schema.h
-        src/sdk/datatype/sdk_base_model_entity.h
-        src/sdk/datatype/sdk_base_model_entity.cpp
-        src/sdk/util/sdk_color_t.h
-        src/sdk/datatype/sdk_dota_base_npc.h
-        src/lua/binding/lua_binding_source_engine.cpp
-        src/lua/binding/lua_binding_source_engine.h
-        src/sdk/memory/sdk_memory.cpp
-        src/sdk/memory/sdk_memory.h
-        src/sdk/memory/sdk_memory_utl_vector.h
-        src/sdk/datatype/sdk_dota_modifier_manager.h
-        src/sdk/datatype/sdk_dota_buff.h
-        src/lua/binding/lua_binding_sdk_modifier.cpp
-        src/lua/binding/lua_binding_sdk_modifier.h
-        src/sdk/interface/sdk_entity_identities_chunk.h
-        src/lua/binding/lua_binding_utl_vector.h
-        src/lua/binding/lua_binding_sdk_utils.cpp
-        src/lua/binding/lua_binding_sdk_utils.h
-
-        src/sdk/protobuf/gen/dota_usercmd.pb.cc
-        src/sdk/protobuf/gen/usercmd.pb.cc
-        src/sdk/protobuf/gen/networkbasetypes.pb.cc
-        src/sdk/singleton/sdk_dota_input.cpp
-        src/sdk/singleton/sdk_dota_input.h
-        src/hook/impl/hook_impl_create_move.cpp
-        src/hook/impl/hook_impl_create_move.h
-        src/sdk/datatype/sdk_user_cmd.h
-        src/sdk/custom/sdk_input_controller.cpp
-        src/sdk/custom/sdk_input_controller.h
-        src/bootstrap/bootstrap_hook.cpp
-        src/feature/feature_virtual_camera_manager.cpp
-        src/feature/feature_virtual_camera_manager.h
-        src/sdk/math/sdk_math_quantize_point.h
-        src/sdk/datatype/sdk_dota_camera.h
-        src/sdk/singleton/sdk_dota_camera_manager.cpp
-        src/sdk/singleton/sdk_dota_camera_manager.h
-        src/sdk/datatype/sdk_dota_camera.cpp
-        src/hook/impl/hook_impl_get_matrices_for_view.cpp
-        src/hook/impl/hook_impl_get_matrices_for_view.h
-        src/sdk/custom/sdk_matrices_system.cpp
-        src/sdk/custom/sdk_matrices_system.h
-        src/feature/feature_virtual_camera.cpp
-        src/feature/feature_virtual_camera.h
-        src/renderer/renderer_math.cpp
-        src/renderer/renderer_math.h
-        external/dx_xtx/Inc/SimpleMath.inl
-        external/dx_math/Inc/DirectXMathMatrix.inl
-        src/feature/feature_fog_controller.cpp
-        src/feature/feature_fog_controller.h
-        src/sdk/datatype/sdk_fog_controller.h
-        src/sdk/datatype/sdk_fog_params.h
-        src/sdk/datatype/sdk_game_event.h
-        src/sdk/datatype/sdk_game_event.cpp
-        src/sdk/datatype/sdk_event_hash.h
-        src/sdk/util/sdk_hash_seed.h
-        external/murmur/MurmurHash2.c
-        src/hook/impl/hook_impl_fire_event.cpp
-        src/hook/impl/hook_impl_fire_event.h
-        src/sdk/util/sdk_game_state.h
-        src/sdk/custom/sdk_event_game_state.cpp
-        src/sdk/custom/sdk_event_game_state.h
-        src/sdk/singleton/sdk_phys2_world.cpp
-        src/sdk/singleton/sdk_phys2_world.h
-        src/sdk/datatype/sdk_ray.h
-        src/sdk/datatype/sdk_trace_filter.h
-        src/sdk/datatype/sdk_collision_property.h
-        src/sdk/datatype/sdk_game_trace.h
-        src/lua/binding/util/lua_binding_dynamic_cast.h
-        src/lua/binding/lua_binding_camera.cpp
-        src/lua/binding/lua_binding_camera.h
 )
 
-target_compile_options(dxx_dlc PRIVATE
-        $<$<CXX_COMPILER_ID:Clang>:-fvisibility=hidden>
-        $<$<CXX_COMPILER_ID:Clang>:-fvisibility-inlines-hidden>
-        -mavx2
-        -mfma
+target_sources(dxx_dlc PUBLIC
+        FILE_SET module_files TYPE CXX_MODULES FILES
+        src/application.ixx
+        src/directx/dx_swap_chain.ixx
+        src/service/service_container.ixx
+        src/hook/hook_container.ixx
+        src/bootstrap/bootstrap.ixx
+        src/service/service_locator.ixx
+        src/bootstrap/bootstrap_sdk.ixx
+        src/bootstrap/bootstrap_hook.ixx
+        src/hook/impl/hook_impl_present.ixx
+        src/hook/impl/hook_impl_resize_buffers.ixx
+        src/hook/hook_dispatcher.ixx
 )
 
-set_target_properties(dxx_dlc PROPERTIES
-        CXX_VISIBILITY_PRESET hidden
-        VISIBILITY_INLINES_HIDDEN YES
-)
-
-target_sources(dxx_dlc PRIVATE "empty.def")
-
-target_compile_definitions(dxx_dlc PRIVATE
-        SOL_ALL_SAFETIES_ON=1
-        SOL_PRINT_ERRORS=1
-        SOL_EXCEPTIONS_SAFE_PROPAGATION=1
-        PROTOBUF_USE_DLLS=0
-        ABSL_CONSUME_DLL=0
-        LIBPROTOBUF_EXPORTS
-)
+target_compile_options(dxx_dlc PRIVATE -mcx16)
 
 target_include_directories(dxx_dlc PUBLIC
         "external/"
-        "external/imgui/backends/"
-        "external/imgui/"
-        "external/luajit/src/"
-        "external/sol/single/single/include/"
-        "external/nlohmann/single_include/"
-        "external/minhook/include/"
-        "external/mem_scanner/include/"
-        "external/xenium/"
-        "external/libguarded/src/"
         "src/"
-        "external/protobuf/src/"
         "."
-        "external/dx_xtx/Inc/"
-        "external/dx_math/Inc/"
-        "external/xxhash_cx/"
-        "external/xxhashct/"
+        "external/minhook/include/"
+        "external/libguarded/src/"
 )
 
-target_link_libraries(dxx_dlc PRIVATE libprotobuf-lite d3d11 d3dcompiler dwmapi ${CMAKE_SOURCE_DIR}/external/luajit/src/libluajit.a)
+target_link_libraries(dxx_dlc PRIVATE d3d11)

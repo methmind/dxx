@@ -118,6 +118,7 @@ static UINT FindHookEntry(LPVOID pTarget)
     return INVALID_HOOK_POS;
 }
 
+//@brief My little "fork" of minhook library...
 FARPROC FindTrampolineByDetour(LPVOID pDetour)
 {
     for (uint32_t i = 0; i < g_hooks.size; i++) {

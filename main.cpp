@@ -1,23 +1,17 @@
-#include <windows.h>
 #include <memory>
+#include <windows.h>
+#include <debug/debug_output.h>
 
-#include "application.h"
-#include "debug/debug_output.h"
-
-DWORD WINAPI UnloadModule(LPVOID lpModule)
-{
-    FreeLibraryAndExitThread(static_cast<HMODULE>(lpModule), 0);
-}
+import dxx;
 
 DWORD WINAPI EntryModule(LPVOID lpModule)
 {
     {
         MessageBoxA(nullptr, "Press F to pay respect", nullptr, 0);
-        std::make_unique<app::C_Application>()->entry();
+        std::make_unique<dxx::C_Application>()->entry();
     }
 
-    CloseHandle(CreateThread(nullptr, 0, UnloadModule, lpModule, 0, nullptr));
-    return 0;
+    FreeLibraryAndExitThread(static_cast<HMODULE>(lpModule), 0);
 }
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
@@ -27,10 +21,16 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
     }
 
     if (!DisableThreadLibraryCalls(hinstDLL)) {
-        dbg("DisableThreadLibraryCalls got:err = %d", GetLastError());
+        dbg("DisableThreadLibraryCalls got:err = {}", GetLastError());
         return false;
     }
 
-    CloseHandle(CreateThread(nullptr, 0, EntryModule, hinstDLL, 0, nullptr));
+    const auto thread = CreateThread(nullptr, 0, EntryModule, hinstDLL, 0, nullptr);
+    if (!thread) {
+        dbg("CreateThread got:err = {}", GetLastError());
+        return false;
+    }
+
+    CloseHandle(thread);
     return true;
 }
