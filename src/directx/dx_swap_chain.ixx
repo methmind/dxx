@@ -14,16 +14,14 @@ namespace dx
 
     constexpr auto IDXGI_PRESENT_FUNCTION_INDEX = 8;
 
-    constexpr auto IDXGI_RESIZE_BUFFERS_FUNCTION_INDEX = 13;
-
     constexpr D3D_FEATURE_LEVEL FEATURE_LEVELS[] = { D3D_FEATURE_LEVEL_11_0, D3D_FEATURE_LEVEL_10_0, };
 
-    export bool GetSwapChainInfo(void** present, void** resizeBuffers)
+    export void* GetPresentFunction()
     {
         const auto targetWnd = FindWindowA(nullptr, TARGET_WINDOW_NAME);
         if (!targetWnd) {
             dbg("FindWindowA got:err = Unable to find {} window!", TARGET_WINDOW_NAME);
-            return false;
+            return nullptr;
         }
 
         DXGI_SWAP_CHAIN_DESC swapChainDesc{};
@@ -43,16 +41,15 @@ namespace dx
             &swapChainDesc, &swapChain, &device, nullptr, nullptr
         ); err != S_OK) {
             dbg("D3D11CreateDeviceAndSwapChain got:err = {:08X}!", err);
-            return false;
+            return nullptr;
         }
 
         const auto vtable = *reinterpret_cast<void***>(swapChain);
-        *present = vtable[IDXGI_PRESENT_FUNCTION_INDEX];
-        *resizeBuffers = vtable[IDXGI_RESIZE_BUFFERS_FUNCTION_INDEX];
+        const auto present = vtable[IDXGI_PRESENT_FUNCTION_INDEX];
 
         swapChain->Release();
         device->Release();
 
-        return true;
+        return present;
     }
 }

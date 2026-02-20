@@ -14,7 +14,6 @@ import service.locator;
 import hook.container;
 import hook.dispatcher;
 import hook.impl.present;
-import hook.impl.resizebuffers;
 
 import dx;
 
@@ -22,19 +21,14 @@ namespace bootstrap
 {
     bool SetupRendererHook()
     {
-        uint8_t* presentFunction = nullptr, *resizeBuffersFunction = nullptr;
-        if (!dx::GetSwapChainInfo(reinterpret_cast<void**>(&presentFunction), reinterpret_cast<void**>(&resizeBuffersFunction))) {
-            dbg("dx::GetSwapChainInfo got:err = Unable to get IDXGISwapChain::Present function!");
+        const auto presentFunction = dx::GetPresentFunction();
+        if (!presentFunction) {
+            dbg("dx::GetPresentFunction got:err = Unable to get IDXGISwapChain::Present function!");
             return false;
         }
 
         if (const auto err = hook::C_HookContainer::Create(presentFunction, reinterpret_cast<void*>(hook::hkPresent)); err != MH_OK) {
             dbg("Unable to create hook for IDXGISwapChain::Present! err = {}", err);
-            return false;
-        }
-
-        if (const auto err = hook::C_HookContainer::Create(resizeBuffersFunction, reinterpret_cast<void*>(hook::hkResizeBuffers)); err != MH_OK) {
-            dbg("Unable to create hook for IDXGISwapChain::ResizeBuffers! err = {}", err);
             return false;
         }
 

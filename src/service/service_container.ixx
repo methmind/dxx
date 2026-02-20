@@ -54,18 +54,24 @@ public:
         }
     }
 
-    template<typename T, typename ... args_t>
-    std::shared_ptr<T> add(args_t&& ... args)
+    template<typename T>
+    std::shared_ptr<T> add(std::shared_ptr<T> service)
     {
         constexpr auto serviceHash = type_hash_s<T>::GetHash();
-        if (auto it = this->services_.find(serviceHash); it != this->services_.end()) {
+        if (const auto it = this->services_.find(serviceHash); it != this->services_.end()) {
             return std::static_pointer_cast<T>(it->second);
         }
 
-        auto it = this->services_.emplace(serviceHash, std::make_shared<T>(std::forward<args_t>(args)...));
+        const auto it = this->services_.emplace(serviceHash, std::move(service));
         this->deleteOrder_.push_back(it.first->second);
 
         return std::static_pointer_cast<T>(it.first->second);
+    }
+
+    template<typename T, typename ... args_t>
+    std::shared_ptr<T> add(args_t&& ... args)
+    {
+        return this->add<T>(std::make_shared<T>(std::forward<args_t>(args)...));
     }
 
     template<typename T>
