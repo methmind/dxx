@@ -62,15 +62,28 @@ namespace render
 
         C_Renderer() : isContextInitialized_(false), primitivesRenderFrame_(std::make_unique<C_RendererFrame>()), targetWnd_(nullptr)
         {
-            this->onPresentSubscription_ = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<IDXGISwapChain*, UINT, UINT>(
+            const auto dispatcher = C_ServiceLocator::Get<hook::C_HookDispatcher>();
+            this->onPresentSubscription_ = dispatcher->subscribe<IDXGISwapChain*, UINT, UINT>(
                 static_cast<uint16_t>(hook::hook_type_e::PRESENT),
                 [this](IDXGISwapChain* swapChain, UINT syncInterval, UINT flags) {
                     onPresent(swapChain, syncInterval, flags);
                 }
             );
-        }
 
-        [[nodiscard]] C_RendererFrame* getPrimitivesRenderFrame() const { return this->primitivesRenderFrame_.get(); }
+            this->onRenderStartSubscription_ = dispatcher->subscribe(
+                static_cast<uint16_t>(hook::hook_type_e::_internal_ON_RENDER_START),
+                [this] {
+                    onRenderStart();
+                }
+            );
+
+            this->onRenderEndSubscription_ = dispatcher->subscribe(
+                static_cast<uint16_t>(hook::hook_type_e::_internal_ON_RENDER_END),
+                [this] {
+                    onRenderEnd();
+                }
+            );
+        }
 
     private:
         static LRESULT hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -204,6 +217,18 @@ namespace render
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         }
 
+        void onRenderStart() const
+        {
+            C_ServiceLocator::Get<hook::C_HookDispatcher>()->invoke<static_cast<uint16_t>(hook::hook_type_e::ON_RENDER_START)>(
+                //this->primitivesRenderFrame_.get()
+            );
+        }
+
+        void onRenderEnd() const
+        {
+            this->primitivesRenderFrame_->bake();
+        }
+
         bool isContextInitialized_;
         std::unique_ptr<C_RendererFrame> primitivesRenderFrame_;
 
@@ -213,6 +238,8 @@ namespace render
         com_ptr_t<ID3D11RenderTargetView> renderTargetView_;
 
         hook::hook_subscription_t onPresentSubscription_;
+        hook::hook_subscription_t onRenderStartSubscription_;
+        hook::hook_subscription_t onRenderEndSubscription_;
     };
 }
 

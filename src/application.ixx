@@ -17,13 +17,18 @@ export namespace dxx
     class C_Application
     {
     public:
-        ~C_Application() = default;
+        ~C_Application()
+        {
+            if (this->closeEvent_) {
+                CloseHandle(this->closeEvent_);
+            }
+        }
 
-        C_Application() = default;
+        C_Application() : closeEvent_(nullptr) {}
 
         void entry()
         {
-            if (this->closeEvent_ = CreateEventW(nullptr, false, false, nullptr); !this->closeEvent_) {
+            if (this->closeEvent_ = CreateEventW(nullptr, false, false, nullptr); this->closeEvent_ == INVALID_HANDLE_VALUE) {
                 dbg("CreateEvent got:err = {}", GetLastError());
                 return;
             }

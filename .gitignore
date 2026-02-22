@@ -1,5 +1,6 @@
 .idea
 cmake-build-debug-clang
 cmake-build-release-clang
+cmake-build-minsizerel-clang
 build
 src/sdk/protobuf/gen

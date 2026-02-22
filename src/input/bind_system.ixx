@@ -6,7 +6,6 @@ module;
 #include <cstdint>
 #include <functional>
 #include <optional>
-#include <ranges>
 #include <unordered_map>
 #include <vector>
 #include <windows.h>
@@ -23,11 +22,12 @@ import hook.type;
 namespace input
 {
     using callback_t = std::function<void()>;
-    using bind_subscription_t = std::unique_ptr<void, std::function<void(void*)>>;
+    export using bind_subscription_t = std::unique_ptr<void, std::function<void(void*)>>;
 
     struct callback_entry_s
     {
         uint64_t id;
+        UINT virtualKey;
         callback_t callback;
     };
 
@@ -60,28 +60,28 @@ namespace input
         [[nodiscard]] bind_subscription_t bind(int32_t virtualKey, callback_t callback)
         {
             const uint64_t id = this->nextCallbackID_.fetch_add(1, std::memory_order_relaxed);
-            this->subscribers_.lock()->operator[](static_cast<UINT>(virtualKey)).push_back({ id, std::move(callback) });
+            const auto key = static_cast<UINT>(virtualKey);
+            this->subscribers_.lock()->operator[](key).push_back({ id, key, std::move(callback) });
 
-            return bind_subscription_t(
+            return bind_subscription_t{
                 reinterpret_cast<void*>(id),
-                [this](void* ptr) {
-                    unbind(reinterpret_cast<uint64_t>(ptr));
+                [this, key](void* ptr) {
+                    unbind(key, reinterpret_cast<uint64_t>(ptr));
                 }
-            );
+            };
         }
 
-        void unbind(uint64_t subscriptionID)
+        void unbind(UINT virtualKey, uint64_t subscriptionID)
         {
-            for (const auto map = this->subscribers_.lock(); auto& entries: *map | std::views::values)
-            {
-                auto it = std::remove_if(entries.begin(), entries.end(),
-                    [subscriptionID](const callback_entry_s& e) {
-                        return e.id == subscriptionID;
-                    }
-                );
-
-                entries.erase(it, entries.end());
+            const auto map = this->subscribers_.lock();
+            const auto it = map->find(virtualKey);
+            if (it == map->end()) {
+                return;
             }
+
+            std::erase_if(it->second, [subscriptionID](const callback_entry_s& e) {
+                return e.id == subscriptionID;
+            });
         }
 
         [[nodiscard]] bool isKeyDown(int32_t virtualKey) const
@@ -90,7 +90,7 @@ namespace input
                 return false;
             }
 
-            return this->keyStates_.lock_shared()->at(static_cast<size_t>(virtualKey));
+            return this->keyStates_.at(static_cast<size_t>(virtualKey)).load(std::memory_order_relaxed);
         }
 
     private:
@@ -107,7 +107,11 @@ namespace input
 
         [[nodiscard]] static int32_t RemapToUsLayout(int32_t vk, UINT scanCode)
         {
-            static const HKL usLayout = LoadKeyboardLayoutW(L"00000409", KLF_NOTELLSHELL);
+            static HKL usLayout = LoadKeyboardLayoutW(L"00000409", KLF_NOTELLSHELL);
+            if (!usLayout) {
+                return vk;
+            }
+
             if (const auto mapped = MapVirtualKeyExW(scanCode, MAPVK_VSC_TO_VK_EX, usLayout); mapped != 0) {
                 return static_cast<int32_t>(mapped);
             }
@@ -127,7 +131,7 @@ namespace input
                 {
                     const UINT scanCode = (static_cast<UINT>(lParam) >> 16) & 0xFF;
                     const bool isExtended = (lParam & (1 << 24)) != 0;
-                    int32_t vk = static_cast<int32_t>(wParam);
+                    auto vk = static_cast<int32_t>(wParam);
                     if (vk == VK_SHIFT || vk == VK_CONTROL || vk == VK_MENU) {
                         vk = ResolveModifierKey(vk, scanCode, isExtended);
                     }
@@ -156,7 +160,6 @@ namespace input
                     ev.virtualKey = (GET_XBUTTON_WPARAM(wParam) == XBUTTON1) ? VK_XBUTTON1 : VK_XBUTTON2;
                     ev.isDown = (uMsg == WM_XBUTTONDOWN);
                     break;
-
                 default:
                     return std::nullopt;
             }
@@ -172,27 +175,35 @@ namespace input
             }
 
             if (ev->virtualKey >= 0 && ev->virtualKey < 256) {
-                this->keyStates_.lock()->at(static_cast<size_t>(ev->virtualKey)) = ev->isDown;
+                this->keyStates_.at(static_cast<size_t>(ev->virtualKey)).store(ev->isDown, std::memory_order_relaxed);
             }
 
             if (!ev->isDown || ev->isRepeat) {
                 return;
             }
 
-            const auto map = this->subscribers_.lock_shared();
-            const auto it  = map->find(static_cast<UINT>(ev->virtualKey));
-            if (it == map->end()) {
-                return;
+            std::vector<callback_t> pending;
+            {
+                const auto map = this->subscribers_.lock_shared();
+                const auto it  = map->find(static_cast<UINT>(ev->virtualKey));
+                if (it == map->end()) {
+                    return;
+                }
+
+                pending.reserve(it->second.size());
+                for (const auto& entry : it->second) {
+                    pending.push_back(entry.callback);
+                }
             }
 
-            for (const auto& [id, callback] : it->second) {
+            for (const auto& callback : pending) {
                 callback();
             }
         }
 
         std::atomic<uint64_t> nextCallbackID_;
 
-        libguarded::shared_guarded<std::array<bool, 256>> keyStates_;
+        std::array<std::atomic<bool>, 256> keyStates_;
         libguarded::shared_guarded<std::unordered_map<UINT, std::vector<callback_entry_s>>> subscribers_;
 
         hook::hook_subscription_t onMessageSubscription_;

@@ -2,9 +2,11 @@
 // Created by sexey on 17.02.2026.
 //
 module;
-#include "angelscript.h"
+#include <memory>
 
 export module as.binding;
+
+import as.engine_interface;
 
 namespace as
 {
@@ -13,6 +15,6 @@ namespace as
     public:
         virtual ~C_IASBinding() = default;
 
-        virtual void apply(asIScriptEngine* engine) = 0;
+        virtual bool apply(std::weak_ptr<C_IASEngine> enginePtr) = 0;
     };
 }

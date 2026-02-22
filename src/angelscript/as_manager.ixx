@@ -74,6 +74,7 @@ namespace as
             if (auto [it, _] = this->scripts_.emplace(scriptPath, std::make_shared<C_ASInstance>(this->engine_));
                 !it->second->initialize(scriptPath.data())) {
                 dbg("Failed to initialize script instance for script: {}", scriptPath.data());
+                this->scripts_.erase(scriptPath.data());
                 return false;
             }
 
@@ -82,6 +83,8 @@ namespace as
         }
 
         [[nodiscard]] bool isScriptLoaded(const std::string_view& scriptPath) const { return this->scripts_.contains(scriptPath); }
+
+        auto getEngine() { return this->engine_; }
 
     private:
         std::shared_ptr<C_AScriptEngine> engine_;

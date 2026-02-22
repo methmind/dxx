@@ -2,8 +2,10 @@
 // Created by sexey on 17.02.2026.
 //
 module;
+#include <cassert>
 #include <memory>
 
+#include "MinHook.h"
 #include "debug/debug_output.h"
 
 export module bootstrap.gui;
@@ -26,9 +28,13 @@ import hook.type;
 
 import as.manager;
 
+import bind_system;
+
 namespace bootstrap
 {
     struct render_hook_subscription_proxy_s : hook::hook_subscription_t {};
+
+    struct keybind_subscription_proxy_s : input::bind_subscription_t {};
 
     export bool InitializeGUI(const std::unique_ptr<C_ServiceContainer>& services)
     {
@@ -69,6 +75,15 @@ namespace bootstrap
                     renderQueue->processCommands();
                 }
             )
+        );
+
+        const auto bindService = services->get<input::C_BindSystem>();
+        assert(bindService != nullptr && "input::C_BindSystem service is not registered!");
+
+        services->add<keybind_subscription_proxy_s>(
+            bindService->bind(VK_INSERT, [navbarForm] {
+                navbarForm->setVisibleState(!navbarForm->getVisibleState());
+            })
         );
 
         return true;

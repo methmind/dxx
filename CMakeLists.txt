@@ -84,6 +84,15 @@ target_sources(dxx_dlc PUBLIC
         src/angelscript/as_instance.ixx
         src/config/config.ixx
         src/input/bind_system.ixx
+        src/sdk/interface/sdk_interface_scanner.ixx
+        src/sdk/locator/sdk_locator_source2_client.ixx
+        src/sdk/engine/sdk_source2_client.ixx
+        src/hook/impl/hook_impl_frame_stage_notify.ixx
+        src/sdk/datatype/sdk_client_frame_stage_t.ixx
+        src/angelscript/binding/as_binding_imgui.ixx
+        src/angelscript/as_engine_interface.ixx
+        src/angelscript/binding/memory/as_binding_memory.ixx
+        src/angelscript/binding/as_binding_hook.ixx
 )
 
 target_compile_options(dxx_dlc PRIVATE -mcx16)
@@ -99,6 +108,8 @@ target_include_directories(dxx_dlc PUBLIC
         "external/xxhash/"
         "external/angelscript/add_on/"
         "external/nlohmann/single_include/"
+        "external/hde/include/"
+        "external/asbind20/include/"
 )
 
 target_link_libraries(dxx_dlc PRIVATE d3d11 d3dcompiler dwmapi angelscript ws2_32)

@@ -20,15 +20,16 @@ module;
 
 export module as.engine;
 
+import as.engine_interface;
 import as.binding;
 import as.context_pool;
 
 namespace as
 {
-    export class C_AScriptEngine : public std::enable_shared_from_this<C_AScriptEngine>
+    export class C_AScriptEngine : public C_IASEngine, public std::enable_shared_from_this<C_AScriptEngine>
     {
     public:
-        ~C_AScriptEngine()
+        ~C_AScriptEngine() override
         {
             if (this->isMultithreadInitialized_) {
                 asUnprepareMultithread();
@@ -41,7 +42,7 @@ namespace as
 
         C_AScriptEngine() : engine_(nullptr) {}
 
-        bool initialize()
+        [[nodiscard]] bool initialize()
         {
             if (const auto err = asPrepareMultithread(); err < asSUCCESS) {
                 dbg("asPrepareMultithread got:err = {}!", err);
@@ -59,19 +60,24 @@ namespace as
 
             initializeDefaultAddons();
             this->engine_->RegisterGlobalFunction("void print(const string& in)", asFUNCTION(PrintOverride), asCALL_CDECL);
+            this->engine_->SetUserData(this, ENGINE_USERDATA_ID);
 
             return true;
         }
 
-        void addBinding(std::unique_ptr<C_IASBinding> binding)
+        [[nodiscard]] bool addBinding(std::unique_ptr<C_IASBinding> binding)
         {
-            binding->apply(this->engine_);
+            if (!binding->apply(weak_from_this())) {
+                return false;
+            }
+
             this->bindings_.push_back(std::move(binding));
+            return true;
         }
 
-        [[nodiscard]] asIScriptEngine* getEngine() const { return this->engine_; }
+        [[nodiscard]] asIScriptEngine* getEngine() override { return this->engine_; }
 
-        [[nodiscard]] as_context_t getContext() const { return this->contextPool_->getContext(); }
+        [[nodiscard]] as_context_t getContext() const override { return this->contextPool_->getContext(); }
 
     private:
         static void PrintOverride(const std::string& msg)
