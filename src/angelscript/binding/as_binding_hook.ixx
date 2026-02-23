@@ -47,7 +47,7 @@ namespace as
                 engine,
                 "setOnRenderStart",
                 "void OnRenderStartCb()",
-                "OnRenderStartCb"
+                "onRenderStartCb"
             );
 
             engine->SetDefaultNamespace("");
@@ -55,7 +55,6 @@ namespace as
         }
 
     private:
-        //C++ porn
         template<hook::hook_id_t type, typename ... arg_t>
         void registerHookCallback(
             asIScriptEngine* engine,
@@ -74,7 +73,7 @@ namespace as
                     return nullptr;
                 }
 
-                auto safeCallback = std::shared_ptr<asIScriptFunction>(callback, [](asIScriptFunction* function) {
+                auto safeCallback = std::shared_ptr<asIScriptFunction>(callback, [](const asIScriptFunction* function) {
                     if (function) {
                         // ReSharper disable once CppExpressionWithoutSideEffects
                         function->Release();

@@ -33,13 +33,11 @@ namespace as
             engine->SetDefaultNamespace(AS_IMGUI_NAMESPACE_NAME);
 
             asbind20::value_class<ImVec2>(engine, "ImVec2", asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS)
-                .constructor<>("void f()")
                 .constructor<float, float>("float, float")
                 .property("float x", &ImVec2::x)
                 .property("float y", &ImVec2::y);
 
             asbind20::value_class<ImVec4>(engine, "ImVec4", asOBJ_POD | asOBJ_APP_CLASS_ALLFLOATS)
-                .constructor<>("void f()")
                 .constructor<float, float, float, float>("float, float, float, float")
                 .property("float x", &ImVec4::x)
                 .property("float y", &ImVec4::y)

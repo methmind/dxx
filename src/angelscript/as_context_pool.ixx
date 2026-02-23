@@ -53,11 +53,10 @@ namespace as
     private:
         static asIScriptContext* onContextRequest(asIScriptEngine* engine, void* userData)
         {
-            auto self = static_cast<C_ASContextPool*>(userData);
+            const auto self = static_cast<C_ASContextPool*>(userData);
             asIScriptContext* ctx = nullptr;
 
-            auto pool = self->pool_.lock();
-            if (!pool->empty()) {
+            if (const auto pool = self->pool_.lock(); !pool->empty()) {
                 ctx = pool->back();
                 pool->pop_back();
             }

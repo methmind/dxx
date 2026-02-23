@@ -90,7 +90,7 @@ namespace hook
             }
         }
 
-        void release(hook_id_t id, hook_handle_t handle)
+        void release(const hook_id_t id, hook_handle_t handle)
         {
             const auto globalMap = this->callbacks_.lock();
             const auto it = globalMap->find(id);
