@@ -30,6 +30,12 @@ add_library(dxx_dlc SHARED main.cpp ${MINHOOK_MODULE} ${ANGEL_SCRIPT_ADDONS}
         #XXHASH
         external/xxhash/xxhash.c
         #XXHASH END
+        #LZ4
+        external/lz4/lib/lz4.c
+        #LZ4 END
+        #S3TC
+        external/s3tc/s3tc.cpp
+        #S3TC END
 )
 
 target_sources(dxx_dlc PUBLIC
@@ -46,10 +52,9 @@ target_sources(dxx_dlc PUBLIC
         src/hook/hook_dispatcher.ixx
         src/renderer/renderer.ixx
         src/hook/impl/hook_impl_type.ixx
-        src/renderer/renderer_frame.ixx
         src/gui/widget/gui_widget_base.ixx
         src/gui/gui_widget_regedit.ixx
-        src/gui/gui_render_queue.ixx
+        src/renderer/renderer_queue.ixx
         src/hash/xxhash_wrapper.ixx
         src/gui/widget/gui_widget_container.ixx
         src/gui/widget/gui_widget_type.ixx
@@ -57,7 +62,7 @@ target_sources(dxx_dlc PUBLIC
         src/gui/widget/gui_widget_root.ixx
         src/angelscript/as_engine.ixx
         src/bootstrap/bootstrap_angelscript.ixx
-        src/angelscript/as_engine_binding.ixx
+        src/angelscript/as_engine_binding_interface.ixx
         src/menu/menu_navbar_form.ixx
         src/menu/menu_form_interface.ixx
         src/menu/menu_navbar_form_designer.ixx
@@ -93,6 +98,12 @@ target_sources(dxx_dlc PUBLIC
         src/angelscript/as_engine_interface.ixx
         src/angelscript/binding/memory/as_binding_memory.ixx
         src/angelscript/binding/as_binding_hook.ixx
+        src/angelscript/binding/as_binding_renderer.ixx
+        src/sdk/locator/sdk_locator_vfile_system.ixx
+        src/sdk/filesystem/sdk_base_filesystem.ixx
+        src/memory/vmt_call.ixx
+        src/renderer/renderer_load_image.ixx
+        src/sdk/parser/sdk_parser_vtex.ixx
 )
 
 target_compile_options(dxx_dlc PRIVATE -mcx16)
@@ -110,6 +121,7 @@ target_include_directories(dxx_dlc PUBLIC
         "external/nlohmann/single_include/"
         "external/hde/include/"
         "external/asbind20/include/"
+        "external/lz4/lib/"
 )
 
 target_link_libraries(dxx_dlc PRIVATE d3d11 d3dcompiler dwmapi angelscript ws2_32)

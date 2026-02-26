@@ -3,6 +3,7 @@
 //
 module;
 #include <memory>
+#include <windows.h>
 
 #include "debug/debug_output.h"
 
@@ -15,6 +16,7 @@ import bootstrap.gui;
 import bootstrap.angelscript;
 
 import renderer;
+import renderer.queue;
 import gui.regedit;
 
 import bind_system;
@@ -35,7 +37,10 @@ namespace bootstrap
         }
 
         container->add<input::C_BindSystem>();
-        container->add<render::C_Renderer>();
+        const auto renderer = container->add<render::C_Renderer>();
+        while (!renderer->isContextInitialized()) {
+            Sleep(1);
+        }
 
         if (!InitializeAngelscript(container)) {
             dbg("InitializeAngelscript got:err = Unable to initialize Angelscript!");

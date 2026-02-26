@@ -5,6 +5,7 @@ module;
 #include <format>
 #include <memory>
 
+#include "imgui.h"
 #include "asbind20/asbind.hpp"
 #include "debug/debug_output.h"
 
@@ -25,11 +26,12 @@ namespace as
 
     using hook_subscription_t = C_SharedPtr<hook::hook_subscription_t>;
 
-    export class C_ASBindingHook : public C_IASBinding {
+    export class C_ASBindingHook : public C_IASBinding
+    {
     public:
         C_ASBindingHook() = default;
 
-        bool apply(std::weak_ptr<C_IASEngine> engineWeak) override
+        [[nodiscard]] bool apply(const std::weak_ptr<C_IASEngine>& engineWeak) override
         {
             const auto enginePtr = engineWeak.lock();
             if (!enginePtr) {
@@ -43,11 +45,11 @@ namespace as
                 .addref(&hook_subscription_t::addRef)
                 .release(&hook_subscription_t::release);
 
-            registerHookCallback<static_cast<hook::hook_id_t>(hook::hook_type_e::ON_RENDER_START)>(
+            registerHookCallback<static_cast<hook::hook_id_t>(hook::hook_type_e::ON_IMGUI_RENDER), ImDrawList*>(
                 engine,
-                "setOnRenderStart",
-                "void OnRenderStartCb()",
-                "onRenderStartCb"
+                "setOnRender",
+                "void OnRenderCb(render::C_Frame@)",
+                "OnRenderCb"
             );
 
             engine->SetDefaultNamespace("");
@@ -55,7 +57,7 @@ namespace as
         }
 
     private:
-        template<hook::hook_id_t type, typename ... arg_t>
+        template<hook::hook_id_t hook_t, typename ... arg_t>
         void registerHookCallback(
             asIScriptEngine* engine,
             const std::string& funcName,
@@ -81,7 +83,7 @@ namespace as
                 });
 
                 const auto scriptEngine = callback->GetEngine();
-                auto sub = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<arg_t...>(type, [scriptEngine, safeCallback](arg_t ... args) {
+                auto sub = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<arg_t...>(hook_t, [scriptEngine, safeCallback](arg_t ... args) {
                     const auto ctx = static_cast<C_IASEngine*>(scriptEngine->GetUserData(ENGINE_USERDATA_ID))->getContext();
                     const auto result = asbind20::script_invoke<void>(ctx.get(), safeCallback.get(), std::forward<arg_t>(args)...);
                     if (!result) {

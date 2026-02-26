@@ -11,7 +11,6 @@ export module gui.regedit;
 import xxhash.wrapper;
 import gui.widget.base;
 import gui.widget.container;
-import gui.render_queue;
 
 namespace gui
 {
@@ -61,13 +60,6 @@ namespace gui
             if (!obj) {
                 return;
             }
-
-            /*const auto guarded = this->widgets_.lock();
-            if (const auto parent = obj->getParent().lock(); parent) {
-                this->queue_->enqueue([parent, obj] {
-                    std::dynamic_pointer_cast<C_ContainerBase>(parent)->removeChild(obj);
-                });
-            }*/
 
             this->widgets_.lock()->erase(id.data());
         }

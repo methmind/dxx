@@ -18,16 +18,5 @@ export namespace hook
     void __attribute__((__fastcall__)) hkFrameStageNotify(void* self, const sdk::ClientFrameStage_t frameStage)
     {
         MH_CALL_ORIGINAL(hkFrameStageNotify)(self, frameStage);
-
-        const auto dispatcher = C_ServiceLocator::Get<C_HookDispatcher>();
-        switch (frameStage) {
-            case sdk::ClientFrameStage_t::FRAME_RENDER_START:
-                dispatcher->invoke<static_cast<hook_id_t>(hook_type_e::_internal_ON_RENDER_START)>();
-                break;
-            case sdk::ClientFrameStage_t::FRAME_RENDER_END:
-                dispatcher->invoke<static_cast<hook_id_t>(hook_type_e::_internal_ON_RENDER_END)>();
-                break;
-            default: break;
-        }
     }
 }

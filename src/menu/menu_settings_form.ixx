@@ -10,8 +10,9 @@ module;
 
 export module menu.settings;
 
+import renderer.queue;
+
 import gui.regedit;
-import gui.render_queue;
 import gui.widget.clickable;
 
 import menu;
@@ -34,7 +35,7 @@ namespace menu
 
         explicit C_MenuSettingsForm(const std::shared_ptr<as::C_ASManager>& scriptManager,
             const std::shared_ptr<gui::C_WidgetRegedit>& widgetRegedit,
-            const std::shared_ptr<gui::C_RenderQueue>& renderQueue) :
+            const std::shared_ptr<render::C_RendererQueue>& renderQueue) :
             C_MenuSettingsFormDesigner(MENU_SETTINGS_ID), scriptManager_(scriptManager),
             widgetRegedit_(widgetRegedit), renderQueue_(renderQueue)
         {
@@ -174,6 +175,6 @@ namespace menu
         home::C_HomeDirectory home_;
         std::weak_ptr<as::C_ASManager> scriptManager_;
         std::weak_ptr<gui::C_WidgetRegedit> widgetRegedit_;
-        std::shared_ptr<gui::C_RenderQueue> renderQueue_;
+        std::shared_ptr<render::C_RendererQueue> renderQueue_;
     };
 }

@@ -12,9 +12,7 @@ export namespace hook
     {
         PRESENT = 0,
         WINDOW_MESSAGE,
+        ON_PRE_IMGUI_RENDER,
         ON_IMGUI_RENDER,
-        _internal_ON_RENDER_START,
-        _internal_ON_RENDER_END,
-        ON_RENDER_START,
     };
 }

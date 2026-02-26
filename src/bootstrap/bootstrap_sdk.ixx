@@ -14,6 +14,9 @@ import service.locator;
 import sdk.locator.source2_client;
 import sdk.engine.source2_client;
 
+import sdk.locator.vfile_system;
+import sdk.base_filesystem;
+
 namespace bootstrap
 {
     bool InitializeEngineSDK()
@@ -28,10 +31,27 @@ namespace bootstrap
         return true;
     }
 
+    bool InitializeFileSystemSDK()
+    {
+        const auto fileSystem = sdk::GetVFileSystem();
+        if (!fileSystem) {
+            dbg("Unable to find C_VFileSystem singleton!");
+            return false;
+        }
+
+        C_ServiceLocator::Register<sdk::C_BaseFileSystem>(static_cast<sdk::C_BaseFileSystem*>(fileSystem));
+        return true;
+    }
+
     export bool InitializeSDK(std::unique_ptr<C_ServiceContainer>& services)
     {
         if (!InitializeEngineSDK()) {
             dbg("Unable to initialize engine SDK!");
+            return false;
+        }
+
+        if (!InitializeFileSystemSDK()) {
+            dbg("Unable to initialize filesystem SDK!");
             return false;
         }
 

@@ -22,7 +22,7 @@ namespace as
     public:
         C_ASBindingImgui() = default;
 
-        bool apply(std::weak_ptr<C_IASEngine> engineWeak) override
+        [[nodiscard]] bool apply(const std::weak_ptr<C_IASEngine>& engineWeak) override
         {
             const auto enginePtr = engineWeak.lock();
             if (!enginePtr) {
@@ -43,6 +43,8 @@ namespace as
                 .property("float y", &ImVec4::y)
                 .property("float z", &ImVec4::z)
                 .property("float w", &ImVec4::w);
+
+            asbind20::ref_class<ImFont>(engine, "ImFont", asOBJ_NOCOUNT);
 
             asbind20::global(engine).function("uint color32(uint8 r, uint8 g, uint8 b, uint8 a)", [] (uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
                 return IM_COL32(r, g, b, a);

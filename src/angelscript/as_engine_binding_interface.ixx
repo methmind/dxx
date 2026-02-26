@@ -15,6 +15,6 @@ namespace as
     public:
         virtual ~C_IASBinding() = default;
 
-        virtual bool apply(std::weak_ptr<C_IASEngine> enginePtr) = 0;
+        [[nodiscard]] virtual bool apply(const std::weak_ptr<C_IASEngine>& enginePtr) = 0;
     };
 }

@@ -5,6 +5,7 @@ module;
 #include <cassert>
 #include <memory>
 
+#include "imgui.h"
 #include "MinHook.h"
 #include "debug/debug_output.h"
 
@@ -12,10 +13,10 @@ export module bootstrap.gui;
 
 import service.container;
 import service.locator;
-import renderer;
+
+import renderer.queue;
 
 import gui.regedit;
-import gui.render_queue;
 import gui.widget.root;
 import gui.widget.clickable;
 import gui.widget.menu_item;
@@ -38,7 +39,7 @@ namespace bootstrap
 
     export bool InitializeGUI(const std::unique_ptr<C_ServiceContainer>& services)
     {
-        const auto renderQueue = services->add<gui::C_RenderQueue>();
+        const auto renderQueue = services->add<render::C_RendererQueue>();;
         const auto widgetRegedit = services->add<gui::C_WidgetRegedit>();
         const auto guiRoot = widgetRegedit->createWidget<gui::C_WidgetRoot>();
 
@@ -69,8 +70,8 @@ namespace bootstrap
         guiRoot->addChild(navbarForm);
 
         services->add<render_hook_subscription_proxy_s>(
-            C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe(static_cast<uint16_t>(hook::hook_type_e::ON_IMGUI_RENDER),
-                [renderQueue, guiRoot] {
+            C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<ImDrawList*>(static_cast<uint16_t>(hook::hook_type_e::ON_IMGUI_RENDER),
+                [renderQueue, guiRoot](ImDrawList* ctx) {
                     guiRoot->render();
                     renderQueue->processCommands();
                 }

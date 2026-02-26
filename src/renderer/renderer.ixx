@@ -21,7 +21,6 @@ export module renderer;
 import service.locator;
 import hook.type;
 import hook.dispatcher;
-import renderer.frame;
 
 namespace render
 {
@@ -53,14 +52,14 @@ namespace render
                 originalWndProc = nullptr;
             }
 
-            if (this->isContextInitialized_) {
+            if (this->isContextInitialized_.load(std::memory_order_relaxed)) {
                 ImGui_ImplDX11_Shutdown();
                 ImGui_ImplWin32_Shutdown();
                 ImGui::DestroyContext();
             }
         }
 
-        C_Renderer() : isContextInitialized_(false), primitivesRenderFrame_(std::make_unique<C_RendererFrame>()), targetWnd_(nullptr)
+        C_Renderer() : isContextInitialized_(false), targetWnd_(nullptr)
         {
             const auto dispatcher = C_ServiceLocator::Get<hook::C_HookDispatcher>();
             this->onPresentSubscription_ = dispatcher->subscribe<IDXGISwapChain*, UINT, UINT>(
@@ -69,21 +68,11 @@ namespace render
                     onPresent(swapChain, syncInterval, flags);
                 }
             );
-
-            this->onRenderStartSubscription_ = dispatcher->subscribe(
-                static_cast<uint16_t>(hook::hook_type_e::_internal_ON_RENDER_START),
-                [this] {
-                    onRenderStart();
-                }
-            );
-
-            this->onRenderEndSubscription_ = dispatcher->subscribe(
-                static_cast<uint16_t>(hook::hook_type_e::_internal_ON_RENDER_END),
-                [this] {
-                    onRenderEnd();
-                }
-            );
         }
+
+        [[nodiscard]] bool isContextInitialized() const { return this->isContextInitialized_.load(std::memory_order_acquire); }
+
+        [[nodiscard]] ID3D11Device* getDevice() const { return this->d3dDevice_.get(); }
 
     private:
         static LRESULT hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -96,7 +85,7 @@ namespace render
                 return 1L;
             }
 
-            if (const auto& io = ImGui::GetIO(); io.WantCaptureMouse && io.WantCaptureKeyboard) {
+            if (const auto& io = ImGui::GetIO(); io.WantCaptureMouse || io.WantCaptureKeyboard) {
                 return 1L;
             }
 
@@ -121,7 +110,7 @@ namespace render
             io.LogFilename = nullptr;
             io.ConfigFlags = ImGuiConfigFlags_NoMouseCursorChange;
 
-            io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 15.0f);
+            io.Fonts->AddFontFromFileTTF(fontPath.c_str(), 15.0f, nullptr, io.Fonts->GetGlyphRangesCyrillic());
 
             ImGui_ImplWin32_Init(this->targetWnd_);
             ImGui_ImplDX11_Init(device, this->d3dContext_.get());
@@ -152,7 +141,7 @@ namespace render
 
         [[nodiscard]] bool initializeDX11(IDXGISwapChain* swapChain)
         {
-            if (this->isContextInitialized_) {
+            if (this->isContextInitialized_.load(std::memory_order_relaxed)) {
                 return true;
             }
 
@@ -189,7 +178,8 @@ namespace render
                 return false;
             }
 
-            return (this->isContextInitialized_ = true);
+            this->isContextInitialized_.store(true, std::memory_order_release);
+            return true;
         }
 
         void onPresent(IDXGISwapChain* swapChain, UINT syncInterval, UINT flags)
@@ -202,12 +192,16 @@ namespace render
                 return;
             }
 
+            const auto dispatcher = C_ServiceLocator::Get<hook::C_HookDispatcher>();
+            dispatcher->invoke<static_cast<uint16_t>(hook::hook_type_e::ON_PRE_IMGUI_RENDER)>();
+
             ImGui_ImplDX11_NewFrame();
             ImGui_ImplWin32_NewFrame();
             ImGui::NewFrame();
 
-            this->primitivesRenderFrame_->render(ImGui::GetBackgroundDrawList());
-            C_ServiceLocator::Get<hook::C_HookDispatcher>()->invoke<static_cast<uint16_t>(hook::hook_type_e::ON_IMGUI_RENDER)>();
+            dispatcher->invoke<static_cast<uint16_t>(hook::hook_type_e::ON_IMGUI_RENDER)>(
+                ImGui::GetBackgroundDrawList()
+            );
 
             ImGui::EndFrame();
             ImGui::Render();
@@ -217,29 +211,14 @@ namespace render
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         }
 
-        void onRenderStart() const
-        {
-            C_ServiceLocator::Get<hook::C_HookDispatcher>()->invoke<static_cast<uint16_t>(hook::hook_type_e::ON_RENDER_START)>(
-                //this->primitivesRenderFrame_.get()
-            );
-        }
-
-        void onRenderEnd() const
-        {
-            this->primitivesRenderFrame_->bake();
-        }
-
-        bool isContextInitialized_;
-        std::unique_ptr<C_RendererFrame> primitivesRenderFrame_;
-
+        std::atomic<bool> isContextInitialized_;
         HWND targetWnd_;
+
         com_ptr_t<ID3D11Device> d3dDevice_;
         com_ptr_t<ID3D11DeviceContext> d3dContext_;
         com_ptr_t<ID3D11RenderTargetView> renderTargetView_;
 
         hook::hook_subscription_t onPresentSubscription_;
-        hook::hook_subscription_t onRenderStartSubscription_;
-        hook::hook_subscription_t onRenderEndSubscription_;
     };
 }
 

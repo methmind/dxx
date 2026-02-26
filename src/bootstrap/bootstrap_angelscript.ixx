@@ -9,16 +9,28 @@ module;
 export module bootstrap.angelscript;
 
 import service.container;
+import service.locator;
 import as.manager;
 
 import as.binding.imgui;
+import as.binding.renderer;
 import as.binding.hook;
+
+import hook.dispatcher;
+import hook.type;
+
+import renderer;
+import renderer.queue;
 
 namespace bootstrap
 {
-    export bool InitializeAngelscript(const std::unique_ptr<C_ServiceContainer>& container)
+    using as_renderer_queue_t = render::C_RendererQueue;
+
+    using queue_hook_subscription_t = hook::hook_subscription_t;
+
+    export bool InitializeAngelscript(const std::unique_ptr<C_ServiceContainer>& services)
     {
-        const auto asManager = container->add<as::C_ASManager>();
+        const auto asManager = services->add<as::C_ASManager>();
         if (!asManager->initialize()) {
             dbg("Unable to initialize AngelScript manager!");
             return false;
@@ -30,10 +42,21 @@ namespace bootstrap
             return false;
         }
 
+        const auto preRendererQueue = services->add<as_renderer_queue_t>();
+        if (!asEngine->addBinding(std::make_unique<as::C_ASBindingRenderer>(services->get<render::C_Renderer>(), preRendererQueue))) {
+            dbg("Unable to initialize renderer binding!");
+            return false;
+        }
+
         if (!asEngine->addBinding(std::make_unique<as::C_ASBindingHook>())) {
             dbg("Unable to initialize hook binding!");
             return false;
         }
+
+        services->add<queue_hook_subscription_t>(C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe(
+            static_cast<uint16_t>(hook::hook_type_e::ON_PRE_IMGUI_RENDER),
+            [preRendererQueue]{ preRendererQueue->processCommands(); }
+        ));
 
         return true;
     }
