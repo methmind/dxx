@@ -44,7 +44,11 @@ namespace as
                 .property("float z", &ImVec4::z)
                 .property("float w", &ImVec4::w);
 
-            asbind20::ref_class<ImFont>(engine, "ImFont", asOBJ_NOCOUNT);
+            asbind20::ref_class<ImFont>(engine, "ImFont", asOBJ_NOCOUNT)
+                .method("float getFontSize()",
+                [](const ImFont& self) {
+                    return self.LastBaked->Size;
+                });
 
             asbind20::global(engine).function("uint color32(uint8 r, uint8 g, uint8 b, uint8 a)", [] (uint8_t r, uint8_t g, uint8_t b, uint8_t a) {
                 return IM_COL32(r, g, b, a);

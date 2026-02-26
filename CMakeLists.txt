@@ -54,7 +54,7 @@ target_sources(dxx_dlc PUBLIC
         src/hook/impl/hook_impl_type.ixx
         src/gui/widget/gui_widget_base.ixx
         src/gui/gui_widget_regedit.ixx
-        src/renderer/renderer_queue.ixx
+        src/queue/worker_queue.ixx
         src/hash/xxhash_wrapper.ixx
         src/gui/widget/gui_widget_container.ixx
         src/gui/widget/gui_widget_type.ixx

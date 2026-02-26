@@ -14,8 +14,6 @@ export module bootstrap.gui;
 import service.container;
 import service.locator;
 
-import renderer.queue;
-
 import gui.regedit;
 import gui.widget.root;
 import gui.widget.clickable;
@@ -30,6 +28,7 @@ import hook.type;
 import as.manager;
 
 import bind_system;
+import worker_queue;
 
 namespace bootstrap
 {
@@ -37,9 +36,11 @@ namespace bootstrap
 
     struct keybind_subscription_proxy_s : input::bind_subscription_t {};
 
+    using gui_renderer_queue_t = C_WorkerQueue;
+
     export bool InitializeGUI(const std::unique_ptr<C_ServiceContainer>& services)
     {
-        const auto renderQueue = services->add<render::C_RendererQueue>();;
+        const auto renderQueue = services->add<gui_renderer_queue_t>();
         const auto widgetRegedit = services->add<gui::C_WidgetRegedit>();
         const auto guiRoot = widgetRegedit->createWidget<gui::C_WidgetRoot>();
 

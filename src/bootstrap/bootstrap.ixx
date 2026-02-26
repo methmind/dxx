@@ -16,10 +16,10 @@ import bootstrap.gui;
 import bootstrap.angelscript;
 
 import renderer;
-import renderer.queue;
 import gui.regedit;
 
 import bind_system;
+import worker_queue;
 
 namespace bootstrap
 {

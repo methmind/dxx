@@ -16,7 +16,7 @@ export module as.binding.renderer;
 
 import renderer;
 import renderer.load_image;
-import renderer.queue;
+import worker_queue;
 
 import as.binding;
 import as.engine_interface;
@@ -32,7 +32,7 @@ namespace as
     {
     public:
         C_ASBindingRenderer(const std::shared_ptr<render::C_Renderer>& renderer,
-            const std::shared_ptr<render::C_RendererQueue>& preRenderQueue
+            const std::shared_ptr<C_WorkerQueue>& preRenderQueue
         ) : renderer_(renderer), preRenderQueue_(preRenderQueue) {}
 
         [[nodiscard]] bool apply(const std::weak_ptr<C_IASEngine>& engineWeak) override
@@ -168,6 +168,6 @@ namespace as
         }
 
         std::shared_ptr<render::C_Renderer> renderer_;
-        std::shared_ptr<render::C_RendererQueue> preRenderQueue_;
+        std::shared_ptr<C_WorkerQueue> preRenderQueue_;
     };
 }

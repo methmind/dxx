@@ -20,11 +20,11 @@ import hook.dispatcher;
 import hook.type;
 
 import renderer;
-import renderer.queue;
+import worker_queue;
 
 namespace bootstrap
 {
-    using as_renderer_queue_t = render::C_RendererQueue;
+    using as_pre_renderer_queue_t = C_WorkerQueue;
 
     using queue_hook_subscription_t = hook::hook_subscription_t;
 
@@ -42,7 +42,7 @@ namespace bootstrap
             return false;
         }
 
-        const auto preRendererQueue = services->add<as_renderer_queue_t>();
+        const auto preRendererQueue = services->add<as_pre_renderer_queue_t>();
         if (!asEngine->addBinding(std::make_unique<as::C_ASBindingRenderer>(services->get<render::C_Renderer>(), preRendererQueue))) {
             dbg("Unable to initialize renderer binding!");
             return false;
