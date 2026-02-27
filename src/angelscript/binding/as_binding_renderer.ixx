@@ -2,7 +2,6 @@
 // Created by sexey on 23.02.2026.
 //
 module;
-#include <d3d11.h>
 #include <memory>
 #include <windows.h>
 
@@ -21,10 +20,13 @@ import worker_queue;
 
 import as.binding;
 import as.engine_interface;
+import as.binding.memory;
 
 namespace as
 {
     constexpr auto AS_RENDERER_NAMESPACE_NAME = "render";
+
+    using d3d_texture_t = C_SharedPtr<render::d3d_texture_t>;
 
     export class C_ASBindingRenderer : public C_IASBinding
     {
@@ -43,7 +45,9 @@ namespace as
             const auto engine = enginePtr->getEngine();
             engine->SetDefaultNamespace(AS_RENDERER_NAMESPACE_NAME);
 
-            asbind20::ref_class<ID3D11ShaderResourceView>(engine, "d3d_texture_t", asOBJ_NOCOUNT);
+            asbind20::ref_class<d3d_texture_t>(engine, "d3d_texture_t")
+                .addref(&d3d_texture_t::addRef)
+                .release(&d3d_texture_t::release);
 
             asbind20::ref_class<ImDrawList>(engine, "C_Frame", asOBJ_NOCOUNT)
                 .method("void addLine(imgui::ImVec2, imgui::ImVec2, uint, float)",
@@ -92,14 +96,14 @@ namespace as
                     self.AddCircleFilled(pos, radius, color, seg);
                 })
                 .method("void addTexture(render::d3d_texture_t@ texture, imgui::ImVec2, imgui::ImVec2, uint)",
-                [](ImDrawList& self, ID3D11ShaderResourceView* texture, ImVec2 pos, ImVec2 size, uint32_t color) {
-                    if (!texture) {
+                [](ImDrawList& self, const d3d_texture_t* texture, ImVec2 pos, ImVec2 size, uint32_t color) {
+                    if (!texture || !texture->get() || !texture->get()->get()) {
                         asbind20::set_script_exception("Texture couldnt be a nullptr!");
                         return;
                     }
 
                     const ImVec2 p_max(pos.x + size.x, pos.y + size.y);
-                    self.AddImage(texture, pos, p_max,
+                    self.AddImage(texture->get()->get(), pos, p_max,
                         ImVec2(0, 0), ImVec2(1, 1), color
                     );
                 });
@@ -112,10 +116,12 @@ namespace as
                 [](const std::string& text) {
                     return ImGui::CalcTextSize(text.c_str());
                 })
-                .function("render::d3d_texture_t@ loadImage(string path)",
-                [](const std::string& path) {
-                    return render::LoadTexture(path);
-                })
+                .function("render::d3d_texture_t@ loadVtexPNG(string path)",
+                    &C_ASBindingRenderer::loadVtexPNG, asbind20::auxiliary(this)
+                )
+                .function("render::d3d_texture_t@ loadPNG(string path)",
+                    &C_ASBindingRenderer::loadPNG, asbind20::auxiliary(this)
+                )
                 .function("imgui::ImFont@ loadFont(string path, float size)",
                     &C_ASBindingRenderer::loadFont, asbind20::auxiliary(this)
                 );
@@ -137,6 +143,28 @@ namespace as
             }
 
             return newFont;
+        }
+
+        d3d_texture_t* loadVtexPNG(const std::string& path) const
+        {
+            auto imageData = render::LoadVtexPNG(this->renderer_->getDevice(), path);
+            if (!imageData) {
+                asbind20::set_script_exception("Failed to load image: " + path);
+                return nullptr;
+            }
+
+            return new d3d_texture_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
+        }
+
+        d3d_texture_t* loadPNG(const std::string& path) const
+        {
+            auto imageData = render::LoadPNG(this->renderer_->getDevice(), path);
+            if (!imageData) {
+                asbind20::set_script_exception("Failed to load image: " + path);
+                return nullptr;
+            }
+
+            return new d3d_texture_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
         }
 
         std::shared_ptr<render::C_Renderer> renderer_;

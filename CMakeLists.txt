@@ -30,6 +30,12 @@ add_library(dxx_dlc SHARED main.cpp ${MINHOOK_MODULE} ${ANGEL_SCRIPT_ADDONS}
         #XXHASH
         external/xxhash/xxhash.c
         #XXHASH END
+        #LZ4
+        external/lz4/lib/lz4.c
+        #LZ4 END
+        #S3TC
+        external/s3tc/s3tc.cpp
+        #S3TC END
 )
 
 target_sources(dxx_dlc PUBLIC
@@ -97,11 +103,7 @@ target_sources(dxx_dlc PUBLIC
         src/sdk/filesystem/sdk_base_filesystem.ixx
         src/memory/vmt_call.ixx
         src/renderer/renderer_load_image.ixx
-        src/sdk/panorama/sdk_panorama_ui_engine.ixx
-        src/sdk/locator/sdk_locator_panorama_ui_engine.ixx
-        src/sdk/panorama/sdk_panorama_ui_engine_source2.ixx
-        src/sdk/panorama/sdk_panorama_image_resource_manager.ixx
-        src/sdk/panorama/sdk_panorama_image_proxy_source.ixx
+        src/sdk/parser/sdk_parser_vtex.ixx
 )
 
 target_compile_options(dxx_dlc PRIVATE -mcx16)

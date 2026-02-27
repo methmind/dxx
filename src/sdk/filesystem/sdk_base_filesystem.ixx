@@ -61,6 +61,8 @@ namespace sdk
     export class C_BaseFileSystem
     {
     public:
+        C_BaseFileSystem() = default;
+
         bool readFile(const std::string& filePath, std::vector<uint8_t>& output, const char* searchLocation = "game")
         {
             const std::unique_ptr<void, vhandle_destructor_s> handle(memory::vcall<vf_open_fn, OPEN_VMT_INDEX>(this, filePath.c_str(), "r", 0, searchLocation), vhandle_destructor_s{ this });

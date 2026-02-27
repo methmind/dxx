@@ -55,7 +55,7 @@ namespace bootstrap
 
         services->add<queue_hook_subscription_t>(C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe(
             static_cast<uint16_t>(hook::hook_type_e::ON_PRE_IMGUI_RENDER),
-            [preRendererQueue] { preRendererQueue->processCommands(); }
+            [preRendererQueue]{ preRendererQueue->processCommands(); }
         ));
 
         return true;

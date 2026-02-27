@@ -17,9 +17,6 @@ import sdk.engine.source2_client;
 import sdk.locator.vfile_system;
 import sdk.base_filesystem;
 
-import sdk.locator.panorama_ui_engine;
-import sdk.panorama.ui_engine;
-
 namespace bootstrap
 {
     bool InitializeEngineSDK()
@@ -46,18 +43,6 @@ namespace bootstrap
         return true;
     }
 
-    bool InitializePanoramaSDK()
-    {
-        const auto uiEngine = sdk::GetPanoramaUIEngine();
-        if (!uiEngine) {
-            dbg("Unable to find C_PanoramaUIEngine singleton!");
-            return false;
-        }
-
-        C_ServiceLocator::Register<sdk::C_PanoramaUIEngine>(static_cast<sdk::C_PanoramaUIEngine*>(uiEngine));
-        return true;
-    }
-
     export bool InitializeSDK(std::unique_ptr<C_ServiceContainer>& services)
     {
         if (!InitializeEngineSDK()) {
@@ -67,11 +52,6 @@ namespace bootstrap
 
         if (!InitializeFileSystemSDK()) {
             dbg("Unable to initialize filesystem SDK!");
-            return false;
-        }
-
-        if (!InitializePanoramaSDK()) {
-            dbg("Unable to initialize panorama SDK!");
             return false;
         }
 
