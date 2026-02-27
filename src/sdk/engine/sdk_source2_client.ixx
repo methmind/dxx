@@ -17,10 +17,6 @@ namespace sdk
     export class C_Source2Client
     {
     public:
-        ~C_Source2Client() = default;
-
-        C_Source2Client() = default;
-
         [[nodiscard]] void* getFrameStageNotify()
         {
             const auto vtable = *reinterpret_cast<void***>(this);

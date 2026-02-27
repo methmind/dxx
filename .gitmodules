@@ -16,12 +16,3 @@
 [submodule "external/asbind20"]
 	path = external/asbind20
 	url = https://github.com/HenryAWE/asbind20.git
-[submodule "external/lz4"]
-	path = external/lz4
-	url = https://github.com/lz4/lz4.git
-[submodule "external/s3tc"]
-	path = external/s3tc
-	url = https://github.com/Benjamin-Dobell/s3tc-dxt-decompression.git
-[submodule "external/stb"]
-	path = external/stb
-	url = https://github.com/nothings/stb.git
