@@ -47,6 +47,8 @@ namespace render
     public:
         ~C_Renderer()
         {
+            this->onPresentSubscription_.reset();
+
             if (this->targetWnd_ && originalWndProc) {
                 SetWindowLongPtr(this->targetWnd_, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(originalWndProc));
                 originalWndProc = nullptr;

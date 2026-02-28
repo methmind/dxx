@@ -82,7 +82,7 @@ namespace render
         return SUCCEEDED(hr);
     }
 
-    export d3d_texture_t LoadVtexPNG(ID3D11Device* d3dDevice, const std::string& path)
+    export d3d_texture_t LoadVTEX(ID3D11Device* d3dDevice, const std::string& path)
     {
         std::vector<uint8_t> fileData;
         if (!C_ServiceLocator::Get<sdk::C_BaseFileSystem>()->readFile(path, fileData)) {

@@ -6,12 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_SCAN_FOR_MODULES ON)
 set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS OFF)
 set(ANGEL_SCRIPT_CMAKE "${CMAKE_CURRENT_SOURCE_DIR}/external/angelscript/angelscript/projects/cmake/")
+set(MEM_SCANNER_CMAKE "${CMAKE_CURRENT_SOURCE_DIR}/external/mem_scanner/")
 
 add_definitions(-DDEBUG_OUTPUT)
 
 add_compile_options(-Wa,-mbig-obj)
 
 add_subdirectory(${ANGEL_SCRIPT_CMAKE} angelscript_build)
+add_subdirectory(${MEM_SCANNER_CMAKE} mem_scanner_build)
 
 file(GLOB_RECURSE ANGEL_SCRIPT_ADDONS "${CMAKE_CURRENT_SOURCE_DIR}/external/angelscript/add_on/*.cpp")
 file(GLOB_RECURSE MINHOOK_MODULE "${CMAKE_SOURCE_DIR}/external/minhook/src/*.c")
@@ -36,6 +38,10 @@ add_library(dxx_dlc SHARED main.cpp ${MINHOOK_MODULE} ${ANGEL_SCRIPT_ADDONS}
         #S3TC
         external/s3tc/s3tc.cpp
         #S3TC END
+        #DirectX Math
+        external/dx_xtk/Inc/SimpleMath.inl
+        external/dx_math/Inc/DirectXMathMatrix.inl
+        #DirectX Math END
 )
 
 target_sources(dxx_dlc PUBLIC
@@ -104,9 +110,19 @@ target_sources(dxx_dlc PUBLIC
         src/memory/vmt_call.ixx
         src/renderer/renderer_load_image.ixx
         src/sdk/parser/sdk_parser_vtex.ixx
+        src/sdk/locator/sdk_locator_matrices_for_view.ixx
+        src/sdk/sdk_signature.ixx
+        src/memory/pattern_scanner.ixx
+        src/hook/impl/hook_impl_get_matrices_for_view.ixx
+        src/sdk/render/sdk_matrices_system.ixx
+        src/sdk/math/sdk_math_matrix.ixx
+        src/sdk/math/sdk_math_vector.ixx
+        src/sdk/math/sdk_math_world_to_screen.ixx
+        src/sdk/engine/sdk_source2_engine_to_client.ixx
+        src/sdk/locator/sdk_locator_source2_engine_to_client.ixx
 )
 
-target_compile_options(dxx_dlc PRIVATE -mcx16)
+target_compile_options(dxx_dlc PRIVATE -mcx16 -mavx2 -mfma)
 
 target_include_directories(dxx_dlc PUBLIC
         "external/"
@@ -122,6 +138,9 @@ target_include_directories(dxx_dlc PUBLIC
         "external/hde/include/"
         "external/asbind20/include/"
         "external/lz4/lib/"
+        "external/mem_scanner/include/"
+        "external/dx_math/Inc/"
+        "external/dx_xtk/Inc/"
 )
 
-target_link_libraries(dxx_dlc PRIVATE d3d11 d3dcompiler dwmapi angelscript ws2_32)
+target_link_libraries(dxx_dlc PRIVATE d3d11 d3dcompiler dwmapi angelscript ws2_32 LightningScanner)

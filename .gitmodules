@@ -25,3 +25,9 @@
 [submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb.git
+[submodule "external/dx_xtk"]
+	path = external/dx_xtk
+	url = https://github.com/microsoft/DirectXTK.git
+[submodule "external/dx_math"]
+	path = external/dx_math
+	url = https://github.com/microsoft/DirectXMath.git

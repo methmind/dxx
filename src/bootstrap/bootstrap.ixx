@@ -26,13 +26,18 @@ namespace bootstrap
     export std::unique_ptr<C_ServiceContainer> Build()
     {
         auto container = std::make_unique<C_ServiceContainer>();
+        if (!InitializeHooks(container)) {
+            dbg("InitializeHooks got:err = Unable to initialize hooks!");
+            return nullptr;
+        }
+
         if (!InitializeSDK(container)) {
             dbg("InitializeSDK got:err = Unable to initialize SDK!");
             return nullptr;
         }
 
-        if (!InitializeHooks(container)) {
-            dbg("InitializeHooks got:err = Unable to initialize hooks!");
+        if (!SetupHooks(container)) {
+            dbg("SetupHooks got:err = Unable to create hooks!");
             return nullptr;
         }
 

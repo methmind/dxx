@@ -16,10 +16,12 @@ import hook.container;
 import hook.dispatcher;
 import hook.impl.present;
 import hook.impl.frame_stage_notify;
+import hook.impl.get_matrices_for_view;
 
 import dx;
 
 import sdk.engine.source2_client;
+import sdk.locator.matrices_for_view;
 
 namespace bootstrap
 {
@@ -33,6 +35,17 @@ namespace bootstrap
 
         if (const auto err = hook::C_HookContainer::Create(presentFunction, reinterpret_cast<void*>(hook::hkPresent)); err != MH_OK) {
             dbg("Unable to create hook for IDXGISwapChain::Present! err = {}", err);
+            return false;
+        }
+
+        const auto getMatricesForViewFunc = sdk::GetMatricesForView();
+        if (!getMatricesForViewFunc) {
+            dbg("Unable to get GetMatricesForView function pointer!");
+            return false;
+        }
+
+        if (const auto err = hook::C_HookContainer::Create(getMatricesForViewFunc, reinterpret_cast<void*>(hook::hkGetMatricesForView)); err != MH_OK) {
+            dbg("Unable to create hook for GetMatricesForView! err = {}", err);
             return false;
         }
 
@@ -66,6 +79,12 @@ namespace bootstrap
             return false;
         }
 
+        return true;
+    }
+
+    export bool SetupHooks(const std::unique_ptr<C_ServiceContainer>& services)
+    {
+        const auto hooks = services->get<hook::C_HookContainer>();
         if (!SetupRendererHook()) {
             dbg("SetupRendererHook got:err = Unable to setup renderer hooks!");
             return false;

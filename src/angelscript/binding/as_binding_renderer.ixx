@@ -14,6 +14,8 @@ module;
 
 export module as.binding.renderer;
 
+import service.locator;
+
 import renderer;
 import renderer.load_image;
 import worker_queue;
@@ -22,18 +24,24 @@ import as.binding;
 import as.engine_interface;
 import as.binding.memory;
 
+import sdk.matrices_system;
+import sdk.math.vector;
+import sdk.math.world_to_screen;
+import sdk.source2_engine_to_client;
+
 namespace as
 {
     constexpr auto AS_RENDERER_NAMESPACE_NAME = "render";
 
-    using d3d_texture_t = C_SharedPtr<render::d3d_texture_t>;
+    using d3d_texture_wrapper_t = C_SharedPtr<render::d3d_texture_t>;
 
     export class C_ASBindingRenderer : public C_IASBinding
     {
     public:
         C_ASBindingRenderer(const std::shared_ptr<render::C_Renderer>& renderer,
-            const std::shared_ptr<C_WorkerQueue>& preRenderQueue
-        ) : renderer_(renderer), preRenderQueue_(preRenderQueue) {}
+            const std::shared_ptr<C_WorkerQueue>& preRenderQueue,
+            const std::shared_ptr<sdk::C_MatricesSystem>& matricesSystem
+        ) : renderer_(renderer), preRenderQueue_(preRenderQueue), matricesSystem_(matricesSystem) {}
 
         [[nodiscard]] bool apply(const std::weak_ptr<C_IASEngine>& engineWeak) override
         {
@@ -45,20 +53,20 @@ namespace as
             const auto engine = enginePtr->getEngine();
             engine->SetDefaultNamespace(AS_RENDERER_NAMESPACE_NAME);
 
-            asbind20::ref_class<d3d_texture_t>(engine, "d3d_texture_t")
-                .addref(&d3d_texture_t::addRef)
-                .release(&d3d_texture_t::release);
+            asbind20::ref_class<d3d_texture_wrapper_t>(engine, "d3d_texture_t")
+                .addref(&d3d_texture_wrapper_t::addRef)
+                .release(&d3d_texture_wrapper_t::release);
 
             asbind20::ref_class<ImDrawList>(engine, "C_Frame", asOBJ_NOCOUNT)
                 .method("void addLine(imgui::ImVec2, imgui::ImVec2, uint, float)",
                 [](ImDrawList& self, ImVec2 start, ImVec2 end, uint32_t color, float thickness) {
                     self.AddLine(start, end, color, thickness);
                 })
-                .method("void addText(string text, imgui::ImVec2, uint)",
+                .method("void addText(const string& in, imgui::ImVec2, uint)",
                 [](ImDrawList& self, const std::string& text, ImVec2 pos, uint32_t color) {
                     self.AddText(pos, color, text.c_str());
                 })
-                .method("void addFontText(string text, imgui::ImFont@, float fontSize, imgui::ImVec2, uint)",
+                .method("void addFontText(const string& in, imgui::ImFont@, float fontSize, imgui::ImVec2, uint)",
                 [](ImDrawList& self, const std::string& text, ImFont* font, float fontSize, ImVec2 pos, uint32_t color) {
                     if (!font) {
                         asbind20::set_script_exception("Font couldnt be a nullptr!");
@@ -95,8 +103,8 @@ namespace as
                 [](ImDrawList& self, ImVec2 pos, float radius, uint32_t color, int32_t seg) {
                     self.AddCircleFilled(pos, radius, color, seg);
                 })
-                .method("void addTexture(render::d3d_texture_t@ texture, imgui::ImVec2, imgui::ImVec2, uint)",
-                [](ImDrawList& self, const d3d_texture_t* texture, ImVec2 pos, ImVec2 size, uint32_t color) {
+                .method("void addImage(render::d3d_texture_t@+, imgui::ImVec2, imgui::ImVec2, uint)",
+                [](ImDrawList& self, const d3d_texture_wrapper_t* texture, ImVec2 pos, ImVec2 size, uint32_t color) {
                     if (!texture || !texture->get() || !texture->get()->get()) {
                         asbind20::set_script_exception("Texture couldnt be a nullptr!");
                         return;
@@ -112,18 +120,20 @@ namespace as
                 .function("uint64 getTickCount()", [] {
                     return GetTickCount64();
                 })
-                .function("imgui::ImVec2 measureText(string text)",
+                .function("imgui::ImVec2 measureText(const string& in)",
                 [](const std::string& text) {
                     return ImGui::CalcTextSize(text.c_str());
                 })
-                .function("render::d3d_texture_t@ loadVtexPNG(string path)",
-                    &C_ASBindingRenderer::loadVtexPNG, asbind20::auxiliary(this)
+                .function("render::d3d_texture_t@ loadVTEX(const string& in)",
+                    &C_ASBindingRenderer::loadVTEX, asbind20::auxiliary(this)
                 )
-                .function("render::d3d_texture_t@ loadPNG(string path)",
+                .function("render::d3d_texture_t@ loadPNG(const string& in)",
                     &C_ASBindingRenderer::loadPNG, asbind20::auxiliary(this)
                 )
-                .function("imgui::ImFont@ loadFont(string path, float size)",
+                .function("imgui::ImFont@ loadFont(const string& in, float)",
                     &C_ASBindingRenderer::loadFont, asbind20::auxiliary(this)
+                ).function("imgui::ImVec2 worldToScreen(float, float, float)",
+                    &C_ASBindingRenderer::worldToScreen, asbind20::auxiliary(this)
                 );
 
             engine->SetDefaultNamespace("");
@@ -145,18 +155,18 @@ namespace as
             return newFont;
         }
 
-        d3d_texture_t* loadVtexPNG(const std::string& path) const
+        d3d_texture_wrapper_t* loadVTEX(const std::string& path) const
         {
-            auto imageData = render::LoadVtexPNG(this->renderer_->getDevice(), path);
+            auto imageData = render::LoadVTEX(this->renderer_->getDevice(), path);
             if (!imageData) {
                 asbind20::set_script_exception("Failed to load image: " + path);
                 return nullptr;
             }
 
-            return new d3d_texture_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
+            return new d3d_texture_wrapper_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
         }
 
-        d3d_texture_t* loadPNG(const std::string& path) const
+        d3d_texture_wrapper_t* loadPNG(const std::string& path) const
         {
             auto imageData = render::LoadPNG(this->renderer_->getDevice(), path);
             if (!imageData) {
@@ -164,10 +174,23 @@ namespace as
                 return nullptr;
             }
 
-            return new d3d_texture_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
+            return new d3d_texture_wrapper_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
+        }
+
+        ImVec2 worldToScreen(float x, float y, float z) const
+        {
+            sdk::vector2_t output;
+            if (!sdk::WorldToScreen(sdk::vector3_t(x, y, z),
+                C_ServiceLocator::Get<sdk::C_Source2EngineToClient>()->getScreenSize(),
+                this->matricesSystem_->getWorldToProjection(), output)) {
+                return ImVec2(-1, -1);
+            }
+
+            return ImVec2(output.x, output.y);
         }
 
         std::shared_ptr<render::C_Renderer> renderer_;
         std::shared_ptr<C_WorkerQueue> preRenderQueue_;
+        std::shared_ptr<sdk::C_MatricesSystem> matricesSystem_;
     };
 }

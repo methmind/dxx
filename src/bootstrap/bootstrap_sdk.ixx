@@ -14,8 +14,13 @@ import service.locator;
 import sdk.locator.source2_client;
 import sdk.engine.source2_client;
 
+import sdk.locator.source2_engine_to_client;
+import sdk.source2_engine_to_client;
+
 import sdk.locator.vfile_system;
 import sdk.base_filesystem;
+
+import sdk.matrices_system;
 
 namespace bootstrap
 {
@@ -27,7 +32,15 @@ namespace bootstrap
             return false;
         }
 
+        const auto source2EngineToClient = sdk::GetSource2EngineToClient();
+        if (!source2EngineToClient) {
+            dbg("Unable to find C_Source2EngineToClient singleton!");
+            return false;
+        }
+
         C_ServiceLocator::Register<sdk::C_Source2Client>(static_cast<sdk::C_Source2Client*>(source2Client));
+        C_ServiceLocator::Register<sdk::C_Source2EngineToClient>(static_cast<sdk::C_Source2EngineToClient*>(source2EngineToClient));
+
         return true;
     }
 
@@ -55,6 +68,7 @@ namespace bootstrap
             return false;
         }
 
+        services->add<sdk::C_MatricesSystem>();
         return true;
     }
 }

@@ -22,6 +22,8 @@ import hook.type;
 import renderer;
 import worker_queue;
 
+import sdk.matrices_system;
+
 namespace bootstrap
 {
     using as_pre_renderer_queue_t = C_WorkerQueue;
@@ -43,7 +45,8 @@ namespace bootstrap
         }
 
         const auto preRendererQueue = services->add<as_pre_renderer_queue_t>();
-        if (!asEngine->addBinding(std::make_unique<as::C_ASBindingRenderer>(services->get<render::C_Renderer>(), preRendererQueue))) {
+        if (!asEngine->addBinding(std::make_unique<as::C_ASBindingRenderer>(
+            services->get<render::C_Renderer>(), preRendererQueue, services->get<sdk::C_MatricesSystem>()))) {
             dbg("Unable to initialize renderer binding!");
             return false;
         }

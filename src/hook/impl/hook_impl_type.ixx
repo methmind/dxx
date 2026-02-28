@@ -14,5 +14,6 @@ export namespace hook
         WINDOW_MESSAGE,
         ON_PRE_IMGUI_RENDER,
         ON_IMGUI_RENDER,
+        GET_MATRICES_FOR_VIEW,
     };
 }
