@@ -17,15 +17,18 @@ import hook.dispatcher;
 import hook.impl.present;
 import hook.impl.frame_stage_notify;
 import hook.impl.get_matrices_for_view;
+import hook.impl.level_state_change;
 
 import dx;
 
 import sdk.engine.source2_client;
 import sdk.locator.matrices_for_view;
 
+import sdk.locator.world_state;
+
 namespace bootstrap
 {
-    bool SetupRendererHook()
+    bool SetupRendererHooks()
     {
         const auto presentFunction = dx::GetPresentFunction();
         if (!presentFunction) {
@@ -52,7 +55,7 @@ namespace bootstrap
         return true;
     }
 
-    bool SetupEventHook()
+    bool SetupEventHooks()
     {
         const auto source2Client = C_ServiceLocator::Get<sdk::C_Source2Client>();
         const auto frameStageNotifyFunc = source2Client->getFrameStageNotify();
@@ -63,6 +66,33 @@ namespace bootstrap
 
         if (const auto err = hook::C_HookContainer::Create(frameStageNotifyFunc, reinterpret_cast<void*>(hook::hkFrameStageNotify)); err != MH_OK) {
             dbg("Unable to create hook for C_Source2Client::FrameStageNotify! err = {}", err);
+            return false;
+        }
+
+        return true;
+    }
+
+    bool SetupWorldStateHooks()
+    {
+        const auto onInit = sdk::GetLevelInitCallback();
+        if (!onInit) {
+            dbg("Unable to get level init callback function pointer!");
+            return false;
+        }
+
+        const auto onShutdown = sdk::GetLevelShutdownCallback();
+        if (!onShutdown) {
+            dbg("Unable to get level init callback function pointer!");
+            return false;
+        }
+
+        if (const auto err = hook::C_HookContainer::Create(onInit, reinterpret_cast<void*>(hook::hkOnLevelInit)); err != MH_OK) {
+            dbg("Unable to create hook for level init callback! err = {}", err);
+            return false;
+        }
+
+        if (const auto err = hook::C_HookContainer::Create(onShutdown, reinterpret_cast<void*>(hook::hkOnLevelShutdown)); err != MH_OK) {
+            dbg("Unable to create hook for level shutdown callback! err = {}", err);
             return false;
         }
 
@@ -85,13 +115,18 @@ namespace bootstrap
     export bool SetupHooks(const std::unique_ptr<C_ServiceContainer>& services)
     {
         const auto hooks = services->get<hook::C_HookContainer>();
-        if (!SetupRendererHook()) {
-            dbg("SetupRendererHook got:err = Unable to setup renderer hooks!");
+        if (!SetupRendererHooks()) {
+            dbg("SetupRendererHooks got:err = Unable to setup renderer hooks!");
             return false;
         }
 
-        if (!SetupEventHook()) {
-            dbg("SetupEventHook got:err = Unable to setup event hooks!");
+        if (!SetupEventHooks()) {
+            dbg("SetupEventHooks got:err = Unable to setup event hooks!");
+            return false;
+        }
+
+        if (!SetupWorldStateHooks()) {
+            dbg("SetupWorldStateHooks got:err = Unable to setup world state hooks!");
             return false;
         }
 

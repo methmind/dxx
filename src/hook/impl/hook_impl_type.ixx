@@ -15,5 +15,7 @@ export namespace hook
         ON_PRE_IMGUI_RENDER,
         ON_IMGUI_RENDER,
         GET_MATRICES_FOR_VIEW,
+        ON_LEVEL_INIT,
+        ON_LEVEL_SHUTDOWN,
     };
 }

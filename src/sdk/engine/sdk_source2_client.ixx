@@ -14,6 +14,12 @@ namespace sdk
      */
     constexpr auto FRAME_STAGE_NOTIFY_VMT_INDEX = 36;
 
+    /*
+     * 48 8B 05 ? ? ? ? 48 8B 80 ? ? ? ? C3
+     * void*(__fastcall*)(void* instance);
+     */
+    constexpr auto GET_NETWORK_CALLBACK_QUEUE = 32;
+
     export class C_Source2Client
     {
     public:
@@ -25,6 +31,12 @@ namespace sdk
         {
             const auto vtable = *reinterpret_cast<void***>(this);
             return vtable[FRAME_STAGE_NOTIFY_VMT_INDEX];
+        }
+
+        [[nodiscard]] void* getGetNetworkCallbackQueue()
+        {
+            const auto vtable = *reinterpret_cast<void***>(this);
+            return vtable[GET_NETWORK_CALLBACK_QUEUE];
         }
     };
 }

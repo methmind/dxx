@@ -48,8 +48,19 @@ namespace as
             registerHookCallback<static_cast<hook::hook_id_t>(hook::hook_type_e::ON_IMGUI_RENDER), ImDrawList*>(
                 engine,
                 "setOnRender",
-                "void OnRenderCb(render::C_Frame@)",
-                "OnRenderCb"
+                "void onRender(render::C_Frame@)"
+            );
+
+            registerHookCallback<static_cast<hook::hook_id_t>(hook::hook_type_e::ON_LEVEL_INIT)>(
+                engine,
+                "setOnLevelInit",
+                "void onLevelInit()"
+            );
+
+            registerHookCallback<static_cast<hook::hook_id_t>(hook::hook_type_e::ON_LEVEL_SHUTDOWN)>(
+                engine,
+                "setOnLevelShutdown",
+                "void onLevelShutdown()"
             );
 
             engine->SetDefaultNamespace("");
@@ -57,14 +68,34 @@ namespace as
         }
 
     private:
+        static std::string ExtractFuncDefName(const std::string& decl)
+        {
+            const auto parenPos = decl.find('(');
+            if (parenPos == std::string::npos) {
+                return "";
+            }
+
+            const auto spacePos = decl.rfind(' ', parenPos);
+            if (spacePos == std::string::npos) {
+                return "";
+            }
+
+            return decl.substr(spacePos + 1, parenPos - spacePos - 1);
+        }
+
         template<hook::hook_id_t hook_t, typename ... arg_t>
         void registerHookCallback(
             asIScriptEngine* engine,
             const std::string& funcName,
-            const std::string& funcDefDecl,
-            const std::string& funcDefType
+            const std::string& funcDefDecl
         )
         {
+            const auto funcDefType = ExtractFuncDefName(funcDefDecl);
+            if (funcDefType.empty()) {
+                assert(std::format("Invalid funcdef declaration format: {}", funcDefDecl).c_str());
+                return;
+            }
+
             if (engine->GetTypeInfoByDecl(funcDefDecl.c_str()) == nullptr) {
                 engine->RegisterFuncdef(funcDefDecl.c_str());
             }
@@ -95,7 +126,7 @@ namespace as
             };
 
             asbind20::global(engine).function(
-                std::format("hook_subscription_t@ {}({} @)", funcName, funcDefType),
+                std::format("hook_subscription_t@ {}({}@)", funcName, funcDefType),
                 subscribeProxy
             );
         }

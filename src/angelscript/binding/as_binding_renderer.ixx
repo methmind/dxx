@@ -3,7 +3,6 @@
 //
 module;
 #include <memory>
-#include <windows.h>
 
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
@@ -38,6 +37,8 @@ namespace as
     export class C_ASBindingRenderer : public C_IASBinding
     {
     public:
+        ~C_ASBindingRenderer() override = default;
+
         C_ASBindingRenderer(const std::shared_ptr<render::C_Renderer>& renderer,
             const std::shared_ptr<C_WorkerQueue>& preRenderQueue,
             const std::shared_ptr<sdk::C_MatricesSystem>& matricesSystem
@@ -68,12 +69,7 @@ namespace as
                 })
                 .method("void addFontText(const string& in, imgui::ImFont@, float fontSize, imgui::ImVec2, uint)",
                 [](ImDrawList& self, const std::string& text, ImFont* font, float fontSize, ImVec2 pos, uint32_t color) {
-                    if (!font) {
-                        asbind20::set_script_exception("Font couldnt be a nullptr!");
-                        return;
-                    }
-
-                    if (!font->IsLoaded()) {
+                    if (!font || !font->IsLoaded()) {
                         font = ImGui::GetDefaultFont();
                     }
 
@@ -103,7 +99,7 @@ namespace as
                 [](ImDrawList& self, ImVec2 pos, float radius, uint32_t color, int32_t seg) {
                     self.AddCircleFilled(pos, radius, color, seg);
                 })
-                .method("void addImage(render::d3d_texture_t@+, imgui::ImVec2, imgui::ImVec2, uint)",
+                .method("void addImage(const render::d3d_texture_t& in, imgui::ImVec2, imgui::ImVec2, uint)",
                 [](ImDrawList& self, const d3d_texture_wrapper_t* texture, ImVec2 pos, ImVec2 size, uint32_t color) {
                     if (!texture || !texture->get() || !texture->get()->get()) {
                         asbind20::set_script_exception("Texture couldnt be a nullptr!");
@@ -117,9 +113,6 @@ namespace as
                 });
 
             asbind20::global(engine)
-                .function("uint64 getTickCount()", [] {
-                    return GetTickCount64();
-                })
                 .function("imgui::ImVec2 measureText(const string& in)",
                 [](const std::string& text) {
                     return ImGui::CalcTextSize(text.c_str());
