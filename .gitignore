@@ -4,3 +4,5 @@ cmake-build-release-clang
 cmake-build-minsizerel-clang
 build
 src/sdk/protobuf/gen
+
+external/angelscript
