@@ -78,15 +78,20 @@ namespace hook
         template<hook_id_t id, typename ... arg_t>
         __attribute__((always_inline)) void invoke(arg_t&& ... args)
         {
-            thread_local std::vector<std::function<void(std::decay_t<arg_t>...)>> localCallbacks;
+            using holder_t = callback_holder_s<std::decay_t<arg_t>...>;
+            using cache_entry_t = std::weak_ptr<holder_t>;
+
+            thread_local std::vector<cache_entry_t> localCallbacks;
             thread_local uint64_t localEpoch = 0;
 
             if (localEpoch != this->globalEpoch_.load(std::memory_order_acquire)) [[unlikely]] {
                 updateLocalCache<id, std::decay_t<arg_t>...>(localCallbacks, localEpoch);
             }
 
-            for (const auto& callback : localCallbacks) {
-                callback(args...);
+            for (const auto& weak : localCallbacks) {
+                if (auto strong = weak.lock()) {
+                    strong->fn(args...);
+                }
             }
         }
 
@@ -107,7 +112,7 @@ namespace hook
 
     private:
         template<hook_id_t id, typename ... arg_t>
-        __attribute__((noinline)) void updateLocalCache(std::vector<std::function<void(arg_t...)>>& localCache, uint64_t& localEpoch) const
+        __attribute__((noinline)) void updateLocalCache(std::vector<std::weak_ptr<callback_holder_s<arg_t...>>>& localCache, uint64_t& localEpoch) const
         {
             localCache.clear();
 
@@ -117,8 +122,9 @@ namespace hook
 
                 for (const auto& baseHolder : it->second) {
                     if (baseHolder->typeHash == invokeHash) {
-                        auto* specific = static_cast<callback_holder_s<arg_t...>*>(baseHolder.get());
-                        localCache.push_back(specific->fn);
+                        localCache.push_back(
+                            std::static_pointer_cast<callback_holder_s<arg_t...>>(baseHolder)
+                        );
                     } else {
                         assert(false && "Found inconsistent signature in hook dispatcher! This means that someone subscribed to the same hook id with a different callback signature. This is not allowed and may lead to undefined behavior!");
                     }

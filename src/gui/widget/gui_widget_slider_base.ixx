@@ -3,6 +3,7 @@
 //
 module;
 #include <cstdint>
+#include <format>
 #include <functional>
 #include <type_traits>
 #include <string_view>
@@ -24,7 +25,7 @@ namespace gui
 
         ~C_SliderBase() override = default;
 
-        explicit C_SliderBase(const std::string_view& id) : C_WidgetBase(id), value_(0), minValue_(0), maxValue_(0)
+        explicit C_SliderBase(const std::string_view& id) : C_WidgetBase(std::format("##{}", id)), value_(0), minValue_(0), maxValue_(0)
         {
             static_assert(std::is_arithmetic_v<T>, "C_SliderBase supports only arithmetic types");
         }
@@ -43,10 +44,9 @@ namespace gui
                 return;
             }
 
-            const auto rect = ImGui::GetContentRegionAvail();
             T newValue = this->value_;
 
-            ImGui::PushItemWidth(rect.x);
+            ImGui::PushItemWidth(-1.0f);
             if constexpr (std::is_same_v<T, std::int32_t>) {
                 ImGui::SliderInt(getID().c_str(), &newValue, this->minValue_, this->maxValue_);
             } else {

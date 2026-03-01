@@ -122,9 +122,10 @@ target_sources(dxx_dlc PUBLIC
         src/sdk/locator/sdk_locator_source2_engine_to_client.ixx
         src/sdk/locator/sdk_locator_world_state.ixx
         src/hook/impl/hook_impl_level_state_change.ixx
-        src/angelscript/binding/as_binding_gui.ixx
+        src/angelscript/binding/as_binding_menu.ixx
         src/bootstrap/bootstrap_gui.ixx
         src/angelscript/binding/gui/as_binding_widget_window.ixx
+        src/gui/widget/gui_widget_color_picker.ixx
 )
 
 target_compile_options(dxx_dlc PRIVATE -mcx16 -mavx2 -mfma)

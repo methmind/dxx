@@ -113,8 +113,8 @@ namespace as
                     }
                 });
 
-                const auto scriptEngine = callback->GetEngine();
-                auto sub = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<arg_t...>(hook_t, [scriptEngine, safeCallback](arg_t ... args) {
+                auto sub = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<arg_t...>(hook_t, [safeCallback](arg_t ... args) {
+                    const auto scriptEngine = safeCallback->GetEngine();
                     const auto ctx = static_cast<C_IASEngine*>(scriptEngine->GetUserData(ENGINE_USERDATA_ID))->getContext();
                     const auto result = asbind20::script_invoke<void>(ctx.get(), safeCallback.get(), std::forward<arg_t>(args)...);
                     if (!result) {

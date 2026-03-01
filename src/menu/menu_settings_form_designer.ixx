@@ -55,13 +55,13 @@ namespace menu
             this->scriptListUpdateButton_ = std::make_shared<gui::C_WidgetButton>("as_list_update_button",
                 "Update Script List"
             );
-            this->scriptListUpdateButton_->setAutoWidthX(true);
+            this->scriptListUpdateButton_->setAutoWidth(true);
 
             this->configLoadButton_ = std::make_shared<gui::C_WidgetButton>("config_load_button", "Load");
-            this->configLoadButton_->setAutoWidthX(true);
+            this->configLoadButton_->setAutoWidth(true);
 
             this->configSaveButton_ = std::make_shared<gui::C_WidgetButton>("config_save_button", "Save");
-            this->configSaveButton_->setAutoWidthX(true);
+            this->configSaveButton_->setAutoWidth(true);
 
             asDockPanel->addChild(asDockTitle);
             asDockPanel->setSize({250, 0});

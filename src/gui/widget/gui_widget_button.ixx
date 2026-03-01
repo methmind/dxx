@@ -19,9 +19,9 @@ namespace gui
         ~C_WidgetButton() override = default;
 
         explicit C_WidgetButton(const std::string_view& id, const std::string_view& label) :
-            C_ClickableBase(id), label_(std::format("{}##{}", label, id)), isAutoWidthX_(false) {}
+            C_ClickableBase(id), label_(std::format("{}##{}", label, id)), isAutoWidth_(false) {}
 
-        void setAutoWidthX(const bool autoWidth) { this->isAutoWidthX_ = autoWidth; }
+        void setAutoWidth(const bool autoWidth) { this->isAutoWidth_ = autoWidth; }
 
         void render() override
         {
@@ -30,7 +30,7 @@ namespace gui
             }
 
             ImVec2 size{};
-            if (this->isAutoWidthX_) {
+            if (this->isAutoWidth_) {
                 size.x = ImGui::GetContentRegionAvail().x;
                 size.y = 0;
             }
@@ -42,6 +42,6 @@ namespace gui
 
     private:
         std::string label_;
-        bool isAutoWidthX_;
+        bool isAutoWidth_;
     };
 }

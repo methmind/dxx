@@ -734,7 +734,7 @@ void onShutdown()
 
 ## gui -- GUI (зарезервировано)
 
-> **Исходный код:** `src/angelscript/binding/as_binding_gui.ixx`
+> **Исходный код:** `src/angelscript/binding/as_binding_menu.ixx`
 
 Пространство имён `gui` зарегистрировано, но на данный момент **не содержит биндингов**. Предполагается, что в будущем здесь появятся функции для программного создания виджетов GUI из скриптов.
 
@@ -948,7 +948,7 @@ void main()
 
 ```
 src/angelscript/binding/
-├── as_binding_gui.ixx          # gui:: (зарезервировано)
+├── as_binding_menu.ixx          # gui:: (зарезервировано)
 ├── as_binding_hook.ixx         # hook:: (подписки на события)
 ├── as_binding_imgui.ixx        # imgui:: (типы ImVec2, ImVec4, ImFont, color32)
 ├── as_binding_renderer.ixx     # render:: (C_Frame, загрузка ресурсов, worldToScreen)

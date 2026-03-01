@@ -124,9 +124,11 @@ namespace as
                 )
                 .function("imgui::ImFont@ loadFont(const string& in, float)",
                     &C_ASBindingRenderer::loadFont, asbind20::auxiliary(this)
-                ).function("imgui::ImVec2 worldToScreen(float, float, float)",
+                )
+                .function("imgui::ImVec2 worldToScreen(float, float, float)",
                     &C_ASBindingRenderer::worldToScreen, asbind20::auxiliary(this)
-                ).function("imgui::ImVec2 getScreenSize()",
+                )
+                .function("imgui::ImVec2 getScreenSize()",
                 [] {
                     return C_ServiceLocator::Get<sdk::C_Source2EngineToClient>()->getScreenSize();
                 });
