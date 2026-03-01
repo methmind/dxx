@@ -41,7 +41,6 @@ add_library(dxx_dlc SHARED main.cpp ${MINHOOK_MODULE} ${ANGEL_SCRIPT_ADDONS}
         #DirectX Math
         external/dx_xtk/Inc/SimpleMath.inl
         external/dx_math/Inc/DirectXMathMatrix.inl
-        src/angelscript/binding/as_binding_gui.ixx
         #DirectX Math END
 )
 
@@ -65,7 +64,7 @@ target_sources(dxx_dlc PUBLIC
         src/hash/xxhash_wrapper.ixx
         src/gui/widget/gui_widget_container.ixx
         src/gui/widget/gui_widget_type.ixx
-        src/bootstrap/bootstrap_gui.ixx
+        src/bootstrap/bootstrap_menu.ixx
         src/gui/widget/gui_widget_root.ixx
         src/angelscript/as_engine.ixx
         src/bootstrap/bootstrap_angelscript.ixx
@@ -123,6 +122,9 @@ target_sources(dxx_dlc PUBLIC
         src/sdk/locator/sdk_locator_source2_engine_to_client.ixx
         src/sdk/locator/sdk_locator_world_state.ixx
         src/hook/impl/hook_impl_level_state_change.ixx
+        src/angelscript/binding/as_binding_gui.ixx
+        src/bootstrap/bootstrap_gui.ixx
+        src/angelscript/binding/gui/as_binding_widget_window.ixx
 )
 
 target_compile_options(dxx_dlc PRIVATE -mcx16 -mavx2 -mfma)

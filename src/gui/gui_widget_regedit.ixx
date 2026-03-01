@@ -18,6 +18,9 @@ namespace gui
 
     using shared_list_t = libguarded::shared_guarded<widget_list_t>;
 
+    template <typename T>
+    concept widget_t = std::derived_from<T, C_WidgetBase>;
+
     export class C_WidgetRegedit
     {
     public:
@@ -29,7 +32,7 @@ namespace gui
 
         C_WidgetRegedit& operator=(const C_WidgetRegedit&) = delete;
 
-        template<typename T = C_WidgetBase>
+        template<widget_t T = C_WidgetBase>
         std::shared_ptr<T> find(const std::string_view& id) const
         {
             const auto guarded = this->widgets_.lock_shared();
@@ -42,7 +45,7 @@ namespace gui
             if constexpr (std::is_same_v<T, C_WidgetBase>) {
                 return it->second.lock();
             } else {
-                return std::dynamic_pointer_cast<T>(it->second);
+                return std::dynamic_pointer_cast<T>(it->second.lock());
             }
         }
 

@@ -38,17 +38,22 @@ namespace gui
             this->children_.emplace_back(child);
         }
 
-        void removeChild(const widget_ptr_t& child)
+        void removeChild(const C_WidgetBase* child)
         {
             const auto it = std::ranges::remove_if(this->children_,
                [&](const widget_ptr_t& ptr) {
-                   return ptr.get() == child.get();
+                   return ptr.get() == child;
                }
             ).begin();
 
             if (it != this->children_.end()) {
                  this->children_.erase(it, this->children_.end());
             }
+        }
+
+        __attribute__((always_inline)) void removeChild(const widget_ptr_t& child)
+        {
+            removeChild(child.get());
         }
 
     protected:

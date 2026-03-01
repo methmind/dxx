@@ -13,6 +13,7 @@ import service.container;
 import bootstrap.sdk;
 import bootstrap.hook;
 import bootstrap.gui;
+import bootstrap.menu;
 import bootstrap.angelscript;
 
 import renderer;
@@ -25,38 +26,43 @@ namespace bootstrap
 {
     export std::unique_ptr<C_ServiceContainer> Build()
     {
-        auto container = std::make_unique<C_ServiceContainer>();
-        if (!InitializeHooks(container)) {
+        auto services = std::make_unique<C_ServiceContainer>();
+        if (!InitializeHooks(services)) {
             dbg("InitializeHooks got:err = Unable to initialize hooks!");
             return nullptr;
         }
 
-        if (!InitializeSDK(container)) {
+        if (!InitializeSDK(services)) {
             dbg("InitializeSDK got:err = Unable to initialize SDK!");
             return nullptr;
         }
 
-        if (!SetupHooks(container)) {
+        if (!SetupHooks(services)) {
             dbg("SetupHooks got:err = Unable to create hooks!");
             return nullptr;
         }
 
-        container->add<input::C_BindSystem>();
-        const auto renderer = container->add<render::C_Renderer>();
+        services->add<input::C_BindSystem>();
+        const auto renderer = services->add<render::C_Renderer>();
         while (!renderer->isContextInitialized()) {
             Sleep(1);
         }
 
-        if (!InitializeAngelscript(container)) {
-            dbg("InitializeAngelscript got:err = Unable to initialize Angelscript!");
-            return nullptr;
-        }
-
-        if (!InitializeGUI(container)) {
+        if (!InitializeGUI(services)) {
             dbg("InitializeGUI got:err = Unable to initialize GUI!");
             return nullptr;
         }
 
-        return container;
+        if (!InitializeAngelscript(services)) {
+            dbg("InitializeAngelscript got:err = Unable to initialize Angelscript!");
+            return nullptr;
+        }
+
+        if (!InitializeMenu(services)) {
+            dbg("InitializeGUI got:err = Unable to initialize GUI!");
+            return nullptr;
+        }
+
+        return services;
     }
 }

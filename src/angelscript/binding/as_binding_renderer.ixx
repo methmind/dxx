@@ -8,8 +8,7 @@ module;
 #include "imgui_impl_dx11.h"
 #include "imgui_internal.h"
 
-#include "asbind20/bind/class.hpp"
-#include "asbind20/bind/global.hpp"
+#include "asbind20/asbind.hpp"
 
 export module as.binding.renderer;
 
@@ -127,7 +126,10 @@ namespace as
                     &C_ASBindingRenderer::loadFont, asbind20::auxiliary(this)
                 ).function("imgui::ImVec2 worldToScreen(float, float, float)",
                     &C_ASBindingRenderer::worldToScreen, asbind20::auxiliary(this)
-                );
+                ).function("imgui::ImVec2 getScreenSize()",
+                [] {
+                    return C_ServiceLocator::Get<sdk::C_Source2EngineToClient>()->getScreenSize();
+                });
 
             engine->SetDefaultNamespace("");
             return true;

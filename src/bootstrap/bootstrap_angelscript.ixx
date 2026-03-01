@@ -10,17 +10,21 @@ export module bootstrap.angelscript;
 
 import service.container;
 import service.locator;
-import as.manager;
 
+import as.manager;
 import as.binding.imgui;
 import as.binding.renderer;
 import as.binding.hook;
+import as.binding.menu;
 
 import hook.dispatcher;
 import hook.type;
 
 import renderer;
 import worker_queue;
+
+import bootstrap.gui;
+import gui.regedit;
 
 import sdk.matrices_system;
 
@@ -48,6 +52,11 @@ namespace bootstrap
         if (!asEngine->addBinding(std::make_unique<as::C_ASBindingRenderer>(
             services->get<render::C_Renderer>(), preRendererQueue, services->get<sdk::C_MatricesSystem>()))) {
             dbg("Unable to initialize renderer binding!");
+            return false;
+        }
+
+        if (!asEngine->addBinding(std::make_unique<as::C_ASBindingMenu>(services->get<gui::C_WidgetRegedit>(), services->get<gui_renderer_queue_t>()))) {
+            dbg("Unable to initialize menu binding!");
             return false;
         }
 
