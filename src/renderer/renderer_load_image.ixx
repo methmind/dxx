@@ -15,19 +15,10 @@ export module renderer.load_image;
 import service.locator;
 import sdk.base_filesystem;
 import sdk.parser.vtex;
+export import renderer.d3d_texture;
 
 namespace render
 {
-    struct d3d_texture_destructor_s
-    {
-        void operator()(ID3D11ShaderResourceView* svr) const
-        {
-            if (svr) {
-                svr->Release();
-            }
-        }
-    };
-
     struct stb_content_destructor_s
     {
         void operator()(uint8_t* data) const
@@ -38,7 +29,6 @@ namespace render
         }
     };
 
-    export using d3d_texture_t = std::unique_ptr<ID3D11ShaderResourceView, d3d_texture_destructor_s>;
 
     using stb_content_t = std::unique_ptr<uint8_t, stb_content_destructor_s>;
 
@@ -82,7 +72,7 @@ namespace render
         return SUCCEEDED(hr);
     }
 
-    export d3d_texture_t LoadVTEX(ID3D11Device* d3dDevice, const std::string& path)
+    export d3d_texture_ptr_t LoadVTEX(ID3D11Device* d3dDevice, const std::string& path)
     {
         std::vector<uint8_t> fileData;
         if (!C_ServiceLocator::Get<sdk::C_BaseFileSystem>()->readFile(path, fileData)) {
@@ -102,10 +92,10 @@ namespace render
             return nullptr;
         }
 
-        return d3d_texture_t{textureView};
+        return makeTexture(textureView);
     }
 
-    export d3d_texture_t LoadPNG(ID3D11Device* d3dDevice, const std::string& path)
+    export d3d_texture_ptr_t LoadPNG(ID3D11Device* d3dDevice, const std::string& path)
     {
         int32_t originalWidth = 0, originalHeight = 0, channels = 0;
         const stb_content_t imageData(stbi_load(path.c_str(), &originalWidth, &originalHeight, &channels, 4));
@@ -120,6 +110,6 @@ namespace render
             return nullptr;
         }
 
-        return d3d_texture_t{textureView};
+        return makeTexture(textureView);
     }
 }

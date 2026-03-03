@@ -4,6 +4,9 @@
 module;
 #include <memory>
 
+#include <d3d11.h>
+#undef interface
+
 #include "imgui.h"
 #include "imgui_impl_dx11.h"
 #include "imgui_internal.h"
@@ -20,7 +23,7 @@ import worker_queue;
 
 import as.binding;
 import as.engine_interface;
-import as.binding.memory;
+import as.binding.d3d_texture;
 
 import sdk.matrices_system;
 import sdk.math.vector;
@@ -30,8 +33,6 @@ import sdk.source2_engine_to_client;
 namespace as
 {
     constexpr auto AS_RENDERER_NAMESPACE_NAME = "render";
-
-    using d3d_texture_wrapper_t = C_SharedPtr<render::d3d_texture_t>;
 
     export class C_ASBindingRenderer : public C_IASBinding
     {
@@ -100,13 +101,13 @@ namespace as
                 })
                 .method("void addImage(const render::d3d_texture_t& in, imgui::ImVec2, imgui::ImVec2, uint)",
                 [](ImDrawList& self, const d3d_texture_wrapper_t* texture, ImVec2 pos, ImVec2 size, uint32_t color) {
-                    if (!texture || !texture->get() || !texture->get()->get()) {
+                    if (!texture || !texture->get()) {
                         asbind20::set_script_exception("Texture couldnt be a nullptr!");
                         return;
                     }
 
                     const ImVec2 p_max(pos.x + size.x, pos.y + size.y);
-                    self.AddImage(texture->get()->get(), pos, p_max,
+                    self.AddImage(texture->get(), pos, p_max,
                         ImVec2(0, 0), ImVec2(1, 1), color
                     );
                 });
@@ -160,7 +161,7 @@ namespace as
                 return nullptr;
             }
 
-            return new d3d_texture_wrapper_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
+            return new d3d_texture_wrapper_t(std::move(imageData));
         }
 
         d3d_texture_wrapper_t* loadPNG(const std::string& path) const
@@ -171,7 +172,7 @@ namespace as
                 return nullptr;
             }
 
-            return new d3d_texture_wrapper_t(std::make_shared<render::d3d_texture_t>(std::move(imageData)));
+            return new d3d_texture_wrapper_t(std::move(imageData));
         }
 
         ImVec2 worldToScreen(float x, float y, float z) const

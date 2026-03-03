@@ -59,11 +59,6 @@ namespace gui
 
         void remove(const std::string_view& id)
         {
-            const auto obj = find(id);
-            if (!obj) {
-                return;
-            }
-
             this->widgets_.lock()->erase(id.data());
         }
 

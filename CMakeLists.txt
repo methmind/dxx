@@ -109,6 +109,7 @@ target_sources(dxx_dlc PUBLIC
         src/sdk/filesystem/sdk_base_filesystem.ixx
         src/memory/vmt_call.ixx
         src/renderer/renderer_load_image.ixx
+        src/renderer/renderer_d3d_texture.ixx
         src/sdk/parser/sdk_parser_vtex.ixx
         src/sdk/locator/sdk_locator_matrices_for_view.ixx
         src/sdk/sdk_signature.ixx
@@ -126,9 +127,13 @@ target_sources(dxx_dlc PUBLIC
         src/bootstrap/bootstrap_gui.ixx
         src/angelscript/binding/gui/as_binding_widget_window.ixx
         src/gui/widget/gui_widget_color_picker.ixx
+        src/gui/widget/gui_widget_combobox.ixx
+        src/gui/widget/gui_widget_image_checkbox.ixx
+        src/angelscript/binding/render/as_binding_d3d_texture.ixx
+        src/gui/widget/gui_widget_header.ixx
 )
 
-target_compile_options(dxx_dlc PRIVATE -mcx16 -mavx2 -mfma)
+target_compile_options(dxx_dlc PRIVATE -mavx2 -mfma)
 
 target_include_directories(dxx_dlc PUBLIC
         "external/"

@@ -31,13 +31,17 @@ namespace as
             std::static_pointer_cast<C_ContainerBase>(parent)->removeChild(this->shownButton_);
         }
 
-        explicit C_ASBindingWidgetWindow(
-            const std::string_view& id,
-            const std::string_view& title
-        ) : C_WidgetWindow(id, title), shownButton_(std::make_shared<gui::C_WidgetMenuItem>(std::format("{}_show_button", id), title))
+        explicit C_ASBindingWidgetWindow(const std::string_view& id, const std::string_view& title) :
+            C_WidgetWindow(id, title),
+            shownButton_(std::make_shared<gui::C_WidgetMenuItem>(std::format("{}_show_button", id), title)) {}
+
+        void initialize()
         {
-            this->shownButton_->setCallback([this](gui::C_ClickableBase* obj) {
-                this->setVisibleState(true);
+            auto weak = weak_from_this();
+            this->shownButton_->setCallback([weak](gui::C_ClickableBase* obj) {
+                if (const auto ptr = weak.lock(); ptr) {
+                    ptr->setVisibleState(true);
+                }
             });
         }
 
