@@ -11,11 +11,13 @@ export namespace hook
     enum class hook_type_e : uint16_t
     {
         PRESENT = 0,
-        WINDOW_MESSAGE,
+        ON_WINDOW_MESSAGE,
         ON_PRE_IMGUI_RENDER,
         ON_IMGUI_RENDER,
-        GET_MATRICES_FOR_VIEW,
+        ON_MATRICES_UPDATE,
         ON_LEVEL_INIT,
         ON_LEVEL_SHUTDOWN,
+        ON_ENTITY_ADD,
+        ON_ENTITY_REMOVE,
     };
 }

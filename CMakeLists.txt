@@ -131,6 +131,16 @@ target_sources(dxx_dlc PUBLIC
         src/gui/widget/gui_widget_image_checkbox.ixx
         src/angelscript/binding/render/as_binding_d3d_texture.ixx
         src/gui/widget/gui_widget_header.ixx
+        src/sdk/entity/sdk_game_entity_system.ixx
+        src/sdk/locator/sdk_locator_game_entity_system.ixx
+        src/hook/impl/hook_impl_entity_system.ixx
+        src/sdk/locator/sdk_locator_schema_system.ixx
+        src/sdk/schema/sdk_schema_system.ixx
+        src/sdk/schema/sdk_schema_datatype.ixx
+        src/sdk/entity/sdk_entity_list.ixx
+        src/sdk/entity/sdk_entity_identity.ixx
+        src/sdk/entity/sdk_entity_instance.ixx
+        src/sdk/util/sdk_source_handle.ixx
 )
 
 target_compile_options(dxx_dlc PRIVATE -mavx2 -mfma)
@@ -152,6 +162,7 @@ target_include_directories(dxx_dlc PUBLIC
         "external/mem_scanner/include/"
         "external/dx_math/Inc/"
         "external/dx_xtk/Inc/"
+        "external/const_xxhash/"
 )
 
 target_link_libraries(dxx_dlc PRIVATE d3d11 d3dcompiler dwmapi angelscript ws2_32 LightningScanner)

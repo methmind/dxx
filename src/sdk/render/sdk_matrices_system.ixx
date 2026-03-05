@@ -22,7 +22,7 @@ namespace sdk
         C_MatricesSystem()
         {
             this->onMatricesUpdateSubscription_ = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<void*, void*, void*, void*, void*, void*>(
-              static_cast<hook::hook_id_t>(hook::hook_type_e::GET_MATRICES_FOR_VIEW),
+              static_cast<hook::hook_id_t>(hook::hook_type_e::ON_MATRICES_UPDATE),
               [this](void* renderSystem, void* viewRender, void* worldToView, void* viewToProjection, void* worldToProjection, void* worldToScreen) {
                   onMatricesUpdate(static_cast<matrix_t*>(worldToView), static_cast<matrix_t*>(worldToProjection));
               }

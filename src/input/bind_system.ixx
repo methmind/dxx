@@ -45,7 +45,7 @@ namespace input
             : nextCallbackID_(0)
         {
             this->onMessageSubscription_ = C_ServiceLocator::Get<hook::C_HookDispatcher>()->subscribe<UINT, WPARAM, LPARAM>(
-                static_cast<hook::hook_id_t>(hook::hook_type_e::WINDOW_MESSAGE),
+                static_cast<hook::hook_id_t>(hook::hook_type_e::ON_WINDOW_MESSAGE),
                 [this](UINT uMsg, WPARAM wParam, LPARAM lParam){
                     onWindowMessage(uMsg, wParam, lParam);
                 }

@@ -79,7 +79,7 @@ namespace render
     private:
         static LRESULT hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
-            C_ServiceLocator::Get<hook::C_HookDispatcher>()->invoke<static_cast<uint16_t>(hook::hook_type_e::WINDOW_MESSAGE)>(
+            C_ServiceLocator::Get<hook::C_HookDispatcher>()->invoke<static_cast<uint16_t>(hook::hook_type_e::ON_WINDOW_MESSAGE)>(
                 uMsg, wParam, lParam
             );
 

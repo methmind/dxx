@@ -20,7 +20,15 @@ import sdk.source2_engine_to_client;
 import sdk.locator.vfile_system;
 import sdk.base_filesystem;
 
+import sdk.locator.game_entity_system;
+import sdk.game_entity_system;
+
+import sdk.locator.schema_system;
+import sdk.schema_system;
+
 import sdk.matrices_system;
+
+import sdk.entity_list;
 
 namespace bootstrap
 {
@@ -44,6 +52,19 @@ namespace bootstrap
         return true;
     }
 
+    bool InitializeSchemaSDK(const std::unique_ptr<C_ServiceContainer>& services)
+    {
+        const auto schemaSystem = sdk::GetSchemaSystem();
+        if (!schemaSystem) {
+            dbg("Unable to find C_SchemaSystem singleton!");
+            return false;
+        }
+
+        const auto instance = services->add<sdk::C_SchemaSystem>(schemaSystem);
+        C_ServiceLocator::Register<sdk::C_SchemaSystem>(instance.get());
+        return true;
+    }
+
     bool InitializeFileSystemSDK()
     {
         const auto fileSystem = sdk::GetVFileSystem();
@@ -56,15 +77,39 @@ namespace bootstrap
         return true;
     }
 
-    export bool InitializeSDK(std::unique_ptr<C_ServiceContainer>& services)
+    bool InitializeEntitySDK(const std::unique_ptr<C_ServiceContainer>& services)
+    {
+        const auto gameEntitySystem = sdk::GetGameEntitySystem();
+        if (!gameEntitySystem) {
+            dbg("Unable to find C_GameEntitySystem instance!");
+            return false;
+        }
+
+        C_ServiceLocator::Register<sdk::C_GameEntitySystem>(static_cast<sdk::C_GameEntitySystem*>(gameEntitySystem));
+        services->add<sdk::C_EntityList>();
+
+        return true;
+    }
+
+    export bool InitializeSDK(const std::unique_ptr<C_ServiceContainer>& services)
     {
         if (!InitializeEngineSDK()) {
             dbg("Unable to initialize engine SDK!");
             return false;
         }
 
+        if (!InitializeSchemaSDK(services)) {
+            dbg("Unable to initialize schema SDK!");
+            return false;
+        }
+
         if (!InitializeFileSystemSDK()) {
             dbg("Unable to initialize filesystem SDK!");
+            return false;
+        }
+
+        if (!InitializeEntitySDK(services)) {
+            dbg("Unable to initialize entity SDK!");
             return false;
         }
 

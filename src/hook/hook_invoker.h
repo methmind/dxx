@@ -5,7 +5,6 @@
 #ifndef DXX_DLC_HOOK_INVOKER_H
 #define DXX_DLC_HOOK_INVOKER_H
 #include <cassert>
-#include <type_traits>
 
 #include "MinHook.h"
 
@@ -19,15 +18,9 @@ namespace hook
     public:
 
         template<typename func_declaration_t, typename ... arg_t>
-        __attribute__((always_inline)) auto invoke(arg_t ... args)
+        __attribute__((always_inline)) decltype(auto) invoke(arg_t ... args)
         {
-            auto fn = reinterpret_cast<func_declaration_t>(this->cached_);
-
-            if constexpr (std::is_void_v<func_declaration_t>) {
-                fn(args...);
-            } else {
-                return fn(args...);
-            }
+            return reinterpret_cast<func_declaration_t>(this->cached_)(args...);
         }
 
         explicit C_HookInvoker(void* detour) : cached_(FindTrampolineByDetour(detour))

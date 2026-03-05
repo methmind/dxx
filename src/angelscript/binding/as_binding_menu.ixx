@@ -149,7 +149,7 @@ namespace as
                     }
 
                     std::vector<std::string> tmp(array->GetSize());
-                    for (asUINT i = 0; i < array->GetSize(); i++) {
+                    for (auto i = 0; i < array->GetSize(); i++) {
                         tmp[i] = *static_cast<std::string*>(array->At(i));
                     }
 
@@ -170,7 +170,7 @@ namespace as
             asbind20::global(engine)
                 .function("bool isWidgetVisible(const C_WidgetBase& in)",
                     [](const as_widget_base_t& ptr) { return ptr->getVisibleState(); })
-                .function("void setWidgetVisible(bool)",
+                .function("void setWidgetVisible(const C_WidgetBase& in, bool)",
                     [](const as_widget_base_t& ptr, bool visible) { ptr->setVisibleState(visible); })
                 .function("menu::C_WidgetWindow@ createWindow(const string& in, const string& in)",
                     &C_ASBindingMenu::createWindow, asbind20::auxiliary(this))

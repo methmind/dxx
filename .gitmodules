@@ -31,3 +31,6 @@
 [submodule "external/dx_math"]
 	path = external/dx_math
 	url = https://github.com/microsoft/DirectXMath.git
+[submodule "external/const_xxhash"]
+	path = external/const_xxhash
+	url = https://github.com/chys87/constexpr-xxh3.git

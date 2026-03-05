@@ -17,7 +17,7 @@ export namespace hook
     void* __attribute__((__fastcall__)) hkGetMatricesForView(void* renderGameSystem, void* viewRender, void* worldToView, void* viewToProjection, void* worldToProjection, void* worldToPixels)
     {
         const auto result = MH_CALL_ORIGINAL(hkGetMatricesForView)(renderGameSystem, viewRender, worldToView, viewToProjection, worldToProjection, worldToPixels);
-        C_ServiceLocator::Get<C_HookDispatcher>()->invoke<static_cast<hook_id_t>(hook_type_e::GET_MATRICES_FOR_VIEW)>(
+        C_ServiceLocator::Get<C_HookDispatcher>()->invoke<static_cast<hook_id_t>(hook_type_e::ON_MATRICES_UPDATE)>(
             renderGameSystem, viewRender, worldToView, viewToProjection, worldToProjection, worldToPixels
         );
 

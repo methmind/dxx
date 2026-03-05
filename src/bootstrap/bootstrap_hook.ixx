@@ -18,12 +18,14 @@ import hook.impl.present;
 import hook.impl.frame_stage_notify;
 import hook.impl.get_matrices_for_view;
 import hook.impl.level_state_change;
+import hook.impl.entity_system;
 
 import dx;
 
 import sdk.engine.source2_client;
-import sdk.locator.matrices_for_view;
+import sdk.game_entity_system;
 
+import sdk.locator.matrices_for_view;
 import sdk.locator.world_state;
 
 namespace bootstrap
@@ -99,6 +101,22 @@ namespace bootstrap
         return true;
     }
 
+    bool SetupEntityHooks()
+    {
+        auto gameEntitySystem = C_ServiceLocator::Get<sdk::C_GameEntitySystem>();
+        if (const auto err = hook::C_HookContainer::Create(gameEntitySystem->getOnAddEntityFunc(), reinterpret_cast<void*>(hook::hkOnAddEntity)); err != MH_OK) {
+            dbg("Unable to create hook for C_GameEntitySystem::OnAddEntity! err = {}", err);
+            return false;
+        }
+
+        if (const auto err = hook::C_HookContainer::Create(gameEntitySystem->getOnRemoveEntityFunc(), reinterpret_cast<void*>(hook::hkOnRemoveEntity)); err != MH_OK) {
+            dbg("Unable to create hook for C_GameEntitySystem::OnRemoveEntity! err = {}", err);
+            return false;
+        }
+
+        return true;
+    }
+
     export bool InitializeHooks(const std::unique_ptr<C_ServiceContainer>& services)
     {
         C_ServiceLocator::Register<hook::C_HookDispatcher>(services->add<hook::C_HookDispatcher>().get());
@@ -127,6 +145,11 @@ namespace bootstrap
 
         if (!SetupWorldStateHooks()) {
             dbg("SetupWorldStateHooks got:err = Unable to setup world state hooks!");
+            return false;
+        }
+
+        if (!SetupEntityHooks()) {
+            dbg("SetupEntityHooks got:err = Unable to setup entity hooks!");
             return false;
         }
 

@@ -13,4 +13,9 @@
         return *reinterpret_cast<std::add_pointer_t<type>>(reinterpret_cast<uintptr_t>(this) + offset); \
     }
 
+#define OFFSET_INLINE(type, fieldName, offset) \
+    __attribute__((always_inline)) type fieldName() const { \
+        return reinterpret_cast<type>(reinterpret_cast<uintptr_t>(this) + offset); \
+    }
+
 #endif //DXX_DLC_OFFSET_H
